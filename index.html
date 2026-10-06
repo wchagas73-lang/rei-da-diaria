@@ -90,10 +90,6 @@
         .botao-editar { background: #3b82f6; color: white; padding: 8px 12px; font-size: 14px; width: auto; margin: 4px; }
         .botao-linha { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
         
-        .grupo-porcentagem { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0; }
-        .opcao-pct { padding: 12px 16px; border-radius: 10px; background: #2a2a2a; cursor: pointer; border: 2px solid transparent; font-size: 15px; }
-        .opcao-pct.selecionada { border-color: var(--dourado); background: #3a3a2a; font-weight: bold; color: var(--dourado); }
-        
         .item-lista { background: #252525; border-radius: 14px; padding: 16px; margin-bottom: 12px; }
         .item-cabecalho { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
         .acoes-item { display: flex; justify-content: flex-end; gap: 6px; flex-wrap: wrap; }
@@ -108,10 +104,12 @@
         .card-estimativa.visivel { display: block; animation: aparecer 0.3s ease; }
         .barra-progresso { height: 12px; background: #333; border-radius: 6px; overflow: hidden; margin: 8px 0; }
         .barra-preenchida { height: 100%; border-radius: 6px; transition: width 0.3s ease; }
-        .info-km { font-size: 13px; margin-top: 8px; color: #aaa; line-height: 1.5; }
+        .info-km { font-size: 13px; margin-top: 8px; color: #aaa; line-height: 1.6; }
+        .proxima-troca { margin-top: 10px; padding: 10px; background: #1f1f1f; border-radius: 8px; font-size: 14px; line-height: 1.7; }
+        .status-texto { font-weight: bold; margin-top: 6px; }
+        .oculto { display: none !important; }
         
         .form-edicao { background: #2d2d2d; border-radius: 12px; padding: 16px; margin-top: 10px; }
-        .oculto { display: none !important; }
         
         .rodape { text-align: center; padding: 24px; font-size: 13px; color: #666; margin-top: 20px; }
     </style>
@@ -170,7 +168,7 @@
         </div>
 
         <div class="cartao">
-            <h2 id="titulo-dia-atual"><i class="fas fa-calendar-day"></i> Resumo do Dia</h2>
+            <h2 id="titulo-dia-atual"><i class="fas fa-calendar-day"></i> Resumo — Hoje</h2>
             
             <div class="resumo-rapido">
                 <div class="bloco">
@@ -194,8 +192,9 @@
             <div class="linha"><span>Total Recebido</span><span class="valor v-verde" id="res-diaria">R$ 0,00</span></div>
             <div class="linha"><span>KM Rodado</span><span class="valor v-dourado" id="res-km-dia">0 km</span></div>
             <div class="linha"><span>Gastos do Dia</span><span class="valor v-vermelho" id="res-gastos">R$ 0,00</span></div>
+            <div class="linha"><span>Manutenção do Dia</span><span class="valor v-vermelho" id="res-manutencao-dia">R$ 0,00</span></div>
             <div class="linha"><span>Custo Fixo do Dia</span><span class="valor v-vermelho" id="res-fixo-dia">R$ 0,00</span></div>
-            <div class="linha"><span>Reserva Manutenção (<span id="res-pct">10</span>%)</span><span class="valor v-dourado" id="res-reserva">R$ 0,00</span></div>
+            <div class="linha"><span>Reserva (<span id="res-pct">10</span>%)</span><span class="valor v-dourado" id="res-reserva">R$ 0,00</span></div>
             <div class="linha" style="margin-top:12px; padding-top:12px; border-top:2px dashed #333;">
                 <strong>Lucro Real</strong>
                 <strong class="valor" id="res-livre">R$ 0,00</strong>
@@ -205,7 +204,7 @@
         <div class="cartao">
             <h2><i class="fas fa-calendar-week"></i> Esta Semana</h2>
             <div class="linha"><span>Total Recebido</span><span class="valor v-verde" id="semana-ganho">R$ 0,00</span></div>
-            <div class="linha"><span>Total Gastos</span><span class="valor v-vermelho" id="semana-gasto">R$ 0,00</span></div>
+            <div class="linha"><span>Total Gastos + Manutenção</span><span class="valor v-vermelho" id="semana-gasto">R$ 0,00</span></div>
             <div class="linha"><span>KM Rodado</span><span class="valor v-dourado" id="semana-km">0 km</span></div>
             <div class="linha"><strong>Lucro Semanal</strong><strong class="valor" id="semana-lucro">R$ 0,00</strong></div>
         </div>
@@ -214,7 +213,7 @@
             <h2><i class="fas fa-calendar-alt"></i> Este Mês</h2>
             <div class="linha"><span>Total Recebido</span><span class="valor v-verde" id="mes-ganho">R$ 0,00</span></div>
             <div class="linha"><span>Total Custos Fixos</span><span class="valor v-vermelho" id="mes-fixo">R$ 0,00</span></div>
-            <div class="linha"><span>Total Gastos Variáveis</span><span class="valor v-vermelho" id="mes-gasto">R$ 0,00</span></div>
+            <div class="linha"><span>Total Gastos + Manutenção</span><span class="valor v-vermelho" id="mes-gasto">R$ 0,00</span></div>
             <div class="linha"><span>KM Rodado</span><span class="valor v-dourado" id="mes-km">0 km</span></div>
             <div class="linha"><span>Reserva Acumulada</span><span class="valor v-dourado" id="mes-reserva">R$ 0,00</span></div>
             <div class="linha"><strong>Lucro Real Mensal</strong><strong class="valor" id="mes-lucro">R$ 0,00</strong></div>
@@ -224,7 +223,7 @@
             <h2><i class="fas fa-calendar"></i> Este Ano</h2>
             <div class="linha"><span>Total Recebido</span><span class="valor v-verde" id="ano-ganho">R$ 0,00</span></div>
             <div class="linha"><span>Total Custos Fixos</span><span class="valor v-vermelho" id="ano-fixo">R$ 0,00</span></div>
-            <div class="linha"><span>Total Gastos</span><span class="valor v-vermelho" id="ano-gasto">R$ 0,00</span></div>
+            <div class="linha"><span>Total Gastos + Manutenção</span><span class="valor v-vermelho" id="ano-gasto">R$ 0,00</span></div>
             <div class="linha"><span>KM Rodado Total</span><span class="valor v-dourado" id="ano-km">0 km</span></div>
             <div class="linha"><strong>Lucro Real Anual</strong><strong class="valor" id="ano-lucro">R$ 0,00</strong></div>
         </div>
@@ -234,7 +233,7 @@
             Coloque na poupança hoje mesmo. Não misture com os outros valores!
         </div>
         <div class="aviso-fixo">
-            ⚠️ <strong>CUSTO FIXO:</strong> Todo dia tem custo — IPVA, prestação, seguro, aluguel. O valor já está sendo descontado automaticamente!
+            ⚠️ <strong>CUSTO FIXO:</strong> Todo dia tem custo — IPVA, prestação, seguro, aluguel. Já descontado automaticamente!
         </div>
 
         <div class="cartao">
@@ -283,16 +282,16 @@
             <h2><i class="fas fa-home"></i> Custos Fixos Mensais</h2>
             <p style="font-size:14px; color:#aaa; margin-bottom:16px;">Valores que paga TODO MÊS — abatem no lucro automaticamente</p>
             
-            <label>IPVA / Licenciamento / Seguro Obrigatório (mensal)</label>
+            <label>IPVA / Licenciamento (mensal)</label>
             <input type="text" id="fixo-ipva" placeholder="Ex: 85,00">
             
-            <label>Prestação / Financiamento da Moto</label>
+            <label>Prestação da Moto</label>
             <input type="text" id="fixo-prestacao" placeholder="Ex: 350,00">
             
-            <label>Seguro / Proteção / Assistência</label>
+            <label>Seguro / Assistência</label>
             <input type="text" id="fixo-seguro" placeholder="Ex: 60,00">
             
-            <label>Aluguel / Garagem / Outro Fixo</label>
+            <label>Aluguel / Garagem</label>
             <input type="text" id="fixo-aluguel" placeholder="Ex: 200,00">
             
             <button class="botao botao-principal" onclick="salvarCustosFixos()">
@@ -313,7 +312,7 @@
             <h2><i class="fas fa-wrench"></i> Lançar Manutenção</h2>
             <label>Item / Serviço</label>
             <div class="autocomplete-wrapper">
-                <input type="text" id="manut-descricao" placeholder="Digite: oleo, pneu, freio... sem acento!">
+                <input type="text" id="manut-descricao" placeholder="Ex: Troca de óleo, Pneu...">
                 <div class="sugestoes oculto" id="sugestoes-manut"></div>
             </div>
 
@@ -323,6 +322,7 @@
                     <div class="barra-preenchida" id="barra-progresso"></div>
                 </div>
                 <div class="info-km" id="info-km-status"></div>
+                <div class="proxima-troca" id="proxima-troca-info"></div>
                 <div style="margin-top: 12px;">
                     <label style="font-size:14px; color:#aaa;">Editar meta de troca (km):</label>
                     <input type="number" id="meta-km-edit" placeholder="Ex: 3000" style="width:140px; display:inline-block; margin:0 10px;">
@@ -337,7 +337,7 @@
             <label>KM da moto na hora</label>
             <input type="number" id="manut-km" placeholder="Ex: 12500">
             <button class="botao botao-verde" onclick="registrarManutencao()">
-                <i class="fas fa-plus"></i> Registrar — Salva Automático ✅
+                <i class="fas fa-plus"></i> Registrar — Salva ✅
             </button>
         </div>
         <div class="cartao">
@@ -353,7 +353,7 @@
                 </div>
                 <div class="bloco">
                     <div class="valor v-dourado" id="manut-km-atual">0 km</div>
-                    <div class="etiqueta">Total rodado</div>
+                    <div class="etiqueta">Último km</div>
                 </div>
             </div>
             <div id="lista-manut"></div>
@@ -369,11 +369,12 @@
             <select id="gasto-cat">
                 <option value="Alimentação">🍔 Alimentação / Lanche</option>
                 <option value="Acessórios">🎒 Acessórios / Equipamentos</option>
+                <option value="Combustível">⛽ Combustível</option>
                 <option value="Outros">📝 Outros Gastos</option>
             </select>
 
             <label>Descrição <small style="color:#888;">(opcional)</small></label>
-            <input type="text" id="gasto-desc" placeholder="Deixe em branco se não quiser descrever">
+            <input type="text" id="gasto-desc" placeholder="Deixe em branco se não quiser">
             
             <label>Valor R$</label>
             <input type="text" id="gasto-valor" placeholder="Ex: 35,90">
@@ -382,7 +383,7 @@
             <input type="date" id="gasto-data">
             
             <button class="botao botao-vermelho" onclick="registrarGasto()">
-                <i class="fas fa-minus-circle"></i> Lançar — Salva Automático ✅
+                <i class="fas fa-minus-circle"></i> Lançar — Salva ✅
             </button>
         </div>
         <div class="cartao">
@@ -410,7 +411,7 @@
             <label>KM Final</label>
             <input type="number" id="km-final" placeholder="Ex: 12650">
             <button class="botao botao-principal" onclick="registrarKm()">
-                <i class="fas fa-flag-checkered"></i> Registrar — Salva Automático ✅
+                <i class="fas fa-flag-checkered"></i> Registrar — Salva ✅
             </button>
             <div class="linha" style="margin-top: 16px;">
                 <span>Rodado Hoje</span>
@@ -459,8 +460,8 @@
                 <p style="font-size:14px; line-height:1.8;">
                     💡 <strong>Dicas:</strong><br>
                     • Baixe uma vez por mês e guarde no Google Drive ou WhatsApp<br>
-                    • Restaurar SUBSTITUI tudo que tem agora — confirme antes!<br>
-                    • Os dados ficam salvos no próprio navegador do celular
+                    • Restaurar SUBSTITUI tudo — confirme antes!<br>
+                    • Os dados ficam salvos no próprio navegador
                 </p>
             </div>
         </div>
@@ -469,7 +470,7 @@
 </main>
 
 <footer class="rodape">
-    <p>👑 Rei da Diária © 2026 — Tudo Salvo Automaticamente • Histórico Permanente</p>
+    <p>👑 Rei da Diária © 2026 — Tudo Salvo Automaticamente</p>
 </footer>
 
 <script>
@@ -482,7 +483,9 @@ const ITENS_MANUTENCAO = {
     "Pneu traseiro": { km: 15000, tempoMeses: null, categoria: "Pneus" },
     "Pastilha de freio dianteiro": { km: 10000, tempoMeses: null, categoria: "Freios" },
     "Kit relação (coroa/pinhão/corrente)": { km: 25000, tempoMeses: null, categoria: "Transmissão" },
-    "Revisão geral preventiva": { km: 5000, tempoMeses: 6, categoria: "Revisão" }
+    "Revisão geral preventiva": { km: 5000, tempoMeses: 6, categoria: "Revisão" },
+    "Corrente": { km: 12000, tempoMeses: null, categoria: "Transmissão" },
+    "Embreagem": { km: 20000, tempoMeses: null, categoria: "Motor" }
 };
 
 let itemSelecionadoAtual = null;
@@ -512,8 +515,13 @@ function mesAno(dt) {
 function ano(dt) {
     return dt.substring(0, 4);
 }
+function somarRodadoAte(dataLimite = dataHoje()) {
+    return dados.kmLancados
+        .filter(k => k.data <= dataLimite)
+        .reduce((s, k) => s + k.rodado, 0);
+}
 
-// ========== SALVAMENTO AUTOMÁTICO ==========
+// ========== SALVAMENTO ==========
 function carregarDados() {
     return {
         diarias: JSON.parse(localStorage.getItem('rd-diarias') || '[]'),
@@ -531,13 +539,9 @@ function salvarDados(chave, valor) {
 }
 let dados = carregarDados();
 
-// ========== CÓPIA DE SEGURANÇA ==========
+// ========== CÓPIA ==========
 function baixarCopia() {
-    const tudo = {
-        data: new Date().toLocaleString('pt-BR'),
-        versao: '1.0',
-        dados: dados
-    };
+    const tudo = { data: new Date().toLocaleString('pt-BR'), versao: '1.0', dados };
     const blob = new Blob([JSON.stringify(tudo, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -545,40 +549,23 @@ function baixarCopia() {
     a.download = `MTZ-ReiDaDiaria-${dataHoje()}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    alert('✅ Cópia baixada! Guarde bem esse arquivo!');
+    alert('✅ Cópia baixada! Guarde bem!');
 }
 function restaurarCopia(event) {
-    const arquivo = event.target.files[0];
-    if (!arquivo) return;
-    if (!confirm('⚠️ ATENÇÃO: Isso vai SUBSTITUIR todos os dados atuais! Tem certeza?')) {
-        event.target.value = '';
-        return;
-    }
+    if (!confirm('⚠️ Vai SUBSTITUIR tudo? Tem certeza?')) return;
+    const arq = event.target.files[0]; if (!arq) return;
     const leitor = new FileReader();
-    leitor.onload = (e) => {
+    leitor.onload = e => {
         try {
-            const conteudo = JSON.parse(e.target.result);
-            if (!conteudo.dados) throw new Error('Arquivo inválido');
-            dados = conteudo.dados;
-            salvarDados('rd-diarias', dados.diarias);
-            salvarDados('rd-manut', dados.manutencoes);
-            salvarDados('rd-gastos', dados.gastos);
-            salvarDados('rd-km', dados.kmLancados);
-            salvarDados('rd-trocas', dados.ultimasTrocas);
-            salvarDados('rd-metas', dados.metasPersonalizadas);
-            salvarDados('rd-pct', dados.pctReserva);
-            salvarDados('rd-fixos', dados.custosFixos);
-            atualizarResumo();
-            renderizarDiarias();
-            renderizarManutencoes();
-            renderizarGastos();
-            renderizarKm();
-            alert('✅ Dados restaurados com sucesso!');
-        } catch (erro) {
-            alert('❌ Arquivo inválido! Verifique se escolheu o arquivo certo.');
-        }
+            const c = JSON.parse(e.target.result);
+            if (!c.dados) throw '';
+            dados = c.dados;
+            Object.entries(dados).forEach(([k,v]) => salvarDados(`rd-${k}`, v));
+            atualizarResumo(); renderizarDiarias(); renderizarManutencoes(); renderizarGastos(); renderizarKm();
+            alert('✅ Restaurado!');
+        } catch { alert('❌ Arquivo inválido!'); }
     };
-    leitor.readAsText(arquivo);
+    leitor.readAsText(arq);
     event.target.value = '';
 }
 
@@ -603,8 +590,7 @@ document.getElementById('diaria-data').value = dataHoje();
 document.getElementById('manut-data').value = dataHoje();
 document.getElementById('gasto-data').value = dataHoje();
 document.getElementById('data-selecionada').value = dataHoje();
-
-document.getElementById('data-selecionada').addEventListener('change', (e) => {
+document.getElementById('data-selecionada').addEventListener('change', e => {
     dataVisualizada = e.target.value;
     atualizarResumo();
 });
@@ -630,218 +616,155 @@ function salvarCustosFixos() {
         aluguel: parseDinheiro(document.getElementById('fixo-aluguel').value)
     };
     salvarDados('rd-fixos', dados.custosFixos);
-    calcularTotalFixos();
-    atualizarResumo();
-    alert('✅ Custos fixos salvos! Já descontando automaticamente!');
+    calcularTotalFixos(); atualizarResumo();
+    alert('✅ Salvo! Já descontando!');
 }
 function totalFixoMensal() {
     const f = dados.custosFixos;
-    return (f.ipva || 0) + (f.prestacao || 0) + (f.seguro || 0) + (f.aluguel || 0);
+    return (f.ipva||0)+(f.prestacao||0)+(f.seguro||0)+(f.aluguel||0);
 }
 function calcularTotalFixos() {
-    const totalMes = totalFixoMensal();
-    const porDia = totalMes / 30;
-    document.getElementById('total-fixo-mes').textContent = formatarDinheiro(totalMes);
-    document.getElementById('fixo-por-dia').textContent = formatarDinheiro(porDia);
+    const m = totalFixoMensal();
+    document.getElementById('total-fixo-mes').textContent = formatarDinheiro(m);
+    document.getElementById('fixo-por-dia').textContent = formatarDinheiro(m/30);
 }
 
 // ========== DIÁRIA ==========
 function registrarDiaria() {
-    const data = document.getElementById('diaria-data').value;
-    const valor = parseDinheiro(document.getElementById('diaria-valor').value);
-    if (!data || valor <= 0) { alert('Preencha tudo!'); return; }
-    dados.diarias.unshift({ data, valor, id: Date.now() });
+    const d = document.getElementById('diaria-data').value;
+    const v = parseDinheiro(document.getElementById('diaria-valor').value);
+    if (!d || v<=0) { alert('Preencha tudo!'); return; }
+    dados.diarias.unshift({id:Date.now(), data:d, valor:v});
     salvarDados('rd-diarias', dados.diarias);
     document.getElementById('diaria-valor').value = '';
-    renderizarDiarias();
-    atualizarResumo();
-    alert('✅ Salvo! Guarde a reserva na poupança! 💰');
+    renderizarDiarias(); atualizarResumo();
+    alert('✅ Salvo! Guarde a reserva! 💰');
 }
 function renderizarDiarias() {
     const lista = document.getElementById('lista-diarias');
-    const doDia = dados.diarias.filter(d => d.data === dataVisualizada);
-    const total = doDia.reduce((s, d) => s + d.valor, 0);
+    const total = dados.diarias.reduce((s,d)=>s+d.valor,0);
     document.getElementById('diaria-total').textContent = formatarDinheiro(total);
-    document.getElementById('diaria-qtd').textContent = doDia.length;
-    document.getElementById('diaria-media').textContent = doDia.length ? formatarDinheiro(total / doDia.length) : 'R$ 0,00';
-    
-    if (!dados.diarias.length) {
-        lista.innerHTML = '<p style="color:#666; text-align:center;">Nenhuma diária lançada</p>';
-        return;
-    }
+    document.getElementById('diaria-qtd').textContent = dados.diarias.length;
+    document.getElementById('diaria-media').textContent = dados.diarias.length ? formatarDinheiro(total/dados.diarias.length) : 'R$ 0,00';
+    if (!dados.diarias.length) { lista.innerHTML = '<p style="color:#666;text-align:center;">Nenhuma diária</p>'; return; }
     lista.innerHTML = dados.diarias.map(d => {
-        const editando = idEdicaoAtivo === d.id;
-        return `
-        <div class="item-lista">
-            ${!editando ? `
-            <div class="item-cabecalho">
-                <div>
-                    <strong>${formatarDinheiro(d.valor)}</strong>
-                    <div style="font-size:13px; color:#888;">${d.data}</div>
-                </div>
-                <div class="acoes-item">
-                    <button class="botao botao-editar botao-pequeno" onclick="editarDiaria(${d.id})"><i class="fas fa-edit"></i> Editar</button>
-                    <button class="botao botao-vermelho botao-pequeno" onclick="excluirDiaria(${d.id})"><i class="fas fa-trash"></i></button>
-                </div>
-            </div>
-            ` : `
-            <div class="form-edicao">
-                <label style="font-size:14px;">Data</label>
-                <input type="date" id="edt-diaria-data-${d.id}" value="${d.data}">
-                <label style="font-size:14px;">Valor R$</label>
-                <input type="text" id="edt-diaria-valor-${d.id}" value="${d.valor.toFixed(2).replace('.', ',')}">
-                <div class="botao-linha">
-                    <button class="botao botao-verde botao-pequeno" onclick="salvarEdicaoDiaria(${d.id})"><i class="fas fa-check"></i> Salvar</button>
-                    <button class="botao botao-vermelho botao-pequeno" onclick="cancelarEdicao()"><i class="fas fa-times"></i> Cancelar</button>
-                </div>
-            </div>
-            `}
-        </div>`;
+        const edit = idEdicaoAtivo === d.id;
+        return `<div class="item-lista">${!edit ? `
+        <div class="item-cabecalho"><div><strong>${formatarDinheiro(d.valor)}</strong><div style="font-size:13px;color:#888;">${d.data}</div></div>
+        <div class="acoes-item"><button class="botao botao-editar botao-pequeno" onclick="editarDiaria(${d.id})"><i class="fas fa-edit"></i></button>
+        <button class="botao botao-vermelho botao-pequeno" onclick="excluirDiaria(${d.id})"><i class="fas fa-trash"></i></button></div></div>` : `
+        <div class="form-edicao"><label>Data</label><input type="date" id="edt-dd-${d.id}" value="${d.data}">
+        <label>Valor</label><input type="text" id="edt-dv-${d.id}" value="${d.valor.toFixed(2).replace('.',',')}">
+        <div class="botao-linha"><button class="botao botao-verde botao-pequeno" onclick="salvarEdDiaria(${d.id})">Salvar</button>
+        <button class="botao botao-vermelho botao-pequeno" onclick="cancelarEdicao()">Cancelar</button></div></div>`}</div>`;
     }).join('');
 }
 function editarDiaria(id) { idEdicaoAtivo = id; renderizarDiarias(); }
-function cancelarEdicao() { idEdicaoAtivo = null; renderizarDiarias(); renderizarManutencoes(); renderizarGastos(); renderizarKm(); }
-function salvarEdicaoDiaria(id) {
-    const idx = dados.diarias.findIndex(d => d.id === id);
-    if (idx === -1) return;
-    const novaData = document.getElementById(`edt-diaria-data-${id}`).value;
-    const novoValor = parseDinheiro(document.getElementById(`edt-diaria-valor-${id}`).value);
-    if (!novaData || novoValor <= 0) { alert('Dados inválidos!'); return; }
-    dados.diarias[idx] = { ...dados.diarias[idx], data: novaData, valor: novoValor };
-    salvarDados('rd-diarias', dados.diarias);
-    idEdicaoAtivo = null;
-    renderizarDiarias();
-    atualizarResumo();
-    alert('✅ Atualizado!');
+function salvarEdDiaria(id) {
+    const idx = dados.diarias.findIndex(d=>d.id===id);
+    dados.diarias[idx] = {id, data:document.getElementById(`edt-dd-${id}`).value, valor:parseDinheiro(document.getElementById(`edt-dv-${id}`).value)};
+    salvarDados('rd-diarias', dados.diarias); idEdicaoAtivo=null; renderizarDiarias(); atualizarResumo();
 }
 function excluirDiaria(id) {
-    if (confirm('Excluir?')) {
-        dados.diarias = dados.diarias.filter(d => d.id !== id);
-        salvarDados('rd-diarias', dados.diarias);
-        renderizarDiarias();
-        atualizarResumo();
-    }
+    if (confirm('Excluir?')) { dados.diarias = dados.diarias.filter(d=>d.id!==id); salvarDados('rd-diarias', dados.diarias); renderizarDiarias(); atualizarResumo(); }
 }
 
-// ========== MANUTENÇÃO — SEM ACENTO + HISTÓRICO COM ESTIMATIVA ==========
+// ========== MANUTENÇÃO ==========
 const inputManut = document.getElementById('manut-descricao');
 const caixaSugestoes = document.getElementById('sugestoes-manut');
 const cardEstimativa = document.getElementById('card-estimativa');
 
 inputManut.addEventListener('input', () => {
-    const texto = inputManut.value.trim().toLowerCase()
-        .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    
-    if (texto.length < 1) {
-        caixaSugestoes.classList.add('oculto');
-        cardEstimativa.classList.remove('visivel');
-        itemSelecionadoAtual = null;
-        return;
-    }
-    
-    const itensFiltrados = Object.keys(ITENS_MANUTENCAO).filter(nome => {
-        const nomeSemAcento = nome.toLowerCase()
-            .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-        return nomeSemAcento.includes(texto);
-    });
-    
-    if (itensFiltrados.length === 0) {
-        caixaSugestoes.classList.add('oculto');
-        cardEstimativa.classList.remove('visivel');
-        return;
-    }
-    
+    const texto = inputManut.value.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    if (texto.length < 1) { caixaSugestoes.classList.add('oculto'); cardEstimativa.classList.remove('visivel'); itemSelecionadoAtual=null; return; }
+    const filtro = Object.keys(ITENS_MANUTENCAO).filter(nome => 
+        nome.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes(texto)
+    );
+    if (!filtro.length) { caixaSugestoes.classList.add('oculto'); return; }
     caixaSugestoes.innerHTML = '';
-    itensFiltrados.forEach(nome => {
-        const div = document.createElement('div');
-        div.className = 'sugestao';
-        div.textContent = nome;
-        div.onclick = () => {
-            inputManut.value = nome;
-            itemSelecionadoAtual = nome;
-            caixaSugestoes.classList.add('oculto');
-            atualizarEstimativa();
-        };
+    filtro.forEach(nome => {
+        const div = document.createElement('div'); div.className='sugestao'; div.textContent=nome;
+        div.onclick = () => { inputManut.value=nome; itemSelecionadoAtual=nome; caixaSugestoes.classList.add('oculto'); atualizarEstimativa(); };
         caixaSugestoes.appendChild(div);
     });
     caixaSugestoes.classList.remove('oculto');
 });
-
-document.addEventListener('click', (e) => {
-    if (!e.target.closest('.autocomplete-wrapper')) {
-        caixaSugestoes.classList.add('oculto');
-    }
-});
+document.addEventListener('click', e => { if (!e.target.closest('.autocomplete-wrapper')) caixaSugestoes.classList.add('oculto'); });
 
 function atualizarEstimativa() {
-    if (!itemSelecionadoAtual) {
-        cardEstimativa.classList.remove('visivel');
-        return;
-    }
-    
+    if (!itemSelecionadoAtual) { cardEstimativa.classList.remove('visivel'); return; }
     const itemPadrao = ITENS_MANUTENCAO[itemSelecionadoAtual];
     const metaKm = dados.metasPersonalizadas[itemSelecionadoAtual] || itemPadrao.km;
-    const ultimaTroca = dados.ultimasTrocas[itemSelecionadoAtual];
-    const ultimoKm = ultimaTroca?.km || 0;
-    const totalRodado = dados.kmLancados.reduce((s, l) => s + (l.final - l.inicial), 0);
-    const desdeUltima = totalRodado - ultimoKm;
+    const ultima = dados.ultimasTrocas[itemSelecionadoAtual];
+    const totalRodado = somarRodadoAte();
+    const desdeUltima = ultima ? totalRodado - ultima.km : totalRodado;
     const porcentagem = Math.min(100, Math.round((desdeUltima / metaKm) * 100));
+    const falta = metaKm - desdeUltima;
     
-    let statusTexto = '';
-    let corBarra = '';
-    if (porcentagem >= 90) {
-        statusTexto = `🔴 URGENTE! Faltam só ${metaKm - desdeUltima} km!`;
-        corBarra = 'var(--vermelho)';
-    } else if (porcentagem >= 70) {
-        statusTexto = `🟡 Atenção: ${porcentagem}% — faltam ${metaKm - desdeUltima} km`;
-        corBarra = 'var(--amarelo)';
-    } else {
-        statusTexto = `🟢 Tudo certo: ${porcentagem}% — faltam ${metaKm - desdeUltima} km`;
-        corBarra = 'var(--verde)';
-    }
+    let cor, status;
+    if (porcentagem >= 90) { cor='var(--vermelho)'; status=`🔴 URGENTE! Faltam ${falta} km!`; }
+    else if (porcentagem >= 70) { cor='var(--amarelo)'; status=`🟡 Atenção: ${porcentagem}% — faltam ${falta} km`; }
+    else { cor='var(--verde)'; status=`🟢 Tudo certo: ${porcentagem}% — faltam ${falta} km`; }
     
     document.getElementById('texto-estimativa').innerHTML = `<strong>${itemSelecionadoAtual}</strong><br>Meta: ${metaKm.toLocaleString('pt-BR')} km`;
     document.getElementById('barra-progresso').style.width = `${porcentagem}%`;
-    document.getElementById('barra-progresso').style.background = corBarra;
+    document.getElementById('barra-progresso').style.background = cor;
     document.getElementById('info-km-status').textContent = desdeUltima > 0 
         ? `Rodado desde última troca: ${desdeUltima.toLocaleString('pt-BR')} km` 
-        : 'Ainda sem registro de rodagem desde a última troca';
-    document.getElementById('meta-km-edit').value = metaKm;
+        : 'Ainda sem registro de rodagem';
     
+    let proximaTexto = '';
+    if (ultima) {
+        const proxKm = ultima.km + metaKm;
+        let proxData = '';
+        if (itemPadrao.tempoMeses) {
+            const dt = new Date(ultima.data + 'T00:00:00');
+            dt.setMonth(dt.getMonth() + itemPadrao.tempoMeses);
+            proxData = dt.toLocaleDateString('pt-BR');
+        }
+        proximaTexto = `📅 Próxima troca estimada:<br>• ${proxKm.toLocaleString('pt-BR')} km` + (proxData ? `<br>• ${proxData}` : '');
+    } else {
+        proximaTexto = `⚠️ Registre uma troca primeiro para ver a previsão`;
+    }
+    document.getElementById('proxima-troca-info').innerHTML = proximaTexto;
+    document.getElementById('meta-km-edit').value = metaKm;
     cardEstimativa.classList.add('visivel');
 }
-
 function salvarMetaKm() {
     if (!itemSelecionadoAtual) return;
-    const novaMeta = parseInt(document.getElementById('meta-km-edit').value);
-    if (!novaMeta || novaMeta <= 0) { alert('Digite um valor válido!'); return; }
-    dados.metasPersonalizadas[itemSelecionadoAtual] = novaMeta;
-    salvarDados('rd-metas', dados.metasPersonalizadas);
+    const v = parseInt(document.getElementById('meta-km-edit').value);
+    if (!v || v<=0) { alert('Valor inválido!'); return; }
+    dados.metasPersonalizadas[itemSelecionadoAtual] = v;    salvarDados('rd-metas', dados.metasPersonalizadas);
     atualizarEstimativa();
-    alert('✅ Meta atualizada!');
+    alert(`✅ Meta atualizada: ${v.toLocaleString('pt-BR')} km`);
 }
 
 function registrarManutencao() {
-    const descricao = inputManut.value.trim();
+    const desc = document.getElementById('manut-descricao').value.trim();
     const valor = parseDinheiro(document.getElementById('manut-valor').value);
     const data = document.getElementById('manut-data').value;
     const km = parseInt(document.getElementById('manut-km').value);
     
-    if (!descricao || valor <= 0 || !data || !km) {
+    if (!desc || valor <= 0 || !data || !km) {
         alert('Preencha todos os campos!');
         return;
     }
     
-    dados.manutencoes.unshift({ 
-        id: Date.now(), descricao, valor, data, km, 
-        categoria: ITENS_MANUTENCAO[descricao]?.categoria || 'Geral'
-    });
+    const registro = {
+        id: Date.now(),
+        descricao: desc,
+        valor: valor,
+        data: data,
+        km: km
+    };
     
-    dados.ultimasTrocas[descricao] = { data, km };
+    dados.manutencoes.unshift(registro);
+    dados.ultimasTrocas[desc] = { data: data, km: km };
+    
     salvarDados('rd-manut', dados.manutencoes);
     salvarDados('rd-trocas', dados.ultimasTrocas);
     
-    inputManut.value = '';
+    document.getElementById('manut-descricao').value = '';
     document.getElementById('manut-valor').value = '';
     document.getElementById('manut-km').value = '';
     cardEstimativa.classList.remove('visivel');
@@ -849,172 +772,240 @@ function registrarManutencao() {
     
     renderizarManutencoes();
     atualizarResumo();
-    alert('✅ Manutenção registrada!');
+    alert('✅ Registrado! Histórico atualizado!');
 }
 
 function renderizarManutencoes() {
     const lista = document.getElementById('lista-manut');
     const total = dados.manutencoes.reduce((s, m) => s + m.valor, 0);
-    const ultimoRegistro = dados.manutencoes[dados.manutencoes.length - 1];
+    
     document.getElementById('manut-total').textContent = formatarDinheiro(total);
     document.getElementById('manut-qtd').textContent = dados.manutencoes.length;
-    document.getElementById('manut-km-atual').textContent = ultimoRegistro?.km ? `${ultimoRegistro.km.toLocaleString('pt-BR')} km` : '0 km';
+    const ultimoKm = dados.manutencoes.length > 0 ? dados.manutencoes[0].km : 0;
+    document.getElementById('manut-km-atual').textContent = `${ultimoKm.toLocaleString('pt-BR')} km`;
     
     if (!dados.manutencoes.length) {
-        lista.innerHTML = '<p style="color:#666; text-align:center;">Nenhuma manutenção lançada</p>';
+        lista.innerHTML = '<p style="color:#666;text-align:center;">Nenhum registro de manutenção</p>';
         return;
     }
     
     lista.innerHTML = dados.manutencoes.map(m => {
-        const editando = idEdicaoAtivo === m.id;
-        return `
-        <div class="item-lista">
-            ${!editando ? `
+        const edit = idEdicaoAtivo === m.id;
+        return `<div class="item-lista">${!edit ? `
             <div class="item-cabecalho">
                 <div>
                     <strong>${m.descricao}</strong>
-                    <div style="font-size:13px; color:#888;">${m.data} • ${m.km.toLocaleString('pt-BR')} km</div>
-                    <div class="valor v-verde">${formatarDinheiro(m.valor)}</div>
+                    <div style="font-size:13px;color:#888;">${m.data} · ${m.km.toLocaleString('pt-BR')} km</div>
+                    <div class="valor v-verde" style="margin-top:4px;">${formatarDinheiro(m.valor)}</div>
                 </div>
                 <div class="acoes-item">
-                    <button class="botao botao-editar botao-pequeno" onclick="editarManutencao(${m.id})"><i class="fas fa-edit"></i></button>
-                    <button class="botao botao-vermelho botao-pequeno" onclick="excluirManutencao(${m.id})"><i class="fas fa-trash"></i></button>
+                    <button class="botao botao-editar botao-pequeno" onclick="editarManutencao(${m.id})">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="botao botao-vermelho botao-pequeno" onclick="excluirManutencao(${m.id})">
+                        <i class="fas fa-trash"></i>
+                    </button>
                 </div>
-            </div>
-            ` : `
+            </div>` : `
             <div class="form-edicao">
-                <label style="font-size:14px;">Descrição</label>
-                <input type="text" id="edt-manut-desc-${m.id}" value="${m.descricao}">
-                <label style="font-size:14px;">Valor R$</label>
-                <input type="text" id="edt-manut-val-${m.id}" value="${m.valor.toFixed(2).replace('.', ',')}">
-                <label style="font-size:14px;">Data</label>
-                <input type="date" id="edt-manut-data-${m.id}" value="${m.data}">
-                <label style="font-size:14px;">KM</label>
-                <input type="number" id="edt-manut-km-${m.id}" value="${m.km}">
+                <label>Descrição</label>
+                <input type="text" id="edt-md-${m.id}" value="${m.descricao}">
+                <label>Valor R$</label>
+                <input type="text" id="edt-mv-${m.id}" value="${m.valor.toFixed(2).replace('.', ',')}">
+                <label>Data</label>
+                <input type="date" id="edt-mda-${m.id}" value="${m.data}">
+                <label>KM</label>
+                <input type="number" id="edt-mk-${m.id}" value="${m.km}">
                 <div class="botao-linha">
-                    <button class="botao botao-verde botao-pequeno" onclick="salvarEdicaoManutencao(${m.id})"><i class="fas fa-check"></i> Salvar</button>
-                    <button class="botao botao-vermelho botao-pequeno" onclick="cancelarEdicao()"><i class="fas fa-times"></i> Cancelar</button>
+                    <button class="botao botao-verde botao-pequeno" onclick="salvarEdManutencao(${m.id})">Salvar</button>
+                    <button class="botao botao-vermelho botao-pequeno" onclick="cancelarEdicao()">Cancelar</button>
                 </div>
-            </div>
-            `}
+            </div>`}
         </div>`;
     }).join('');
+    
+    atualizarAvisosManutencao();
 }
 
-function editarManutencao(id) { idEdicaoAtivo = id; renderizarManutencoes(); }
-function salvarEdicaoManutencao(id) {
+function editarManutencao(id) {
+    idEdicaoAtivo = id;
+    renderizarManutencoes();
+}
+
+function salvarEdManutencao(id) {
     const idx = dados.manutencoes.findIndex(m => m.id === id);
-    if (idx === -1) return;
-    const desc = document.getElementById(`edt-manut-desc-${id}`).value.trim();
-    const val = parseDinheiro(document.getElementById(`edt-manut-val-${id}`).value);
-    const dt = document.getElementById(`edt-manut-data-${id}`).value;
-    const km = parseInt(document.getElementById(`edt-manut-km-${id}`).value);
-    if (!desc || val <= 0 || !dt || !km) { alert('Preencha tudo!'); return; }
-    dados.manutencoes[idx] = { ...dados.manutencoes[idx], descricao: desc, valor: val, data: dt, km };
-    dados.ultimasTrocas[desc] = { data: dt, km };
+    dados.manutencoes[idx] = {
+        id: id,
+        descricao: document.getElementById(`edt-md-${id}`).value,
+        valor: parseDinheiro(document.getElementById(`edt-mv-${id}`).value),
+        data: document.getElementById(`edt-mda-${id}`).value,
+        km: parseInt(document.getElementById(`edt-mk-${id}`).value)
+    };
+    
+    const desc = dados.manutencoes[idx].descricao;
+    dados.ultimasTrocas[desc] = {
+        data: dados.manutencoes[idx].data,
+        km: dados.manutencoes[idx].km
+    };
+    
     salvarDados('rd-manut', dados.manutencoes);
     salvarDados('rd-trocas', dados.ultimasTrocas);
     idEdicaoAtivo = null;
     renderizarManutencoes();
     atualizarResumo();
-    alert('✅ Atualizado!');
 }
+
 function excluirManutencao(id) {
-    if (confirm('Excluir?')) {
-        dados.manutencoes = dados.manutencoes.filter(m => m.id !== id);
-        salvarDados('rd-manut', dados.manutencoes);
-        renderizarManutencoes();
-        atualizarResumo();
+    if (!confirm('Excluir este registro?')) return;
+    const excluido = dados.manutencoes.find(m => m.id === id);
+    dados.manutencoes = dados.manutencoes.filter(m => m.id !== id);
+    
+    const aindaExiste = dados.manutencoes.some(m => m.descricao === excluido.descricao);
+    if (!aindaExiste) {
+        delete dados.ultimasTrocas[excluido.descricao];
+    } else {
+        const ultimo = dados.manutencoes.filter(m => m.descricao === excluido.descricao)[0];
+        dados.ultimasTrocas[excluido.descricao] = { data: ultimo.data, km: ultimo.km };
+    }
+    
+    salvarDados('rd-manut', dados.manutencoes);
+    salvarDados('rd-trocas', dados.ultimasTrocas);
+    renderizarManutencoes();
+    atualizarResumo();
+}
+
+function atualizarAvisosManutencao() {
+    const container = document.getElementById('avisos-manutencao');
+    const avisos = [];
+    const totalRodado = somarRodadoAte();
+    
+    for (const [nome, itemPadrao] of Object.entries(ITENS_MANUTENCAO)) {
+        const metaKm = dados.metasPersonalizadas[nome] || itemPadrao.km;
+        const ultima = dados.ultimasTrocas[nome];
+        if (!ultima) continue;
+        
+        const desdeUltima = totalRodado - ultima.km;
+        const porcentagem = Math.round((desdeUltima / metaKm) * 100);
+        const falta = metaKm - desdeUltima;
+        
+        if (porcentagem >= 90) {
+            avisos.push(`🔴 <strong>${nome}</strong>: ${porcentagem}% — faltam ${falta.toLocaleString('pt-BR')} km!`);
+        } else if (porcentagem >= 70) {
+            avisos.push(`🟡 <strong>${nome}</strong>: ${porcentagem}% — faltam ${falta.toLocaleString('pt-BR')} km`);
+        }
+    }
+    
+    if (avisos.length === 0) {
+        container.innerHTML = '<p style="color:#888;text-align:center;padding:10px;">Tudo em ordem! 🏍️✅</p>';
+        document.getElementById('aviso-topo').classList.add('oculto');
+    } else {
+        container.innerHTML = avisos.map(a => `<div style="padding:8px 0; border-bottom:1px solid #333;">${a}</div>`).join('');
+        document.getElementById('texto-aviso-topo').innerHTML = avisos[0];
+        document.getElementById('aviso-topo').classList.remove('oculto');
     }
 }
 
-// ========== GASTOS ==========
+// ========== OUTROS GASTOS ==========
 function registrarGasto() {
     const categoria = document.getElementById('gasto-cat').value;
-    const descricao = document.getElementById('gasto-desc').value.trim() || categoria;
+    const desc = document.getElementById('gasto-desc').value.trim() || categoria;
     const valor = parseDinheiro(document.getElementById('gasto-valor').value);
     const data = document.getElementById('gasto-data').value;
     
-    if (!data || valor <= 0) { alert('Preencha tudo!'); return; }
+    if (valor <= 0 || !data) {
+        alert('Preencha valor e data!');
+        return;
+    }
     
-    dados.gastos.unshift({ id: Date.now(), categoria, descricao, valor, data });
+    dados.gastos.unshift({
+        id: Date.now(),
+        categoria: categoria,
+        descricao: desc,
+        valor: valor,
+        data: data
+    });
+    
     salvarDados('rd-gastos', dados.gastos);
-    
-    document.getElementById('gasto-desc').value = '';
     document.getElementById('gasto-valor').value = '';
-    
+    document.getElementById('gasto-desc').value = '';
     renderizarGastos();
     atualizarResumo();
-    alert('✅ Gasto lançado!');
+    alert('✅ Lançado!');
 }
 
 function renderizarGastos() {
     const lista = document.getElementById('lista-gastos');
     const total = dados.gastos.reduce((s, g) => s + g.valor, 0);
+    
     document.getElementById('gastos-total').textContent = formatarDinheiro(total);
     document.getElementById('gastos-qtd').textContent = dados.gastos.length;
     
     if (!dados.gastos.length) {
-        lista.innerHTML = '<p style="color:#666; text-align:center;">Nenhum gasto lançado</p>';
+        lista.innerHTML = '<p style="color:#666;text-align:center;">Nenhum gasto registrado</p>';
         return;
     }
     
     lista.innerHTML = dados.gastos.map(g => {
-        const editando = idEdicaoAtivo === g.id;
-        return `
-        <div class="item-lista">
-            ${!editando ? `
+        const edit = idEdicaoAtivo === g.id;
+        return `<div class="item-lista">${!edit ? `
             <div class="item-cabecalho">
                 <div>
-                    <strong>${g.categoria}</strong>
-                    <div style="font-size:13px; color:#888;">${g.descricao} • ${g.data}</div>
-                    <div class="valor v-vermelho">${formatarDinheiro(g.valor)}</div>
+                    <strong>${g.descricao}</strong>
+                    <div style="font-size:13px;color:#888;">${g.data} · ${g.categoria}</div>
+                    <div class="valor v-vermelho" style="margin-top:4px;">${formatarDinheiro(g.valor)}</div>
                 </div>
                 <div class="acoes-item">
-                    <button class="botao botao-editar botao-pequeno" onclick="editarGasto(${g.id})"><i class="fas fa-edit"></i></button>
-                    <button class="botao botao-vermelho botao-pequeno" onclick="excluirGasto(${g.id})"><i class="fas fa-trash"></i></button>
+                    <button class="botao botao-editar botao-pequeno" onclick="editarGasto(${g.id})">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="botao botao-vermelho botao-pequeno" onclick="excluirGasto(${g.id})">
+                        <i class="fas fa-trash"></i>
+                    </button>
                 </div>
-            </div>
-            ` : `
+            </div>` : `
             <div class="form-edicao">
-                <label style="font-size:14px;">Categoria</label>
-                <select id="edt-gasto-cat-${g.id}">
-                    <option ${g.categoria==='Alimentação'?'selected':''}>🍔 Alimentação / Lanche</option>
-                    <option ${g.categoria==='Acessórios'?'selected':''}>🎒 Acessórios / Equipamentos</option>
-                    <option ${g.categoria==='Outros'?'selected':''}>📝 Outros Gastos</option>
+                <label>Categoria</label>
+                <select id="edt-gc-${g.id}">
+                    <option value="Alimentação" ${g.categoria==='Alimentação'?'selected':''}>🍔 Alimentação / Lanche</option>
+                    <option value="Acessórios" ${g.categoria==='Acessórios'?'selected':''}>🎒 Acessórios</option>
+                    <option value="Combustível" ${g.categoria==='Combustível'?'selected':''}>⛽ Combustível</option>
+                    <option value="Outros" ${g.categoria==='Outros'?'selected':''}>📝 Outros</option>
                 </select>
-                <label style="font-size:14px;">Descrição</label>
-                <input type="text" id="edt-gasto-desc-${g.id}" value="${g.descricao}">
-                <label style="font-size:14px;">Valor R$</label>
-                <input type="text" id="edt-gasto-val-${g.id}" value="${g.valor.toFixed(2).replace('.', ',')}">
-                <label style="font-size:14px;">Data</label>
-                <input type="date" id="edt-gasto-data-${g.id}" value="${g.data}">
+                <label>Descrição</label>
+                <input type="text" id="edt-gd-${g.id}" value="${g.descricao}">
+                <label>Valor R$</label>
+                <input type="text" id="edt-gv-${g.id}" value="${g.valor.toFixed(2).replace('.', ',')}">
+                <label>Data</label>
+                <input type="date" id="edt-gda-${g.id}" value="${g.data}">
                 <div class="botao-linha">
-                    <button class="botao botao-verde botao-pequeno" onclick="salvarEdicaoGasto(${g.id})"><i class="fas fa-check"></i> Salvar</button>
-                    <button class="botao botao-vermelho botao-pequeno" onclick="cancelarEdicao()"><i class="fas fa-times"></i> Cancelar</button>
+                    <button class="botao botao-verde botao-pequeno" onclick="salvarEdGasto(${g.id})">Salvar</button>
+                    <button class="botao botao-vermelho botao-pequeno" onclick="cancelarEdicao()">Cancelar</button>
                 </div>
-            </div>
-            `}
+            </div>`}
         </div>`;
     }).join('');
 }
 
-function editarGasto(id) { idEdicaoAtivo = id; renderizarGastos(); }
-function salvarEdicaoGasto(id) {
+function editarGasto(id) {
+    idEdicaoAtivo = id;
+    renderizarGastos();
+}
+
+function salvarEdGasto(id) {
     const idx = dados.gastos.findIndex(g => g.id === id);
-    if (idx === -1) return;
-    const cat = document.getElementById(`edt-gasto-cat-${id}`).value;
-    const desc = document.getElementById(`edt-gasto-desc-${id}`).value.trim();
-    const val = parseDinheiro(document.getElementById(`edt-gasto-val-${id}`).value);
-    const dt = document.getElementById(`edt-gasto-data-${id}`).value;
-    if (!dt || val <= 0) { alert('Preencha tudo!'); return; }
-    dados.gastos[idx] = { ...dados.gastos[idx], categoria: cat, descricao: desc, valor: val, data: dt };
+    dados.gastos[idx] = {
+        id: id,
+        categoria: document.getElementById(`edt-gc-${id}`).value,
+        descricao: document.getElementById(`edt-gd-${id}`).value,
+        valor: parseDinheiro(document.getElementById(`edt-gv-${id}`).value),
+        data: document.getElementById(`edt-gda-${id}`).value
+    };
     salvarDados('rd-gastos', dados.gastos);
     idEdicaoAtivo = null;
     renderizarGastos();
     atualizarResumo();
-    alert('✅ Atualizado!');
 }
+
 function excluirGasto(id) {
     if (confirm('Excluir?')) {
         dados.gastos = dados.gastos.filter(g => g.id !== id);
@@ -1030,96 +1021,111 @@ function registrarKm() {
     const final = parseInt(document.getElementById('km-final').value);
     
     if (!inicial || !final || final < inicial) {
-        alert('Valores inválidos! Final deve ser maior que inicial!');
+        alert('Preencha corretamente! Final ≥ Inicial');
         return;
     }
     
-    dados.kmLancados.unshift({ 
-        id: Date.now(), 
-        data: dataHoje(), 
-        inicial, 
-        final, 
-        rodado: final - inicial 
+    const rodado = final - inicial;
+    
+    dados.kmLancados.unshift({
+        id: Date.now(),
+        data: dataHoje(),
+        inicial: inicial,
+        final: final,
+        rodado: rodado
     });
+    
     salvarDados('rd-km', dados.kmLancados);
     
-    document.getElementById('km-inicial').value = '';
+    document.getElementById('km-inicial').value = final;
     document.getElementById('km-final').value = '';
     
     renderizarKm();
     atualizarResumo();
-    atualizarEstimativa();
-    alert('✅ KM registrado!');
+    alert(`✅ ${rodado} km registrados!`);
 }
 
 function renderizarKm() {
     const lista = document.getElementById('lista-km');
-    const hoje = dataHoje();
-    const rodadoDia = dados.kmLancados.filter(k => k.data === hoje).reduce((s, k) => s + k.rodado, 0);
-    const rodadoMes = dados.kmLancados.filter(k => mesAno(k.data) === mesAno(dataHoje())).reduce((s, k) => s + k.rodado, 0);
-    const totalGeral = dados.kmLancados.reduce((s, k) => s + k.rodado, 0);
-    const diasComRegistro = new Set(dados.kmLancados.map(k => k.data)).size;
-    const mediaDia = diasComRegistro > 0 ? Math.round(totalGeral / diasComRegistro) : 0;
+    const rodadoDia = somarRodadoAte(dataVisualizada);
+    document.getElementById('km-total-dia').textContent = `${rodadoDia.toLocaleString('pt-BR')} km`;
     
-    document.getElementById('km-total-dia').textContent = `${rodadoDia} km`;
-    document.getElementById('km-geral').textContent = `${totalGeral.toLocaleString('pt-BR')} km`;
+    const ultimo = dados.kmLancados.length > 0 ? dados.kmLancados[0].final : 0;
+    document.getElementById('km-geral').textContent = `${ultimo.toLocaleString('pt-BR')} km`;
+    
+    const mesAtual = mesAno(dataVisualizada);
+    const rodadoMes = dados.kmLancados
+        .filter(k => mesAno(k.data) === mesAtual)
+        .reduce((s, k) => s + k.rodado, 0);
     document.getElementById('km-mes').textContent = `${rodadoMes.toLocaleString('pt-BR')} km`;
-    document.getElementById('km-media-dia').textContent = `${mediaDia} km`;
+    
+    const diasComRegistro = new Set(dados.kmLancados.map(k => k.data)).size;
+    const mediaDia = diasComRegistro > 0 ? Math.round(dados.kmLancados.reduce((s,k)=>s+k.rodado,0) / diasComRegistro) : 0;
+    document.getElementById('km-media-dia').textContent = `${mediaDia.toLocaleString('pt-BR')} km`;
     
     if (!dados.kmLancados.length) {
-        lista.innerHTML = '<p style="color:#666; text-align:center;">Nenhum percurso lançado</p>';
+        lista.innerHTML = '<p style="color:#666;text-align:center;">Nenhum registro de percurso</p>';
         return;
     }
     
     lista.innerHTML = dados.kmLancados.map(k => {
-        const editando = idEdicaoAtivo === k.id;
-        return `
-        <div class="item-lista">
-            ${!editando ? `
+        const edit = idEdicaoAtivo === k.id;
+        return `<div class="item-lista">${!edit ? `
             <div class="item-cabecalho">
                 <div>
                     <strong>${k.data}</strong>
-                    <div style="font-size:13px; color:#888;">${k.inicial} → ${k.final}</div>
-                    <div class="valor v-dourado">+${k.rodado} km</div>
+                    <div style="font-size:13px;color:#888;">${k.inicial.toLocaleString('pt-BR')} → ${k.final.toLocaleString('pt-BR')} km</div>
+                    <div class="valor v-dourado" style="margin-top:4px;">+${k.rodado.toLocaleString('pt-BR')} km</div>
                 </div>
                 <div class="acoes-item">
-                    <button class="botao botao-editar botao-pequeno" onclick="editarKm(${k.id})"><i class="fas fa-edit"></i></button>
-                    <button class="botao botao-vermelho botao-pequeno" onclick="excluirKm(${k.id})"><i class="fas fa-trash"></i></button>
+                    <button class="botao botao-editar botao-pequeno" onclick="editarKm(${k.id})">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="botao botao-vermelho botao-pequeno" onclick="excluirKm(${k.id})">
+                        <i class="fas fa-trash"></i>
+                    </button>
                 </div>
-            </div>
-            ` : `
+            </div>` : `
             <div class="form-edicao">
-                <label style="font-size:14px;">Data</label>
-                <input type="date" id="edt-km-data-${k.id}" value="${k.data}">
-                <label style="font-size:14px;">KM Inicial</label>
-                <input type="number" id="edt-km-in-${k.id}" value="${k.inicial}">
-                <label style="font-size:14px;">KM Final</label>
-                <input type="number" id="edt-km-fin-${k.id}" value="${k.final}">
+                <label>Data</label>
+                <input type="date" id="edt-kda-${k.id}" value="${k.data}">
+                <label>KM Inicial</label>
+                <input type="number" id="edt-ki-${k.id}" value="${k.inicial}">
+                <label>KM Final</label>
+                <input type="number" id="edt-kf-${k.id}" value="${k.final}">
                 <div class="botao-linha">
-                    <button class="botao botao-verde botao-pequeno" onclick="salvarEdicaoKm(${k.id})"><i class="fas fa-check"></i> Salvar</button>
-                    <button class="botao botao-vermelho botao-pequeno" onclick="cancelarEdicao()"><i class="fas fa-times"></i> Cancelar</button>
+                    <button class="botao botao-verde botao-pequeno" onclick="salvarEdKm(${k.id})">Salvar</button>
+                    <button class="botao botao-vermelho botao-pequeno" onclick="cancelarEdicao()">Cancelar</button>
                 </div>
-            </div>
-            `}
+            </div>`}
         </div>`;
     }).join('');
 }
 
-function editarKm(id) { idEdicaoAtivo = id; renderizarKm(); }
-function salvarEdicaoKm(id) {
+function editarKm(id) {
+    idEdicaoAtivo = id;
+    renderizarKm();
+}
+
+function salvarEdKm(id) {
     const idx = dados.kmLancados.findIndex(k => k.id === id);
-    if (idx === -1) return;
-    const dt = document.getElementById(`edt-km-data-${id}`).value;
-    const ini = parseInt(document.getElementById(`edt-km-in-${id}`).value);
-    const fin = parseInt(document.getElementById(`edt-km-fin-${id}`).value);
-    if (!dt || !ini || !fin || fin < ini) { alert('Valores inválidos!'); return; }
-    dados.kmLancados[idx] = { ...dados.kmLancados[idx], data: dt, inicial: ini, final: fin, rodado: fin - ini };
+    const inicial = parseInt(document.getElementById(`edt-ki-${id}`).value);
+    const final = parseInt(document.getElementById(`edt-kf-${id}`).value);
+    if (final < inicial) { alert('Final não pode ser menor que inicial!'); return; }
+    
+    dados.kmLancados[idx] = {
+        id: id,
+        data: document.getElementById(`edt-kda-${id}`).value,
+        inicial: inicial,
+        final: final,
+        rodado: final - inicial
+    };
     salvarDados('rd-km', dados.kmLancados);
     idEdicaoAtivo = null;
     renderizarKm();
     atualizarResumo();
-    alert('✅ Atualizado!');
 }
+
 function excluirKm(id) {
     if (confirm('Excluir?')) {
         dados.kmLancados = dados.kmLancados.filter(k => k.id !== id);
@@ -1129,130 +1135,111 @@ function excluirKm(id) {
     }
 }
 
-// ========== ATUALIZAR RESUMO GERAL ==========
+// ========== CANCELAR EDIÇÃO ==========
+function cancelarEdicao() {
+    idEdicaoAtivo = null;
+    renderizarDiarias();
+    renderizarManutencoes();
+    renderizarGastos();
+    renderizarKm();
+}
+
+// ========== RESUMO PRINCIPAL ==========
 function atualizarResumo() {
-    const dia = dataVisualizada;
-    const semana = getSemana(dia);
-    const mes = mesAno(dia);
-    const anoAtual = ano(dia);
-    const fixoPorDia = totalFixoMensal() / 30;
-
-    // FILTRAR POR PERÍODO
-    const filtroDia = d => d.data === dia;
-    const filtroSemana = d => getSemana(d.data) === semana;
-    const filtroMes = d => mesAno(d.data) === mes;
-    const filtroAno = d => ano(d.data) === anoAtual;
-
-    // DIÁRIAS
-    const diaRecebido = dados.diarias.filter(filtroDia).reduce((s, d) => s + d.valor, 0);
-    const semRecebido = dados.diarias.filter(filtroSemana).reduce((s, d) => s + d.valor, 0);
-    const mesRecebido = dados.diarias.filter(filtroMes).reduce((s, d) => s + d.valor, 0);
-    const anoRecebido = dados.diarias.filter(filtroAno).reduce((s, d) => s + d.valor, 0);
-
-    // GASTOS
-    const diaGasto = dados.gastos.filter(filtroDia).reduce((s, g) => s + g.valor, 0);
-    const semGasto = dados.gastos.filter(filtroSemana).reduce((s, g) => s + g.valor, 0);
-    const mesGasto = dados.gastos.filter(filtroMes).reduce((s, g) => s + g.valor, 0);
-    const anoGasto = dados.gastos.filter(filtroAno).reduce((s, g) => s + g.valor, 0);
-
-    // KM
-    const diaKm = dados.kmLancados.filter(filtroDia).reduce((s, k) => s + k.rodado, 0);
-    const semKm = dados.kmLancados.filter(filtroSemana).reduce((s, k) => s + k.rodado, 0);
-    const mesKm = dados.kmLancados.filter(filtroMes).reduce((s, k) => s + k.rodado, 0);
-    const anoKm = dados.kmLancados.filter(filtroAno).reduce((s, k) => s + k.rodado, 0);
-
-    // CÁLCULOS
-    const reservaPct = dados.pctReserva / 100;
-    const diaReserva = diaRecebido * reservaPct;
-    const mesReserva = mesRecebido * reservaPct;
-    const diaFixo = fixoPorDia;
-    const mesFixo = totalFixoMensal();
-    const anoFixo = mesFixo * 12;
-
-    const diaLucro = diaRecebido - diaGasto - diaFixo - diaReserva;
-    const semLucro = semRecebido - semGasto - (diaFixo * 7);
-    const mesLucro = mesRecebido - mesGasto - mesFixo - mesReserva;
-    const anoLucro = anoRecebido - anoGasto - anoFixo;
-
-    // ATUALIZAR TÍTULO
-    document.getElementById('titulo-dia-atual').innerHTML = `<i class="fas fa-calendar-day"></i> Resumo — ${dia.split('-').reverse().join('/')}`;
-
-    // RÁPIDO
-    document.getElementById('rapido-recebido').textContent = formatarDinheiro(diaRecebido);
-    document.getElementById('rapido-km').textContent = `${diaKm} km`;
-    document.getElementById('rapido-media').textContent = dados.diarias.filter(filtroDia).length ? formatarDinheiro(diaRecebido / dados.diarias.filter(filtroDia).length) : 'R$ 0,00';
-    document.getElementById('rapido-lancamentos').textContent = dados.diarias.filter(filtroDia).length;
-
-    // DIA
-    document.getElementById('res-diaria').textContent = formatarDinheiro(diaRecebido);
-    document.getElementById('res-km-dia').textContent = `${diaKm} km`;
-    document.getElementById('res-gastos').textContent = formatarDinheiro(diaGasto);
-    document.getElementById('res-fixo-dia').textContent = formatarDinheiro(diaFixo);
-    document.getElementById('res-pct').textContent = dados.pctReserva;
-    document.getElementById('res-reserva').textContent = formatarDinheiro(diaReserva);
-    document.getElementById('res-livre').textContent = formatarDinheiro(diaLucro);
-    document.getElementById('res-livre').className = `valor ${diaLucro >= 0 ? 'v-verde' : 'v-vermelho'}`;
-
-    // SEMANA
-    document.getElementById('semana-ganho').textContent = formatarDinheiro(semRecebido);
-    document.getElementById('semana-gasto').textContent = formatarDinheiro(semGasto);
-    document.getElementById('semana-km').textContent = `${semKm} km`;
-    document.getElementById('semana-lucro').textContent = formatarDinheiro(semLucro);
-    document.getElementById('semana-lucro').className = `valor ${semLucro >= 0 ? 'v-verde' : 'v-vermelho'}`;
-
-    // MÊS
-    document.getElementById('mes-ganho').textContent = formatarDinheiro(mesRecebido);
-    document.getElementById('mes-fixo').textContent = formatarDinheiro(mesFixo);
-    document.getElementById('mes-gasto').textContent = formatarDinheiro(mesGasto);
-    document.getElementById('mes-km').textContent = `${mesKm} km`;
-    document.getElementById('mes-reserva').textContent = formatarDinheiro(mesReserva);
-    document.getElementById('mes-lucro').textContent = formatarDinheiro(mesLucro);
-    document.getElementById('mes-lucro').className = `valor ${mesLucro >= 0 ? 'v-verde' : 'v-vermelho'}`;
-
-    // ANO
-    document.getElementById('ano-ganho').textContent = formatarDinheiro(anoRecebido);
-    document.getElementById('ano-fixo').textContent = formatarDinheiro(anoFixo);
-    document.getElementById('ano-gasto').textContent = formatarDinheiro(anoGasto);
-    document.getElementById('ano-km').textContent = `${anoKm} km`;
-    document.getElementById('ano-lucro').textContent = formatarDinheiro(anoLucro);
-    document.getElementById('ano-lucro').className = `valor ${anoLucro >= 0 ? 'v-verde' : 'v-vermelho'}`;
-
-    // AVISOS DE MANUTENÇÃO
-    const avisos = [];
-    const totalRodado = dados.kmLancados.reduce((s, k) => s + k.rodado, 0);
+    const dataAlvo = dataVisualizada;
+    const semanaAlvo = getSemana(dataAlvo);
+    const mesAlvo = mesAno(dataAlvo);
+    const anoAlvo = ano(dataAlvo);
+    const diasNoMes = new Date(new Date(dataAlvo + 'T00:00:00').getFullYear(), new Date(dataAlvo + 'T00:00:00').getMonth() + 1, 0).getDate();
     
-    for (const [nome, padrao] of Object.entries(ITENS_MANUTENCAO)) {
-        const meta = dados.metasPersonalizadas[nome] || padrao.km;
-        const ultima = dados.ultimasTrocas[nome];
-        if (!ultima) continue;
-        
-        const desde = totalRodado - ultima.km;
-        const pct = (desde / meta) * 100;
-        
-        if (pct >= 90) {
-            avisos.push(`🔴 <strong>${nome}</strong> — ${Math.round(pct)}%! Faltam ${meta - desde} km!`);
-        } else if (pct >= 70) {
-            avisos.push(`🟡 <strong>${nome}</strong> — ${Math.round(pct)}% concluído`);
-        }
-    }
-
-    const avisoTopo = document.getElementById('aviso-topo');
-    if (avisos.length > 0) {
-        avisoTopo.classList.remove('oculto');
-        document.getElementById('texto-aviso-topo').innerHTML = avisos.slice(0, 2).join('<br>');
-    } else {
-        avisoTopo.classList.add('oculto');
-    }
-
-    const listaAvisos = document.getElementById('avisos-manutencao');
-    listaAvisos.innerHTML = avisos.length > 0 
-        ? avisos.map(a => `<p style="margin:8px 0; line-height:1.5;">${a}</p>`).join('')
-        : '<p style="color:#888; text-align:center; padding:10px;">Tudo em ordem! 🏍️✅</p>';
+    const diariaDia = dados.diarias.filter(d => d.data === dataAlvo).reduce((s,d)=>s+d.valor,0);
+    const rodadoDia = somarRodadoAte(dataAlvo);
+    const gastosDia = dados.gastos.filter(g => g.data === dataAlvo).reduce((s,g)=>s+g.valor,0);
+    const manutDia = dados.manutencoes.filter(m => m.data === dataAlvo).reduce((s,m)=>s+m.valor,0);
+    const fixoDia = totalFixoMensal() / diasNoMes;
+    const reservaDia = diariaDia * 0.10;
+    const lucroDia = diariaDia - gastosDia - manutDia - fixoDia - reservaDia;
+    
+    const qtdLancamentos = 
+        dados.diarias.filter(d => d.data === dataAlvo).length +
+        dados.gastos.filter(g => g.data === dataAlvo).length +
+        dados.manutencoes.filter(m => m.data === dataAlvo).length;
+    
+    const diariasSemana = dados.diarias.filter(d => d.data >= semanaAlvo).reduce((s,d)=>s+d.valor,0);
+    const gastosSemana = dados.gastos.filter(g => g.data >= semanaAlvo).reduce((s,g)=>s+g.valor,0);
+    const manutSemana = dados.manutencoes.filter(m => m.data >= semanaAlvo).reduce((s,m)=>s+m.valor,0);
+    const rodadoSemana = dados.kmLancados.filter(k => k.data >= semanaAlvo).reduce((s,k)=>s+k.rodado,0);
+    const lucroSemana = diariasSemana - gastosSemana - manutSemana - (totalFixoMensal()/4) - (diariasSemana*0.10);
+    
+    const diariasMes = dados.diarias.filter(d => mesAno(d.data) === mesAlvo).reduce((s,d)=>s+d.valor,0);
+    const gastosMes = dados.gastos.filter(g => mesAno(g.data) === mesAlvo).reduce((s,g)=>s+g.valor,0);
+    const manutMes = dados.manutencoes.filter(m => mesAno(m.data) === mesAlvo).reduce((s,m)=>s+m.valor,0);
+    const rodadoMes = dados.kmLancados.filter(k => mesAno(k.data) === mesAlvo).reduce((s,k)=>s+k.rodado,0);
+    const reservaMes = diariasMes * 0.10;
+    const lucroMes = diariasMes - totalFixoMensal() - gastosMes - manutMes - reservaMes;
+    
+    const diariasAno = dados.diarias.filter(d => ano(d.data) === anoAlvo).reduce((s,d)=>s+d.valor,0);
+    const gastosAno = dados.gastos.filter(g => ano(g.data) === anoAlvo).reduce((s,g)=>s+g.valor,0);
+    const manutAno = dados.manutencoes.filter(m => ano(m.data) === anoAlvo).reduce((s,m)=>s+m.valor,0);
+    const fixosAno = totalFixoMensal() * 12;
+    const rodadoAno = dados.kmLancados.filter(k => ano(k.data) === anoAlvo).reduce((s,k)=>s+k.rodado,0);
+    const reservaAno = diariasAno * 0.10;
+    const lucroAno = diariasAno - fixosAno - gastosAno - manutAno - reservaAno;
+    
+    const mediaDiaria = dados.diarias.length > 0 
+        ? diariasMes / dados.diarias.filter(d => mesAno(d.data) === mesAlvo).length 
+        : 0;
+    
+    document.getElementById('titulo-dia-atual').innerHTML = 
+        dataAlvo === dataHoje() 
+            ? '<i class="fas fa-calendar-day"></i> Resumo — Hoje' 
+            : `<i class="fas fa-calendar-day"></i> Resumo — ${dataAlvo.split('-').reverse().join('/')}`;
+    
+    document.getElementById('rapido-recebido').textContent = formatarDinheiro(diariaDia);
+    document.getElementById('rapido-km').textContent = `${rodadoDia.toLocaleString('pt-BR')} km`;
+    document.getElementById('rapido-media').textContent = formatarDinheiro(mediaDiaria);
+    document.getElementById('rapido-lancamentos').textContent = qtdLancamentos;
+    
+    document.getElementById('res-diaria').textContent = formatarDinheiro(diariaDia);
+    document.getElementById('res-km-dia').textContent = `${rodadoDia.toLocaleString('pt-BR')} km`;
+    document.getElementById('res-gastos').textContent = formatarDinheiro(gastosDia);
+    document.getElementById('res-manutencao-dia').textContent = formatarDinheiro(manutDia);
+    document.getElementById('res-fixo-dia').textContent = formatarDinheiro(fixoDia);
+    document.getElementById('res-pct').textContent = '10';
+    document.getElementById('res-reserva').textContent = formatarDinheiro(reservaDia);
+    document.getElementById('res-livre').textContent = formatarDinheiro(lucroDia);
+    document.getElementById('res-livre').style.color = lucroDia >= 0 ? 'var(--verde)' : 'var(--vermelho)';
+    
+    document.getElementById('semana-ganho').textContent = formatarDinheiro(diariasSemana);
+    document.getElementById('semana-gasto').textContent = formatarDinheiro(gastosSemana + manutSemana);
+    document.getElementById('semana-km').textContent = `${rodadoSemana.toLocaleString('pt-BR')} km`;
+    document.getElementById('semana-lucro').textContent = formatarDinheiro(lucroSemana);
+    document.getElementById('semana-lucro').style.color = lucroSemana >= 0 ? 'var(--verde)' : 'var(--vermelho)';
+    
+    document.getElementById('mes-ganho').textContent = formatarDinheiro(diariasMes);
+    document.getElementById('mes-fixo').textContent = formatarDinheiro(totalFixoMensal());
+    document.getElementById('mes-gasto').textContent = formatarDinheiro(gastosMes + manutMes);
+    document.getElementById('mes-km').textContent = `${rodadoMes.toLocaleString('pt-BR')} km`;
+    document.getElementById('mes-reserva').textContent = formatarDinheiro(reservaMes);
+    document.getElementById('mes-lucro').textContent = formatarDinheiro(lucroMes);
+    document.getElementById('mes-lucro').style.color = lucroMes >= 0 ? 'var(--verde)' : 'var(--vermelho)';
+    
+    document.getElementById('ano-ganho').textContent = formatarDinheiro(diariasAno);
+    document.getElementById('ano-fixo').textContent = formatarDinheiro(fixosAno);
+    document.getElementById('ano-gasto').textContent = formatarDinheiro(gastosAno + manutAno);
+    document.getElementById('ano-km').textContent = `${rodadoAno.toLocaleString('pt-BR')} km`;
+    document.getElementById('ano-lucro').textContent = formatarDinheiro(lucroAno);
+    document.getElementById('ano-lucro').style.color = lucroAno >= 0 ? 'var(--verde)' : 'var(--vermelho)';
+    
+    atualizarAvisosManutencao();
 }
 
 // ========== INICIALIZAÇÃO ==========
-atualizarResumo();
-preencherFixos();
+document.addEventListener('DOMContentLoaded', () => {
+    atualizarResumo();
+    calcularTotalFixos();
+});
 </script>
+
 </body>
-</html>
+            </html>
