@@ -75,6 +75,13 @@
             font-size: 14px; color: #f87171; line-height: 1.6;
         }
         
+        .controle-pct {
+            display: flex; align-items: center; gap: 10px; margin: 10px 0; flex-wrap: wrap;
+        }
+        .controle-pct input {
+            max-width: 80px; margin: 0; text-align: center;
+        }
+        
         input, select, button { 
             width: 100%; padding: 14px 16px; margin: 8px 0 16px; border: none; border-radius: 12px; 
             background: #2a2a2a; color: white; font-size: 16px; outline: none; 
@@ -100,13 +107,19 @@
         .sugestao:hover { background: #3a3a3a; }
         .sugestao:last-child { border-bottom: none; }
         
-        .card-estimativa { background: #2d2d2d; border-radius: 12px; padding: 16px; margin: 12px 0; display: none; }
+        .card-estimativa { 
+            background: #2d2d2d; border-radius: 12px; padding: 16px; margin: 16px 0; 
+            border: 2px solid #444;
+        }
         .card-estimativa.visivel { display: block; animation: aparecer 0.3s ease; }
-        .barra-progresso { height: 12px; background: #333; border-radius: 6px; overflow: hidden; margin: 8px 0; }
-        .barra-preenchida { height: 100%; border-radius: 6px; transition: width 0.3s ease; }
-        .info-km { font-size: 13px; margin-top: 8px; color: #aaa; line-height: 1.6; }
-        .proxima-troca { margin-top: 10px; padding: 10px; background: #1f1f1f; border-radius: 8px; font-size: 14px; line-height: 1.7; }
-        .status-texto { font-weight: bold; margin-top: 6px; }
+        .barra-progresso { height: 14px; background: #333; border-radius: 7px; overflow: hidden; margin: 10px 0; }
+        .barra-preenchida { height: 100%; border-radius: 7px; transition: width 0.4s ease; }
+        .info-km { font-size: 14px; margin-top: 10px; color: #ccc; line-height: 1.8; }
+        .proxima-troca { 
+            margin-top: 12px; padding: 12px; background: #1f1f1f; border-radius: 10px; 
+            font-size: 15px; line-height: 1.9; border-left: 3px solid var(--dourado);
+        }
+        .status-texto { font-weight: bold; margin-top: 8px; font-size: 15px; }
         .oculto { display: none !important; }
         
         .form-edicao { background: #2d2d2d; border-radius: 12px; padding: 16px; margin-top: 10px; }
@@ -187,6 +200,12 @@
                     <div class="valor v-vermelho" id="rapido-lancamentos">0</div>
                     <div class="etiqueta">Lançamentos</div>
                 </div>
+            </div>
+
+            <div class="controle-pct">
+                <label>Reserva de segurança:</label>
+                <input type="number" id="pct-reserva" value="10" min="0" max="50" onchange="atualizarResumo()">
+                <span>%</span>
             </div>
 
             <div class="linha"><span>Total Recebido</span><span class="valor v-verde" id="res-diaria">R$ 0,00</span></div>
@@ -316,14 +335,16 @@
                 <div class="sugestoes oculto" id="sugestoes-manut"></div>
             </div>
 
+            <!-- ESTIMATIVA SEMPRE VISÍVEL QUANDO ITEM SELECIONADO -->
             <div class="card-estimativa" id="card-estimativa">
-                <div id="texto-estimativa" style="margin-bottom:10px;"></div>
+                <div id="texto-estimativa" style="margin-bottom:12px; font-size:15px;"></div>
                 <div class="barra-progresso">
                     <div class="barra-preenchida" id="barra-progresso"></div>
                 </div>
+                <div class="status-texto" id="texto-status-cor"></div>
                 <div class="info-km" id="info-km-status"></div>
                 <div class="proxima-troca" id="proxima-troca-info"></div>
-                <div style="margin-top: 12px;">
+                <div style="margin-top: 14px;">
                     <label style="font-size:14px; color:#aaa;">Editar meta de troca (km):</label>
                     <input type="number" id="meta-km-edit" placeholder="Ex: 3000" style="width:140px; display:inline-block; margin:0 10px;">
                     <button class="botao botao-principal botao-pequeno" onclick="salvarMetaKm()">Salvar</button>
@@ -520,6 +541,15 @@ function somarRodadoAte(dataLimite = dataHoje()) {
         .filter(k => k.data <= dataLimite)
         .reduce((s, k) => s + k.rodado, 0);
 }
+function getCorEStatus(porcentagem) {
+    if (porcentagem >= 51) {
+        return { cor: 'var(--verde)', texto: '🟢 TRANQUILO — dentro do prazo', classe: 'v-verde' };
+    } else if (porcentagem >= 30) {
+        return { cor: 'var(--amarelo)', texto: '🟡 ATENÇÃO — aproximando da troca!', classe: 'v-amarelo' };
+    } else {
+        return { cor: 'var(--vermelho)', texto: '🔴 URGENTE — TROCAR JÁ!', classe: 'v-vermelho' };
+    }
+}
 
 // ========== SALVAMENTO ==========
 function carregarDados() {
@@ -592,6 +622,11 @@ document.getElementById('gasto-data').value = dataHoje();
 document.getElementById('data-selecionada').value = dataHoje();
 document.getElementById('data-selecionada').addEventListener('change', e => {
     dataVisualizada = e.target.value;
+    atualizarResumo();
+});
+document.getElementById('pct-reserva').addEventListener('change', e => {
+    dados.pctReserva = parseFloat(e.target.value) || 10;
+    localStorage.setItem('rd-pct', dados.pctReserva);
     atualizarResumo();
 });
 function irParaHoje() {
@@ -676,7 +711,12 @@ const cardEstimativa = document.getElementById('card-estimativa');
 
 inputManut.addEventListener('input', () => {
     const texto = inputManut.value.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    if (texto.length < 1) { caixaSugestoes.classList.add('oculto'); cardEstimativa.classList.remove('visivel'); itemSelecionadoAtual=null; return; }
+    if (texto.length < 1) { 
+        caixaSugestoes.classList.add('oculto'); 
+        cardEstimativa.classList.remove('visivel'); 
+        itemSelecionadoAtual=null; 
+        return; 
+    }
     const filtro = Object.keys(ITENS_MANUTENCAO).filter(nome => 
         nome.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes(texto)
     );
@@ -684,7 +724,12 @@ inputManut.addEventListener('input', () => {
     caixaSugestoes.innerHTML = '';
     filtro.forEach(nome => {
         const div = document.createElement('div'); div.className='sugestao'; div.textContent=nome;
-        div.onclick = () => { inputManut.value=nome; itemSelecionadoAtual=nome; caixaSugestoes.classList.add('oculto'); atualizarEstimativa(); };
+        div.onclick = () => { 
+            inputManut.value=nome; itemSelecionadoAtual=nome; 
+            caixaSugestoes.classList.add('oculto'); 
+            cardEstimativa.classList.add('visivel'); // SEMPRE VISÍVEL
+            atualizarEstimativa(); 
+        };
         caixaSugestoes.appendChild(div);
     });
     caixaSugestoes.classList.remove('oculto');
@@ -692,51 +737,81 @@ inputManut.addEventListener('input', () => {
 document.addEventListener('click', e => { if (!e.target.closest('.autocomplete-wrapper')) caixaSugestoes.classList.add('oculto'); });
 
 function atualizarEstimativa() {
-    if (!itemSelecionadoAtual) { cardEstimativa.classList.remove('visivel'); return; }
+    if (!itemSelecionadoAtual) return;
     const itemPadrao = ITENS_MANUTENCAO[itemSelecionadoAtual];
     const metaKm = dados.metasPersonalizadas[itemSelecionadoAtual] || itemPadrao.km;
     const ultima = dados.ultimasTrocas[itemSelecionadoAtual];
     const totalRodado = somarRodadoAte();
-    const desdeUltima = ultima ? totalRodado - ultima.km : totalRodado;
+
+    document.getElementById('texto-estimativa').innerHTML =
+        `<strong>${itemSelecionadoAtual}</strong><br>Meta de troca: ${metaKm.toLocaleString('pt-BR')} km`;
+
+    if (!ultima) {
+        document.getElementById('barra-progresso').style.width = '0%';
+        document.getElementById('barra-progresso').style.background = '#666';
+        document.getElementById('texto-status-cor').textContent = '📋 Ainda não registrado — defina a meta acima e lance a primeira troca!';
+        document.getElementById('texto-status-cor').className = 'status-texto';
+        document.getElementById('info-km-status').innerHTML = `Rodado total: ${totalRodado.toLocaleString('pt-BR')} km`;
+        document.getElementById('proxima-troca-info').innerHTML =
+            `📍 <strong>Próxima troca estimada:</strong> após atingir ${metaKm.toLocaleString('pt-BR')} km a partir do lançamento`;
+        return;
+    }
+
+    const desdeUltima = totalRodado - ultima.km;
     const porcentagem = Math.min(100, Math.round((desdeUltima / metaKm) * 100));
     const falta = metaKm - desdeUltima;
-    
-    let cor, status;
-    if (porcentagem >= 90) { cor='var(--vermelho)'; status=`🔴 URGENTE! Faltam ${falta} km!`; }
-    else if (porcentagem >= 70) { cor='var(--amarelo)'; status=`🟡 Atenção: ${porcentagem}% — faltam ${falta} km`; }
-    else { cor='var(--verde)'; status=`🟢 Tudo certo: ${porcentagem}% — faltam ${falta} km`; }
-    
-    document.getElementById('texto-estimativa').innerHTML = `<strong>${itemSelecionadoAtual}</strong><br>Meta: ${metaKm.toLocaleString('pt-BR')} km`;
+    const mediaDiaria = (() => {
+        const dias = new Set(dados.kmLancados.map(k => k.data)).size;
+        return dias > 0 ? Math.round(totalRodado / dias) : 0;
+    })();
+    const diasFaltando = mediaDiaria > 0 ? Math.ceil(falta / mediaDiaria) : null;
+
+    const status = getCorEStatus(porcentagem);
+
     document.getElementById('barra-progresso').style.width = `${porcentagem}%`;
-    document.getElementById('barra-progresso').style.background = cor;
-    document.getElementById('info-km-status').textContent = desdeUltima > 0 
-        ? `Rodado desde última troca: ${desdeUltima.toLocaleString('pt-BR')} km` 
-        : 'Ainda sem registro de rodagem';
-    
-    let proximaTexto = '';
-    if (ultima) {
-        const proxKm = ultima.km + metaKm;
-        let proxData = '';
-        if (itemPadrao.tempoMeses) {
-            const dt = new Date(ultima.data + 'T00:00:00');
-            dt.setMonth(dt.getMonth() + itemPadrao.tempoMeses);
-            proxData = dt.toLocaleDateString('pt-BR');
-        }
-        proximaTexto = `📅 Próxima troca estimada:<br>• ${proxKm.toLocaleString('pt-BR')} km` + (proxData ? `<br>• ${proxData}` : '');
-    } else {
-        proximaTexto = `⚠️ Registre uma troca primeiro para ver a previsão`;
+    document.getElementById('barra-progresso').style.background = status.cor;
+    document.getElementById('texto-status-cor').textContent = status.texto;
+    document.getElementById('texto-status-cor').className = `status-texto ${status.classe}`;
+
+    let infoData = '';
+    if (itemPadrao.tempoMeses) {
+        const proximaData = new Date(ultima.data + 'T00:00:00');
+        proximaData.setMonth(proximaData.getMonth() + itemPadrao.tempoMeses);
+        infoData = `📅 Também vence em: ${proximaData.toISOString().split('T')[0].split('-').reverse().join('/')}`;
     }
-    document.getElementById('proxima-troca-info').innerHTML = proximaTexto;
-    document.getElementById('meta-km-edit').value = metaKm;
-    cardEstimativa.classList.add('visivel');
+
+    document.getElementById('info-km-status').innerHTML = `
+        📊 Desde última troca: ${desdeUltima.toLocaleString('pt-BR')} km<br>
+        📍 Faltam: ${falta > 0 ? falta.toLocaleString('pt-BR') : '0'} km<br>
+        ${infoData}
+    `;
+
+    let estimativaTexto = `📍 <strong>Próxima troca:</strong> quando rodar mais ${falta > 0 ? falta.toLocaleString('pt-BR') : '0'} km`;
+    if (diasFaltando && diasFaltando > 0) {
+        estimativaTexto += `<br>⏳ Estimativa: ~${diasFaltando} dia(s) com média de ${mediaDiaria} km/dia`;
+    }
+    if (itemPadrao.tempoMeses) {
+        const proximaData = new Date(ultima.data + 'T00:00:00');
+        proximaData.setMonth(proximaData.getMonth() + itemPadrao.tempoMeses);
+        estimativaTexto += `<br>📅 Ou na data: ${proximaData.toISOString().split('T')[0].split('-').reverse().join('/')} — o que chegar primeiro!`;
+    }
+    document.getElementById('proxima-troca-info').innerHTML = estimativaTexto;
 }
+
 function salvarMetaKm() {
-    if (!itemSelecionadoAtual) return;
-    const v = parseInt(document.getElementById('meta-km-edit').value);
-    if (!v || v<=0) { alert('Valor inválido!'); return; }
-    dados.metasPersonalizadas[itemSelecionadoAtual] = v;    salvarDados('rd-metas', dados.metasPersonalizadas);
+    if (!itemSelecionadoAtual) {
+        alert('Selecione um item primeiro!');
+        return;
+    }
+    const novaMeta = parseInt(document.getElementById('meta-km-edit').value);
+    if (!novaMeta || novaMeta <= 0) {
+        alert('Digite um valor válido!');
+        return;
+    }
+    dados.metasPersonalizadas[itemSelecionadoAtual] = novaMeta;
+    salvarDados('rd-metas', dados.metasPersonalizadas);
     atualizarEstimativa();
-    alert(`✅ Meta atualizada: ${v.toLocaleString('pt-BR')} km`);
+    alert(`✅ Meta atualizada: ${novaMeta.toLocaleString('pt-BR')} km`);
 }
 
 function registrarManutencao() {
@@ -744,12 +819,12 @@ function registrarManutencao() {
     const valor = parseDinheiro(document.getElementById('manut-valor').value);
     const data = document.getElementById('manut-data').value;
     const km = parseInt(document.getElementById('manut-km').value);
-    
+
     if (!desc || valor <= 0 || !data || !km) {
         alert('Preencha todos os campos!');
         return;
     }
-    
+
     const registro = {
         id: Date.now(),
         descricao: desc,
@@ -757,38 +832,38 @@ function registrarManutencao() {
         data: data,
         km: km
     };
-    
+
     dados.manutencoes.unshift(registro);
     dados.ultimasTrocas[desc] = { data: data, km: km };
-    
+
     salvarDados('rd-manut', dados.manutencoes);
     salvarDados('rd-trocas', dados.ultimasTrocas);
-    
+
     document.getElementById('manut-descricao').value = '';
     document.getElementById('manut-valor').value = '';
     document.getElementById('manut-km').value = '';
     cardEstimativa.classList.remove('visivel');
     itemSelecionadoAtual = null;
-    
+
     renderizarManutencoes();
     atualizarResumo();
-    alert('✅ Registrado! Histórico atualizado!');
+    alert('✅ Registrado! Histórico e estimativa atualizados!');
 }
 
 function renderizarManutencoes() {
     const lista = document.getElementById('lista-manut');
     const total = dados.manutencoes.reduce((s, m) => s + m.valor, 0);
-    
+
     document.getElementById('manut-total').textContent = formatarDinheiro(total);
     document.getElementById('manut-qtd').textContent = dados.manutencoes.length;
     const ultimoKm = dados.manutencoes.length > 0 ? dados.manutencoes[0].km : 0;
     document.getElementById('manut-km-atual').textContent = `${ultimoKm.toLocaleString('pt-BR')} km`;
-    
+
     if (!dados.manutencoes.length) {
         lista.innerHTML = '<p style="color:#666;text-align:center;">Nenhum registro de manutenção</p>';
         return;
     }
-    
+
     lista.innerHTML = dados.manutencoes.map(m => {
         const edit = idEdicaoAtivo === m.id;
         return `<div class="item-lista">${!edit ? `
@@ -823,7 +898,7 @@ function renderizarManutencoes() {
             </div>`}
         </div>`;
     }).join('');
-    
+
     atualizarAvisosManutencao();
 }
 
@@ -841,13 +916,13 @@ function salvarEdManutencao(id) {
         data: document.getElementById(`edt-mda-${id}`).value,
         km: parseInt(document.getElementById(`edt-mk-${id}`).value)
     };
-    
+
     const desc = dados.manutencoes[idx].descricao;
     dados.ultimasTrocas[desc] = {
         data: dados.manutencoes[idx].data,
         km: dados.manutencoes[idx].km
     };
-    
+
     salvarDados('rd-manut', dados.manutencoes);
     salvarDados('rd-trocas', dados.ultimasTrocas);
     idEdicaoAtivo = null;
@@ -859,7 +934,7 @@ function excluirManutencao(id) {
     if (!confirm('Excluir este registro?')) return;
     const excluido = dados.manutencoes.find(m => m.id === id);
     dados.manutencoes = dados.manutencoes.filter(m => m.id !== id);
-    
+
     const aindaExiste = dados.manutencoes.some(m => m.descricao === excluido.descricao);
     if (!aindaExiste) {
         delete dados.ultimasTrocas[excluido.descricao];
@@ -867,7 +942,7 @@ function excluirManutencao(id) {
         const ultimo = dados.manutencoes.filter(m => m.descricao === excluido.descricao)[0];
         dados.ultimasTrocas[excluido.descricao] = { data: ultimo.data, km: ultimo.km };
     }
-    
+
     salvarDados('rd-manut', dados.manutencoes);
     salvarDados('rd-trocas', dados.ultimasTrocas);
     renderizarManutencoes();
@@ -878,23 +953,23 @@ function atualizarAvisosManutencao() {
     const container = document.getElementById('avisos-manutencao');
     const avisos = [];
     const totalRodado = somarRodadoAte();
-    
+
     for (const [nome, itemPadrao] of Object.entries(ITENS_MANUTENCAO)) {
         const metaKm = dados.metasPersonalizadas[nome] || itemPadrao.km;
         const ultima = dados.ultimasTrocas[nome];
         if (!ultima) continue;
-        
+
         const desdeUltima = totalRodado - ultima.km;
         const porcentagem = Math.round((desdeUltima / metaKm) * 100);
         const falta = metaKm - desdeUltima;
-        
+
         if (porcentagem >= 90) {
             avisos.push(`🔴 <strong>${nome}</strong>: ${porcentagem}% — faltam ${falta.toLocaleString('pt-BR')} km!`);
         } else if (porcentagem >= 70) {
             avisos.push(`🟡 <strong>${nome}</strong>: ${porcentagem}% — faltam ${falta.toLocaleString('pt-BR')} km`);
         }
     }
-    
+
     if (avisos.length === 0) {
         container.innerHTML = '<p style="color:#888;text-align:center;padding:10px;">Tudo em ordem! 🏍️✅</p>';
         document.getElementById('aviso-topo').classList.add('oculto');
@@ -911,12 +986,12 @@ function registrarGasto() {
     const desc = document.getElementById('gasto-desc').value.trim() || categoria;
     const valor = parseDinheiro(document.getElementById('gasto-valor').value);
     const data = document.getElementById('gasto-data').value;
-    
+
     if (valor <= 0 || !data) {
         alert('Preencha valor e data!');
         return;
     }
-    
+
     dados.gastos.unshift({
         id: Date.now(),
         categoria: categoria,
@@ -924,7 +999,7 @@ function registrarGasto() {
         valor: valor,
         data: data
     });
-    
+
     salvarDados('rd-gastos', dados.gastos);
     document.getElementById('gasto-valor').value = '';
     document.getElementById('gasto-desc').value = '';
@@ -936,15 +1011,15 @@ function registrarGasto() {
 function renderizarGastos() {
     const lista = document.getElementById('lista-gastos');
     const total = dados.gastos.reduce((s, g) => s + g.valor, 0);
-    
+
     document.getElementById('gastos-total').textContent = formatarDinheiro(total);
     document.getElementById('gastos-qtd').textContent = dados.gastos.length;
-    
+
     if (!dados.gastos.length) {
         lista.innerHTML = '<p style="color:#666;text-align:center;">Nenhum gasto registrado</p>';
         return;
     }
-    
+
     lista.innerHTML = dados.gastos.map(g => {
         const edit = idEdicaoAtivo === g.id;
         return `<div class="item-lista">${!edit ? `
@@ -1019,14 +1094,14 @@ function excluirGasto(id) {
 function registrarKm() {
     const inicial = parseInt(document.getElementById('km-inicial').value);
     const final = parseInt(document.getElementById('km-final').value);
-    
+
     if (!inicial || !final || final < inicial) {
         alert('Preencha corretamente! Final ≥ Inicial');
         return;
     }
-    
+
     const rodado = final - inicial;
-    
+
     dados.kmLancados.unshift({
         id: Date.now(),
         data: dataHoje(),
@@ -1034,12 +1109,12 @@ function registrarKm() {
         final: final,
         rodado: rodado
     });
-    
+
     salvarDados('rd-km', dados.kmLancados);
-    
+
     document.getElementById('km-inicial').value = final;
     document.getElementById('km-final').value = '';
-    
+
     renderizarKm();
     atualizarResumo();
     alert(`✅ ${rodado} km registrados!`);
@@ -1049,25 +1124,25 @@ function renderizarKm() {
     const lista = document.getElementById('lista-km');
     const rodadoDia = somarRodadoAte(dataVisualizada);
     document.getElementById('km-total-dia').textContent = `${rodadoDia.toLocaleString('pt-BR')} km`;
-    
+
     const ultimo = dados.kmLancados.length > 0 ? dados.kmLancados[0].final : 0;
     document.getElementById('km-geral').textContent = `${ultimo.toLocaleString('pt-BR')} km`;
-    
+
     const mesAtual = mesAno(dataVisualizada);
     const rodadoMes = dados.kmLancados
         .filter(k => mesAno(k.data) === mesAtual)
         .reduce((s, k) => s + k.rodado, 0);
     document.getElementById('km-mes').textContent = `${rodadoMes.toLocaleString('pt-BR')} km`;
-    
+
     const diasComRegistro = new Set(dados.kmLancados.map(k => k.data)).size;
     const mediaDia = diasComRegistro > 0 ? Math.round(dados.kmLancados.reduce((s,k)=>s+k.rodado,0) / diasComRegistro) : 0;
     document.getElementById('km-media-dia').textContent = `${mediaDia.toLocaleString('pt-BR')} km`;
-    
+
     if (!dados.kmLancados.length) {
         lista.innerHTML = '<p style="color:#666;text-align:center;">Nenhum registro de percurso</p>';
         return;
     }
-    
+
     lista.innerHTML = dados.kmLancados.map(k => {
         const edit = idEdicaoAtivo === k.id;
         return `<div class="item-lista">${!edit ? `
@@ -1112,7 +1187,7 @@ function salvarEdKm(id) {
     const inicial = parseInt(document.getElementById(`edt-ki-${id}`).value);
     const final = parseInt(document.getElementById(`edt-kf-${id}`).value);
     if (final < inicial) { alert('Final não pode ser menor que inicial!'); return; }
-    
+
     dados.kmLancados[idx] = {
         id: id,
         data: document.getElementById(`edt-kda-${id}`).value,
@@ -1151,71 +1226,73 @@ function atualizarResumo() {
     const mesAlvo = mesAno(dataAlvo);
     const anoAlvo = ano(dataAlvo);
     const diasNoMes = new Date(new Date(dataAlvo + 'T00:00:00').getFullYear(), new Date(dataAlvo + 'T00:00:00').getMonth() + 1, 0).getDate();
-    
+    const pctReserva = dados.pctReserva;
+
     const diariaDia = dados.diarias.filter(d => d.data === dataAlvo).reduce((s,d)=>s+d.valor,0);
     const rodadoDia = somarRodadoAte(dataAlvo);
     const gastosDia = dados.gastos.filter(g => g.data === dataAlvo).reduce((s,g)=>s+g.valor,0);
     const manutDia = dados.manutencoes.filter(m => m.data === dataAlvo).reduce((s,m)=>s+m.valor,0);
     const fixoDia = totalFixoMensal() / diasNoMes;
-    const reservaDia = diariaDia * 0.10;
+    const reservaDia = diariaDia * (pctReserva / 100);
     const lucroDia = diariaDia - gastosDia - manutDia - fixoDia - reservaDia;
-    
+
     const qtdLancamentos = 
         dados.diarias.filter(d => d.data === dataAlvo).length +
         dados.gastos.filter(g => g.data === dataAlvo).length +
         dados.manutencoes.filter(m => m.data === dataAlvo).length;
-    
+
     const diariasSemana = dados.diarias.filter(d => d.data >= semanaAlvo).reduce((s,d)=>s+d.valor,0);
     const gastosSemana = dados.gastos.filter(g => g.data >= semanaAlvo).reduce((s,g)=>s+g.valor,0);
     const manutSemana = dados.manutencoes.filter(m => m.data >= semanaAlvo).reduce((s,m)=>s+m.valor,0);
     const rodadoSemana = dados.kmLancados.filter(k => k.data >= semanaAlvo).reduce((s,k)=>s+k.rodado,0);
-    const lucroSemana = diariasSemana - gastosSemana - manutSemana - (totalFixoMensal()/4) - (diariasSemana*0.10);
-    
+    const reservaSemana = diariasSemana * (pctReserva / 100);
+    const lucroSemana = diariasSemana - gastosSemana - manutSemana - (totalFixoMensal()/4) - reservaSemana;
+
     const diariasMes = dados.diarias.filter(d => mesAno(d.data) === mesAlvo).reduce((s,d)=>s+d.valor,0);
     const gastosMes = dados.gastos.filter(g => mesAno(g.data) === mesAlvo).reduce((s,g)=>s+g.valor,0);
     const manutMes = dados.manutencoes.filter(m => mesAno(m.data) === mesAlvo).reduce((s,m)=>s+m.valor,0);
     const rodadoMes = dados.kmLancados.filter(k => mesAno(k.data) === mesAlvo).reduce((s,k)=>s+k.rodado,0);
-    const reservaMes = diariasMes * 0.10;
+    const reservaMes = diariasMes * (pctReserva / 100);
     const lucroMes = diariasMes - totalFixoMensal() - gastosMes - manutMes - reservaMes;
-    
+
     const diariasAno = dados.diarias.filter(d => ano(d.data) === anoAlvo).reduce((s,d)=>s+d.valor,0);
     const gastosAno = dados.gastos.filter(g => ano(g.data) === anoAlvo).reduce((s,g)=>s+g.valor,0);
     const manutAno = dados.manutencoes.filter(m => ano(m.data) === anoAlvo).reduce((s,m)=>s+m.valor,0);
     const fixosAno = totalFixoMensal() * 12;
     const rodadoAno = dados.kmLancados.filter(k => ano(k.data) === anoAlvo).reduce((s,k)=>s+k.rodado,0);
-    const reservaAno = diariasAno * 0.10;
+    const reservaAno = diariasAno * (pctReserva / 100);
     const lucroAno = diariasAno - fixosAno - gastosAno - manutAno - reservaAno;
-    
+
     const mediaDiaria = dados.diarias.length > 0 
         ? diariasMes / dados.diarias.filter(d => mesAno(d.data) === mesAlvo).length 
         : 0;
-    
+
     document.getElementById('titulo-dia-atual').innerHTML = 
         dataAlvo === dataHoje() 
             ? '<i class="fas fa-calendar-day"></i> Resumo — Hoje' 
             : `<i class="fas fa-calendar-day"></i> Resumo — ${dataAlvo.split('-').reverse().join('/')}`;
-    
+
     document.getElementById('rapido-recebido').textContent = formatarDinheiro(diariaDia);
     document.getElementById('rapido-km').textContent = `${rodadoDia.toLocaleString('pt-BR')} km`;
     document.getElementById('rapido-media').textContent = formatarDinheiro(mediaDiaria);
     document.getElementById('rapido-lancamentos').textContent = qtdLancamentos;
-    
+
     document.getElementById('res-diaria').textContent = formatarDinheiro(diariaDia);
     document.getElementById('res-km-dia').textContent = `${rodadoDia.toLocaleString('pt-BR')} km`;
     document.getElementById('res-gastos').textContent = formatarDinheiro(gastosDia);
     document.getElementById('res-manutencao-dia').textContent = formatarDinheiro(manutDia);
     document.getElementById('res-fixo-dia').textContent = formatarDinheiro(fixoDia);
-    document.getElementById('res-pct').textContent = '10';
+    document.getElementById('res-pct').textContent = pctReserva;
     document.getElementById('res-reserva').textContent = formatarDinheiro(reservaDia);
     document.getElementById('res-livre').textContent = formatarDinheiro(lucroDia);
     document.getElementById('res-livre').style.color = lucroDia >= 0 ? 'var(--verde)' : 'var(--vermelho)';
-    
+
     document.getElementById('semana-ganho').textContent = formatarDinheiro(diariasSemana);
     document.getElementById('semana-gasto').textContent = formatarDinheiro(gastosSemana + manutSemana);
     document.getElementById('semana-km').textContent = `${rodadoSemana.toLocaleString('pt-BR')} km`;
     document.getElementById('semana-lucro').textContent = formatarDinheiro(lucroSemana);
     document.getElementById('semana-lucro').style.color = lucroSemana >= 0 ? 'var(--verde)' : 'var(--vermelho)';
-    
+
     document.getElementById('mes-ganho').textContent = formatarDinheiro(diariasMes);
     document.getElementById('mes-fixo').textContent = formatarDinheiro(totalFixoMensal());
     document.getElementById('mes-gasto').textContent = formatarDinheiro(gastosMes + manutMes);
@@ -1223,14 +1300,14 @@ function atualizarResumo() {
     document.getElementById('mes-reserva').textContent = formatarDinheiro(reservaMes);
     document.getElementById('mes-lucro').textContent = formatarDinheiro(lucroMes);
     document.getElementById('mes-lucro').style.color = lucroMes >= 0 ? 'var(--verde)' : 'var(--vermelho)';
-    
+
     document.getElementById('ano-ganho').textContent = formatarDinheiro(diariasAno);
     document.getElementById('ano-fixo').textContent = formatarDinheiro(fixosAno);
     document.getElementById('ano-gasto').textContent = formatarDinheiro(gastosAno + manutAno);
     document.getElementById('ano-km').textContent = `${rodadoAno.toLocaleString('pt-BR')} km`;
     document.getElementById('ano-lucro').textContent = formatarDinheiro(lucroAno);
     document.getElementById('ano-lucro').style.color = lucroAno >= 0 ? 'var(--verde)' : 'var(--vermelho)';
-    
+
     atualizarAvisosManutencao();
 }
 
@@ -1242,4 +1319,4 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 
 </body>
-    </html>
+</html>
