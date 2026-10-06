@@ -52,11 +52,6 @@
             padding: 12px 14px; margin: 10px 0; border-radius: 0 8px 8px 0; 
             font-size: 14px; color: #f87171; line-height: 1.6;
         }
-        .frase-motivacional { 
-            background: rgba(34,197,94,0.08); border-left: 3px solid var(--verde); 
-            padding: 14px 16px; margin: 14px 0 6px; border-radius: 0 8px 8px 0; 
-            font-size: 15px; color: #90ee90; font-style: italic; line-height: 1.7;
-        }
         
         input, select, button { width: 100%; padding: 12px 14px; margin: 6px 0 14px; border: none; border-radius: 10px; background: #2a2a2a; color: white; font-size: 15px; outline: none; border: 2px solid transparent; }
         input:focus, select:focus { border-color: var(--dourado); }
@@ -97,7 +92,7 @@
 <body>
 
 <header class="cabecalho">
-    <h1>👑 Rei da Diária</h1>
+    <h1>👑 Rei da Diária 🏍️💨</h1>
     <p>Controle Total — Diária • Custos • Manutenção • Lucro Real</p>
 </header>
 
@@ -137,7 +132,7 @@
     <!-- ========== RESUMO COMPLETO ========== -->
     <section id="resumo" class="pagina visivel">
         <div class="cartao">
-            <h2><i class="fas fa-calendar-day"></i> Hoje</h2>
+            <h2 id="titulo-dia-atual"><i class="fas fa-calendar-day"></i> Hoje</h2>
             <div class="linha"><span>Total Recebido</span><span class="valor v-verde" id="res-diaria">R$ 0,00</span></div>
             <div class="linha"><span>KM Rodado Hoje</span><span class="valor v-dourado" id="res-km-dia">0 km</span></div>
             <div class="linha"><span>Gastos do Dia</span><span class="valor v-vermelho" id="res-gastos">R$ 0,00</span></div>
@@ -246,7 +241,7 @@
             <h2><i class="fas fa-wrench"></i> Lançar Manutenção</h2>
             <label>Item / Serviço</label>
             <div class="autocomplete-wrapper">
-                <input type="text" id="manut-descricao" placeholder="Digite: óleo, pneu, freio...">
+                <input type="text" id="manut-descricao" placeholder="Digite: oleo, pneu, freio... sem acento!">
                 <div class="sugestoes oculto" id="sugestoes-manut"></div>
             </div>
 
@@ -288,12 +283,11 @@
             <select id="gasto-cat">
                 <option value="Alimentação">🍔 Alimentação / Lanche</option>
                 <option value="Acessórios">🎒 Acessórios / Equipamentos</option>
-                <option value="IPVA e Taxas">📋 IPVA / Licenciamento (avulso)</option>
                 <option value="Outros">📝 Outros Gastos</option>
             </select>
 
-            <label>Descrição</label>
-            <input type="text" id="gasto-desc" placeholder="Ex: Capa de chuva, lanche, capacete...">
+            <label>Descrição <small style="color:#888;">(opcional)</small></label>
+            <input type="text" id="gasto-desc" placeholder="Deixe em branco se não quiser descrever">
             
             <label>Valor R$</label>
             <input type="text" id="gasto-valor" placeholder="Ex: 35,90">
@@ -577,25 +571,34 @@ function excluirDiaria(id) {
     }
 }
 
-// ========== MANUTENÇÃO ==========
+// ========== MANUTENÇÃO — SEM ACENTO ==========
 const inputManut = document.getElementById('manut-descricao');
 const caixaSugestoes = document.getElementById('sugestoes-manut');
 const cardEstimativa = document.getElementById('card-estimativa');
 
 inputManut.addEventListener('input', () => {
-    const texto = inputManut.value.trim().toLowerCase();
+    const texto = inputManut.value.trim().toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    
     if (texto.length < 1) {
         caixaSugestoes.classList.add('oculto');
         cardEstimativa.classList.remove('visivel');
         itemSelecionadoAtual = null;
         return;
     }
-    const itensFiltrados = Object.keys(ITENS_MANUTENCAO).filter(nome => nome.toLowerCase().includes(texto));
+    
+    const itensFiltrados = Object.keys(ITENS_MANUTENCAO).filter(nome => {
+        const nomeSemAcento = nome.toLowerCase()
+            .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        return nomeSemAcento.includes(texto);
+    });
+    
     if (itensFiltrados.length === 0) {
         caixaSugestoes.classList.add('oculto');
         cardEstimativa.classList.remove('visivel');
         return;
     }
+    
     caixaSugestoes.innerHTML = '';
     itensFiltrados.forEach(nome => {
         const div = document.createElement('div');
@@ -613,6 +616,7 @@ inputManut.addEventListener('input', () => {
         };
         caixaSugestoes.appendChild(div);
     });
+    
     caixaSugestoes.classList.remove('oculto');
 });
 document.addEventListener('click', (e) => {
@@ -624,22 +628,50 @@ document.addEventListener('click', (e) => {
 function mostrarEstimativa(nomeItem) {
     const itemBase = ITENS_MANUTENCAO[nomeItem];
     if (!itemBase) return;
-    const metaKm = dados.metasPersonalizadas[nomeItem] || itemBase.km;
+    
+    const metaKm = dados.metasPersonalizadas[nomeItem] || itemBase.km || 99999;
     const kmTotal = calcularKmTotal();
     const ultimaTroca = dados.ultimasTrocas[nomeItem];
-    const kmDesdeTroca = ultimaTroca?.km ? kmTotal - ultimaTroca.km : 0;
+    const kmDesdeTroca = ultimaTroca?.km ? kmTotal - ultimaTroca.km : kmTotal;
     
     let porcentagem = 0, corBarra = 'var(--verde)', statusTexto = '';
+    
     if (metaKm) {
         porcentagem = Math.min(100, (kmDesdeTroca / metaKm) * 100);
-        if (porcentagem >= 100) { corBarra = 'var(--vermelho)'; statusTexto = '🔴 TROCAR JÁ!'; }
-        else if (porcentagem >= 75) { corBarra = 'var(--amarelo)'; statusTexto = '🟡 Chegando perto!'; }
-        else statusTexto = '🟢 Tudo certo';
+        
+        if (porcentagem >= 100) {
+            corBarra = 'var(--vermelho)';
+            statusTexto = '🔴 TROCAR JÁ! Passou do limite!';
+        }
+        else if (porcentagem >= 75) {
+            corBarra = 'var(--amarelo)';
+            statusTexto = '🟡 Atenção — chegando perto!';
+        }
+        else if (porcentagem >= 40) {
+            corBarra = '#84cc33';
+            statusTexto = '🟢 Indo bem...';
+        }
+        else {
+            corBarra = 'var(--verde)';
+            statusTexto = '🟢 Tudo certo!';
+        }
     }
-    document.getElementById('texto-estimativa').innerHTML = `<strong>${nomeItem}</strong><br><small>Troca recomendada a cada ${metaKm?.toLocaleString('pt-BR') || '—'} km</small>`;
-    document.getElementById('barra-progresso').style.width = (metaKm ? porcentagem : 0) + '%';
-    document.getElementById('barra-progresso').style.background = corBarra;
-    document.getElementById('info-km-status').textContent = metaKm ? `${kmDesdeTroca.toLocaleString('pt-BR')} de ${metaKm.toLocaleString('pt-BR')} km — ${statusTexto}` : 'Sem meta de km';
+    
+    document.getElementById('texto-estimativa').innerHTML = `
+        <strong>${nomeItem}</strong><br>
+        <small>Meta: ${metaKm?.toLocaleString('pt-BR') || 'Sem meta'} km 
+        · Rodado: ${kmDesdeTroca.toLocaleString('pt-BR')} km</small>
+    `;
+    
+    const barra = document.getElementById('barra-progresso');
+    barra.style.width = (metaKm ? porcentagem : 0) + '%';
+    barra.style.background = corBarra;
+    
+    document.getElementById('info-km-status').innerHTML = `
+        <strong>${statusTexto}</strong><br>
+        <small style="color:#aaa;">${porcentagem.toFixed(1)}% concluído</small>
+    `;
+    
     document.getElementById('meta-km-edit').value = metaKm || '';
     cardEstimativa.classList.add('visivel');
 }
@@ -739,24 +771,39 @@ function excluirManut(id) {
         dados.manutencoes = dados.manutencoes.filter(m => m.id !== id);
         salvarDados('rd-manut', dados.manutencoes);
         renderizarManutencoes();
-        atualizarResumo();
+                atualizarResumo();
     }
 }
 
-// ========== OUTROS GASTOS ==========
+// ========== OUTROS GASTOS — DESCRIÇÃO OPCIONAL ==========
 function registrarGasto() {
     const categoria = document.getElementById('gasto-cat').value;
     const desc = document.getElementById('gasto-desc').value.trim();
-        const valor = parseDinheiro(document.getElementById('gasto-valor').value);
+    const valor = parseDinheiro(document.getElementById('gasto-valor').value);
     const data = document.getElementById('gasto-data').value;
-    if (!desc || valor <= 0 || !data) { alert('Preencha tudo!'); return; }
-    dados.gastos.unshift({ categoria, desc, valor, data, id: Date.now() });
+    
+    // SÓ valor e data são obrigatórios — descrição é opcional
+    if (valor <= 0 || !data) { 
+        alert('Preencha o Valor e a Data! Descrição é opcional ✅'); 
+        return; 
+    }
+    
+    dados.gastos.unshift({ 
+        categoria, 
+        desc: desc || '—', // Se não digitar, mostra traço
+        valor, 
+        data, 
+        id: Date.now() 
+    });
     salvarDados('rd-gastos', dados.gastos);
+    
+    // Limpa só valor e descrição — data continua
     document.getElementById('gasto-desc').value = '';
     document.getElementById('gasto-valor').value = '';
+    
     renderizarGastos();
     atualizarResumo();
-    alert('✅ Gasto lançado! Já abatendo no lucro!');
+    alert('✅ Gasto lançado!');
 }
 function renderizarGastos() {
     const lista = document.getElementById('lista-gastos');
@@ -771,7 +818,7 @@ function renderizarGastos() {
             ${!editando ? `
             <div class="item-cabecalho">
                 <div>
-                    <strong>${g.categoria}: ${g.desc}</strong>
+                    <strong>${g.categoria}${g.desc !== '—' ? ' · ' + g.desc : ''}</strong>
                     <div style="font-size:12px; color:#888;">${g.data}</div>
                 </div>
                 <div style="text-align:right;">
@@ -788,11 +835,10 @@ function renderizarGastos() {
                 <select id="edt-gasto-cat-${g.id}">
                     <option ${g.categoria==='Alimentação'?'selected':''}>Alimentação</option>
                     <option ${g.categoria==='Acessórios'?'selected':''}>Acessórios</option>
-                    <option ${g.categoria==='IPVA e Taxas'?'selected':''}>IPVA e Taxas</option>
                     <option ${g.categoria==='Outros'?'selected':''}>Outros</option>
                 </select>
-                <label style="font-size:13px;">Descrição</label>
-                <input type="text" id="edt-gasto-desc-${g.id}" value="${g.desc}">
+                <label style="font-size:13px;">Descrição <small style="color:#888;">(opcional)</small></label>
+                <input type="text" id="edt-gasto-desc-${g.id}" value="${g.desc === '—' ? '' : g.desc}">
                 <label style="font-size:13px;">Valor R$</label>
                 <input type="text" id="edt-gasto-valor-${g.id}" value="${g.valor.toFixed(2).replace('.', ',')}">
                 <label style="font-size:13px;">Data</label>
@@ -814,8 +860,14 @@ function salvarEdicaoGasto(id) {
     const desc = document.getElementById(`edt-gasto-desc-${id}`).value.trim();
     const valor = parseDinheiro(document.getElementById(`edt-gasto-valor-${id}`).value);
     const data = document.getElementById(`edt-gasto-data-${id}`).value;
-    if (!desc || valor <= 0 || !data) { alert('Preencha tudo!'); return; }
-    dados.gastos[idx] = { ...dados.gastos[idx], categoria, desc, valor, data };
+    if (valor <= 0 || !data) { alert('Preencha Valor e Data! ✅'); return; }
+    dados.gastos[idx] = { 
+        ...dados.gastos[idx], 
+        categoria, 
+        desc: desc || '—', 
+        valor, 
+        data 
+    };
     salvarDados('rd-gastos', dados.gastos);
     idEdicaoAtivo = null;
     renderizarGastos();
@@ -918,9 +970,9 @@ function excluirKm(id) {
     }
 }
 
-// ========== RESUMO DIA / SEMANA / MÊS / ANO ==========
+// ========== RESUMO — ATUALIZA DATA SOZINHO ==========
 function atualizarResumo() {
-    const hoje = dataHoje();
+    const hoje = dataHoje(); 
     const semanaAtual = getSemana(hoje);
     const mesAtual = mesAno(hoje);
     const anoAtual = ano(hoje);
@@ -931,7 +983,6 @@ function atualizarResumo() {
     let mesRecebido = 0, mesGastoVar = 0, mesKm = 0;
     let anoRecebido = 0, anoGastoVar = 0, anoKm = 0;
 
-    // Diárias
     dados.diarias.forEach(d => {
         const sem = getSemana(d.data);
         const mes = mesAno(d.data);
@@ -942,8 +993,10 @@ function atualizarResumo() {
         if (an === anoAtual) anoRecebido += d.valor;
     });
 
-    // Gastos variáveis (manutenção + outros gastos)
-    const todosGastos = [...dados.manutencoes.map(m => ({ ...m, data: m.data })), ...dados.gastos];
+    const todosGastos = [
+        ...dados.manutencoes.map(m => ({ ...m, data: m.data })), 
+        ...dados.gastos
+    ];
     todosGastos.forEach(g => {
         const sem = getSemana(g.data);
         const mes = mesAno(g.data);
@@ -954,7 +1007,6 @@ function atualizarResumo() {
         if (an === anoAtual) anoGastoVar += g.valor;
     });
 
-    // KM
     dados.kmLancados.forEach(k => {
         const sem = getSemana(k.data);
         const mes = mesAno(k.data);
@@ -965,7 +1017,6 @@ function atualizarResumo() {
         if (an === anoAtual) anoKm += k.rodou;
     });
 
-    // Cálculos finais
     const reservaDia = diaRecebido * (dados.pctReserva / 100);
     const reservaMes = mesRecebido * (dados.pctReserva / 100);
     const reservaAno = anoRecebido * (dados.pctReserva / 100);
@@ -977,7 +1028,9 @@ function atualizarResumo() {
     const lucroMes = mesRecebido - mesGastoVar - fixoMes - reservaMes;
     const lucroAno = anoRecebido - anoGastoVar - fixoAno - reservaAno;
 
-    // Atualizar tela
+    // Atualiza o título com a data de hoje
+    document.getElementById('titulo-dia-atual').innerHTML = `<i class="fas fa-calendar-day"></i> Hoje — ${new Date().toLocaleDateString('pt-BR')}`;
+    
     document.getElementById('res-diaria').textContent = formatarDinheiro(diaRecebido);
     document.getElementById('res-km-dia').textContent = diaKm + ' km';
     document.getElementById('res-gastos').textContent = formatarDinheiro(diaGastoVar);
