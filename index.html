@@ -9,694 +9,1168 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         :root {
             --fundo: #0f0f0f; --cartao: #1a1a1a; --dourado: #facc15;
-            --verde: #22c55e; --amarelo: #f59e0b; --vermelho: #ef4444;
-            --texto: #e5e5e5; --claro: #ffffff;
+            --verde: #22c55e; --amarelo: #f59e0b; --vermelho: #ef4444; --texto: #f5f5f5;
         }
-        body { background: var(--fundo); color: var(--texto); min-height: 100vh; padding-bottom: 80px; }
-        header { background: linear-gradient(135deg, #1a1a1a, #2d2d2d); padding: 1.2rem; text-align: center; border-bottom: 2px solid var(--dourado); }
-        .titulo { font-size: 1.4rem; color: var(--dourado); display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
-        .titulo span { font-size: 1.2rem; opacity: 0.8; }
-        .data-topo { margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.7; }
-        nav { position: fixed; bottom: 0; left: 0; right: 0; background: #1a1a1a; display: flex; justify-content: space-around; padding: 0.7rem 0; border-top: 2px solid #333; z-index: 100; }
-        nav button { background: transparent; border: none; color: #888; font-size: 0.8rem; display: flex; flex-direction: column; align-items: center; gap: 0.2rem; cursor: pointer; transition: 0.2s; }
-        nav button.ativo { color: var(--dourado); }
-        nav button i { font-size: 1.3rem; }
-        .aba { display: none; padding: 1rem; max-width: 500px; margin: 0 auto; }
-        .aba.ativa { display: block; }
-        .cartao { background: var(--cartao); border-radius: 12px; padding: 1rem; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.4); }
-        .cartao h3 { color: var(--dourado); margin-bottom: 0.8rem; font-size: 1rem; }
-        .linha { display: flex; flex-direction: column; gap: 0.7rem; margin-bottom: 0.8rem; }
-        .linha-lado { display: flex; gap: 0.7rem; flex-wrap: wrap; }
-        .linha-lado div { flex: 1; min-width: 140px; }
-        label { font-size: 0.85rem; opacity: 0.8; margin-bottom: 0.2rem; display: block; }
-        input, select, button { width: 100%; padding: 0.75rem; border: none; border-radius: 8px; font-size: 1rem; }
-        input, select { background: #2a2a2a; color: white; border: 1px solid #3a3a3a; }
-        input:focus, select:focus { outline: none; border-color: var(--dourado); }
-        button.primario { background: var(--dourado); color: #000; font-weight: 600; cursor: pointer; margin-top: 0.3rem; }
-        button.primario:hover { filter: brightness(1.1); }
-        .resumo-valor { font-size: 1.6rem; font-weight: 700; }
-        .verde { color: var(--verde); }
-        .amarelo { color: var(--amarelo); }
-        .vermelho { color: var(--vermelho); }
-        .barra { height: 10px; background: #333; border-radius: 5px; overflow: hidden; margin: 0.4rem 0; }
-        .barra > div { height: 100%; transition: width 0.3s; border-radius: 5px; }
-        .item-lista { padding: 0.8rem; background: #252525; border-radius: 8px; margin-bottom: 0.6rem; border-left: 3px solid var(--dourado); }
-        .item-lista .cima { display: flex; justify-content: space-between; margin-bottom: 0.3rem; flex-wrap: wrap; gap: 0.3rem; }
-        .item-lista .nome { font-weight: 600; }
-        .item-lista .valor { font-weight: 700; }
-        .aviso { background: rgba(250, 204, 21, 0.1); border: 1px solid var(--dourado); border-radius: 8px; padding: 0.8rem; margin-bottom: 1rem; font-size: 0.9rem; line-height: 1.5; }
-        .alerta-manutencao { border-left: 4px solid; padding: 0.7rem; margin-bottom: 0.6rem; border-radius: 0 8px 8px 0; }
-        .alerta-verde { background: rgba(34, 197, 94, 0.1); border-color: var(--verde); }
-        .alerta-amarelo { background: rgba(245, 158, 11, 0.1); border-color: var(--amarelo); }
-        .alerta-vermelho { background: rgba(239, 68, 68, 0.1); border-color: var(--vermelho); }
-        .comparativo { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid #333; }
-        .cresceu { color: var(--verde); }
-        .caiu { color: var(--vermelho); }
-        .esconder { display: none !important; }
+        body { background: var(--fundo); color: var(--texto); min-height: 100vh; padding-bottom: 90px; }
+        .cabecalho { text-align: center; padding: 20px; background: linear-gradient(135deg, #1a1a1a, #2d2d2d); border-bottom: 2px solid var(--dourado); }
+        .cabecalho h1 { color: var(--dourado); font-size: 26px; }
+        
+        .aviso-urgente {
+            background: rgba(239,68,68,0.15); border: 2px solid var(--vermelho);
+            border-radius: 12px; padding: 14px; margin: 16px; text-align: center;
+            animation: piscar 1.5s infinite alternate;
+        }
+        @keyframes piscar { from { box-shadow: 0 0 4px var(--vermelho); } to { box-shadow: 0 0 15px var(--vermelho); } }
+        
+        .seletor-data {
+            display: flex; align-items: center; justify-content: center; gap: 10px; margin: 10px 0; flex-wrap: wrap;
+        }
+        .seletor-data input { max-width: 180px; margin: 0; }
+        
+        .abas { display: flex; flex-wrap: wrap; gap: 6px; padding: 12px; background: #151515; position: sticky; top: 0; z-index: 10; justify-content: center; }
+        .aba { 
+            flex: 1; min-width: 85px; max-width: 110px;
+            padding: 12px 6px; border: none; border-radius: 12px; 
+            background: #2a2a2a; color: #ccc; font-size: 12px; 
+            cursor: pointer; transition: 0.2s; 
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            line-height: 1.2; text-align: center;
+            min-height: 65px;
+        }
+        .aba i { font-size: 18px; }
+        .aba.ativa { background: var(--dourado); color: #000; font-weight: bold; }
+        
+        .conteudo { padding: 16px; max-width: 520px; margin: 0 auto; }
+        .pagina { display: none; }
+        .pagina.visivel { display: block; animation: aparecer 0.3s ease; }
+        @keyframes aparecer { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .cartao { background: var(--cartao); border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+        .cartao h2 { font-size: 17px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; color: var(--dourado); }
+        
+        .resumo-rapido {
+            display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px;
+        }
+        .resumo-rapido .bloco {
+            flex: 1; min-width: 100px; background: #252525; border-radius: 10px; padding: 12px; text-align: center;
+        }
+        .resumo-rapido .valor { font-size: 18px; font-weight: bold; color: var(--dourado); }
+        .resumo-rapido .etiqueta { font-size: 11px; color: #888; margin-top: 4px; }
+        
+        .linha { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #2a2a2a; align-items: center; font-size: 15px; }
+        .valor { font-weight: bold; font-size: 16px; }
+        .v-verde { color: var(--verde); }
+        .v-amarelo { color: var(--amarelo); }
+        .v-vermelho { color: var(--vermelho); }
+        .v-dourado { color: var(--dourado); }
+        
+        .aviso-reserva { 
+            background: rgba(250,204,21,0.1); border-left: 3px solid var(--dourado); 
+            padding: 14px; margin: 10px 0; border-radius: 0 10px 10px 0; 
+            font-size: 14px; color: #e5c240; line-height: 1.6;
+        }
+        .aviso-fixo { 
+            background: rgba(239,68,68,0.08); border-left: 3px solid var(--vermelho); 
+            padding: 14px; margin: 10px 0; border-radius: 0 10px 10px 0; 
+            font-size: 14px; color: #f87171; line-height: 1.6;
+        }
+        .aviso-km {
+            background: rgba(34,197,94,0.08); border-left: 3px solid var(--verde);
+            padding: 12px 14px; margin: 12px 0; border-radius: 0 10px 10px 0;
+            font-size: 14px; color: #86efac; line-height: 1.6;
+        }
+        
+        .controle-pct {
+            display: flex; align-items: center; gap: 10px; margin: 10px 0; flex-wrap: wrap;
+        }
+        .controle-pct input {
+            max-width: 80px; margin: 0; text-align: center;
+        }
+        
+        input, select, button { 
+            width: 100%; padding: 14px 16px; margin: 8px 0 16px; border: none; border-radius: 12px; 
+            background: #2a2a2a; color: white; font-size: 16px; outline: none; 
+            border: 2px solid transparent; touch-action: manipulation;
+        }
+        input:focus, select:focus { border-color: var(--dourado); }
+        
+        .botao { padding: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; touch-action: manipulation; }
+        .botao-principal { background: var(--dourado); color: #000; font-size: 16px; }
+        .botao-verde { background: var(--verde); color: white; }
+        .botao-vermelho { background: var(--vermelho); color: white; }
+        .botao-pequeno { padding: 8px 12px; font-size: 14px; width: auto; margin: 4px 0; }
+        .botao-editar { background: #3b82f6; color: white; padding: 8px 12px; font-size: 14px; width: auto; margin: 4px; }
+        .botao-linha { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+        
+        .item-lista { background: #252525; border-radius: 14px; padding: 16px; margin-bottom: 12px; }
+        .item-cabecalho { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+        .acoes-item { display: flex; justify-content: flex-end; gap: 6px; flex-wrap: wrap; }
+        
+        .autocomplete-wrapper { position: relative; }
+        .sugestoes { position: absolute; top: 100%; left: 0; right: 0; background: #2a2a2a; border-radius: 0 0 12px 12px; max-height: 280px; overflow-y: auto; z-index: 20; box-shadow: 0 6px 16px rgba(0,0,0,0.5); }
+        .sugestao { padding: 14px 16px; cursor: pointer; border-bottom: 1px solid #333; font-size: 15px; }
+        .sugestao:hover { background: #3a3a3a; }
+        .sugestao:last-child { border-bottom: none; }
+        
+        .estimativa-item {
+            margin-top: 12px; padding: 12px; background: #1f1f1f; border-radius: 10px;
+            border-left: 3px solid var(--dourado);
+        }
+        .barra-progresso { height: 10px; background: #333; border-radius: 5px; overflow: hidden; margin: 8px 0; }
+        .barra-preenchida { height: 100%; border-radius: 5px; transition: width 0.4s ease; }
+        .info-km { font-size: 13px; margin-top: 6px; color: #ccc; line-height: 1.8; }
+        .status-texto { font-weight: bold; margin-top: 6px; font-size: 14px; }
+        .oculto { display: none !important; }
+        
+        .form-edicao { background: #2d2d2d; border-radius: 12px; padding: 16px; margin-top: 10px; }
+        
+        .rodape { text-align: center; padding: 24px; font-size: 13px; color: #666; margin-top: 20px; }
     </style>
 </head>
 <body>
 
-<header>
-    <h1 class="titulo"><i class="fas fa-crown"></i> Rei da Diária <span>🏍💨</span></h1>
-    <p class="data-topo" id="dataAtual"></p>
+<header class="cabecalho">
+    <h1>👑 Rei da Diária 🏍️💨</h1>
+    <p>Controle Total — Diária • Custos • Manutenção • Lucro Real</p>
 </header>
 
-<section class="aba ativa" id="abaResumo">
-    <div class="aviso">
-        💡 <strong>Dica:</strong> Guarde um valor diário na poupança ou caixinha do seu banco! Assim, quando precisar trocar peça, fazer manutenção ou resolver algo, o dinheiro já estará lá. 💪
-    </div>
+<div id="aviso-topo" class="aviso-urgente oculto">
+    <strong>⚠️ ATENÇÃO!</strong>
+    <p id="texto-aviso-topo" style="margin-top:6px; font-size:14px;"></p>
+</div>
 
-    <!-- ⚠️ ALERTAS DE MANUTENÇÃO NA TELA INICIAL -->
-    <div id="alertasManutencao"></div>
-
-    <div class="cartao">
-        <h3>💰 Resumo — <span id="tituloPeriodo">Hoje</span></h3>
-        <div class="linha">
-            <div>
-                <label>Total Recebido</label>
-                <p class="resumo-valor verde" id="resumoRecebido">R$ 0,00</p>
-            </div>
-            <div>
-                <label>Total Gastos</label>
-                <p class="resumo-valor vermelho" id="resumoGastos">R$ 0,00</p>
-            </div>
-        </div>
-
-        <!-- 💰 CUSTOS FIXOS -->
-        <div style="margin: 0.8rem 0; padding: 0.7rem; background: #2a2a2a; border-radius: 8px;">
-            <div class="linha-lado">
-                <div>
-                    <label>Custos Fixos do Período</label>
-                    <p style="font-weight:700;" id="resumoFixos">R$ 0,00</p>
-                </div>
-                <div>
-                    <label>Mínimo p/ Cobrir</label>
-                    <p style="font-weight:700; color:var(--amarelo);" id="resumoMinimo">R$ 0,00</p>
-                </div>
-            </div>
-            <p style="font-size:0.75rem; opacity:0.6; margin-top:0.3rem;">IPVA · Seguro · Prestação · Aluguel · Apps</p>
-        </div>
-
-        <div class="linha">
-            <div>
-                <label>Lucro Real</label>
-                <p class="resumo-valor" id="resumoSaldo">R$ 0,00</p>
-            </div>
-            <div>
-                <label>% Reserva</label>
-                <p id="resumoReserva">R$ 0,00</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- 📈 COMPARATIVO: HOJE × ONTEM / SEMANA -->
-    <div class="cartao">
-        <h3>📈 Comparativo</h3>
-        <div id="blocoComparativoHoje"></div>
-        <div id="blocoComparativoSemana"></div>
-    </div>
-
-    <div class="cartao">
-        <h3>⚙️ Configurações</h3>
-        <div class="linha-lado">
-            <div>
-                <label>% de Reserva</label>
-                <input type="number" id="porcentagemReserva" value="10" min="0" max="100" step="1">
-            </div>
-            <div style="display:flex;align-items:flex-end;">
-                <button class="primario" onclick="salvarPorcentagem()">Salvar</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="cartao">
-        <h3>📊 Período</h3>
-        <div style="display:flex;gap:0.5rem;margin-bottom:0.8rem;flex-wrap:wrap;">
-            <button style="flex:1;min-width:70px;" id="btnDia" onclick="mudarPeriodo('dia')">Hoje</button>
-            <button style="flex:1;min-width:70px;" id="btnSemana" onclick="mudarPeriodo('semana')">Semana</button>
-            <button style="flex:1;min-width:70px;" id="btnMes" onclick="mudarPeriodo('mes')">Mês</button>
-            <button style="flex:1;min-width:70px;" id="btnAno" onclick="mudarPeriodo('ano')">Ano</button>
-        </div>
-    </div>
-</section>
-
-<section class="aba" id="abaKm">
-    <div class="cartao">
-        <h3>🛵 Controle de Quilometragem</h3>
-        <div class="linha">
-            <div>
-                <label>Km Inicial (início do dia)</label>
-                <input type="number" id="kmInicial" placeholder="Ex: 50000" onchange="atualizarKmRodado()">
-            </div>
-            <div>
-                <label>Km Final (fim do dia)</label>
-                <input type="number" id="kmFinal" placeholder="Ex: 50230" onchange="atualizarKmRodado()">
-            </div>
-        </div>
-        <div class="linha">
-            <div>
-                <label>Km Rodados Hoje</label>
-                <p class="resumo-valor" id="kmRodado">0 km</p>
-            </div>
-        </div>
-        <button class="primario" onclick="salvarKm()">Salvar Quilometragem</button>
-    </div>
-</section>
-
-<section class="aba" id="abaGanhos">
-    <div class="cartao">
-        <h3>💰 Lançar Ganhos</h3>
-        <div class="linha">
-            <div>
-                <label>Valor Recebido (R$)</label>
-                <input type="number" step="0.01" id="valorGanho" placeholder="0,00">
-            </div>
-            <div>
-                <label>Observação (opcional)</label>
-                <input type="text" id="obsGanho" placeholder="Ex: entrega tal">
-            </div>
-        </div>
-        <button class="primario" onclick="lancarGanho()">Lançar Ganho</button>
-    </div>
-    <div class="cartao">
-        <h3>📋 Ganhos Lançados</h3>
-        <div id="listaGanhos"></div>
-    </div>
-</section>
-
-<section class="aba" id="abaGastos">
-    <div class="cartao">
-        <h3>💸 Lançar Gastos</h3>
-        <div class="linha">
-            <div>
-                <label>Categoria</label>
-                <select id="categoriaGasto">
-                    <option value="combustivel">⛽ Combustível</option>
-                    <option value="alimentacao">🍔 Alimentação</option>
-                    <option value="vestuario">👕 Vestuário</option>
-                    <option value="mercado">🏪 Mercado / Supermercado</option>
-                    <option value="saude">💊 Saúde / Farmácia</option>
-                    <option value="acessorios">🛡️ Acessórios</option>
-                    <option value="outros">📌 Outros</option>
-                </select>
-            </div>
-            <div>
-                <label>Valor (R$)</label>
-                <input type="number" step="0.01" id="valorGasto" placeholder="0,00">
-            </div>
-        </div>
-        <div class="linha">
-            <div>
-                <label>Descrição (opcional)</label>
-                <input type="text" id="descricaoGasto" placeholder="Ex: luva, capa de chuva...">
-            </div>
-        </div>
-        <button class="primario" onclick="lancarGasto()">Lançar Gasto</button>
-    </div>
-
-    <!-- 🔩 CUSTOS FIXOS -->
-    <div class="cartao">
-        <h3>🔩 Custos Fixos Mensais</h3>
-        <p style="font-size:0.8rem;opacity:0.7;margin-bottom:0.8rem;">Valores que se repetem todo mês</p>
-        <div class="linha-lado">
-            <div>
-                <label>IPVA (R$)</label>
-                <input type="number" step="0.01" id="custoIpva" placeholder="0,00" onchange="salvarCustosFixos()">
-            </div>
-            <div>
-                <label>Seguro (R$)</label>
-                <input type="number" step="0.01" id="custoSeguro" placeholder="0,00" onchange="salvarCustosFixos()">
-            </div>
-        </div>
-        <div class="linha-lado">
-            <div>
-                <label>Prestação / Financiamento (R$)</label>
-                <input type="number" step="0.01" id="custoPrestacao" placeholder="0,00" onchange="salvarCustosFixos()">
-            </div>
-            <div>
-                <label>Aluguel / Garagem (R$)</label>
-                <input type="number" step="0.01" id="custoAluguel" placeholder="0,00" onchange="salvarCustosFixos()">
-            </div>
-        </div>
-        <div class="linha-lado">
-            <div>
-                <label>App / Assinatura (R$)</label>
-                <input type="number" step="0.01" id="custoApp" placeholder="0,00" onchange="salvarCustosFixos()">
-            </div>
-            <div>
-                <label>Licenciamento / Outros (R$)</label>
-                <input type="number" step="0.01" id="custoOutrosFixo" placeholder="0,00" onchange="salvarCustosFixos()">
-            </div>
-        </div>
-        <p style="margin-top:0.8rem; font-weight:600;">Total Fixo Mensal: <span id="totalFixoMensal">R$ 0,00</span></p>
-    </div>
-
-    <div class="cartao">
-        <h3>📋 Gastos Lançados</h3>
-        <div id="listaGastos"></div>
-    </div>
-</section>
-
-<section class="aba" id="abaManutencao">
-    <div class="cartao">
-        <h3>🔧 Lançar Manutenção</h3>
-        <div class="linha">
-            <div>
-                <label>Nome do Item / Serviço</label>
-                <input type="text" id="nomeManutencao" placeholder="Ex: troca de óleo, pastilha de freio..." oninput="sugerirManutencao(this.value)">
-            </div>
-            <div>
-                <label>Data da Troca</label>
-                <input type="date" id="dataManutencao">
-            </div>
-        </div>
-        <div class="linha-lado">
-            <div>
-                <label>Km na Troca</label>
-                <input type="number" id="kmTroca" placeholder="Ex: 50000">
-            </div>
-            <div>
-                <label>Próximo Km (meta)</label>
-                <input type="number" id="proximoKmMeta" placeholder="Ex: 51000">
-            </div>
-        </div>
-        <div class="linha-lado">
-            <div>
-                <label>Próxima Data (meta)</label>
-                <input type="date" id="proximaDataMeta">
-            </div>
-            <div>
-                <label>Valor Peça (R$)</label>
-                <input type="number" step="0.01" id="valorPeca" placeholder="0,00">
-            </div>
-        </div>
-        <div class="linha-lado">
-            <div>
-                <label>Mão de Obra (R$)</label>
-                <input type="number" step="0.01" id="valorMaoObra" placeholder="0,00">
-            </div>
-            <div>
-                <label>Total Gasto (R$)</label>
-                <input type="number" step="0.01" id="valorTotalManutencao" placeholder="0,00">
-            </div>
-        </div>
-        <button class="primario" onclick="lancarManutencao()">Salvar Manutenção</button>
-    </div>
-
-    <div class="cartao">
-        <h3>📋 Histórico de Manutenção</h3>
-        <div id="listaManutencao"></div>
-    </div>
-</section>
-
-<nav>
-    <button class="ativo" onclick="trocarAba('Resumo')" id="navResumo">
-        <i class="fas fa-chart-pie"></i>Resumo
+<nav class="abas">
+    <button class="aba ativa" data-pagina="resumo">
+        <i class="fas fa-chart-bar"></i>
+        Resumo
     </button>
-    <button onclick="trocarAba('Km')" id="navKm">
-        <i class="fas fa-tachometer-alt"></i>Km
+    <button class="aba" data-pagina="diaria">
+        <i class="fas fa-sack-dollar"></i>
+        Diária
     </button>
-    <button onclick="trocarAba('Ganhos')" id="navGanhos">
-        <i class="fas fa-wallet"></i>Ganhos
+    <button class="aba" data-pagina="fixos">
+        <i class="fas fa-home"></i>
+        Custos<br>Fixos
     </button>
-    <button onclick="trocarAba('Gastos')" id="navGastos">
-        <i class="fas fa-file-invoice-dollar"></i>Gastos
+    <button class="aba" data-pagina="manutencao">
+        <i class="fas fa-wrench"></i>
+        Manutenção
     </button>
-    <button onclick="trocarAba('Manutencao')" id="navManutencao">
-        <i class="fas fa-tools"></i>Manutenção
+    <button class="aba" data-pagina="gastos">
+        <i class="fas fa-file-invoice-dollar"></i>
+        Outros<br>Gastos
+    </button>
+    <button class="aba" data-pagina="km">
+        <i class="fas fa-road"></i>
+        Controle<br>Km
+    </button>
+    <button class="aba" data-pagina="backup">
+        <i class="fas fa-cloud-download"></i>
+        Cópia
     </button>
 </nav>
 
+<main class="conteudo">
+
+    <section id="resumo" class="pagina visivel">
+        <div class="seletor-data">
+            <label>Ver dia:</label>
+            <input type="date" id="data-selecionada">
+            <button class="botao botao-pequeno botao-principal" onclick="irParaHoje()">Hoje</button>
+        </div>
+
+        <div class="cartao">
+            <h2 id="titulo-dia-atual"><i class="fas fa-calendar-day"></i> Resumo — Hoje</h2>
+            
+            <div class="resumo-rapido">
+                <div class="bloco">
+                    <div class="valor v-verde" id="rapido-recebido">R$ 0,00</div>
+                    <div class="etiqueta">Recebido</div>
+                </div>
+                <div class="bloco">
+                    <div class="valor v-dourado" id="rapido-km">0 km</div>
+                    <div class="etiqueta">Rodado</div>
+                </div>
+                <div class="bloco">
+                    <div class="valor" id="rapido-media">R$ 0,00</div>
+                    <div class="etiqueta">Média/diária</div>
+                </div>
+                <div class="bloco">
+                    <div class="valor v-vermelho" id="rapido-lancamentos">0</div>
+                    <div class="etiqueta">Lançamentos</div>
+                </div>
+            </div>
+
+            <div class="controle-pct">
+                <label>Reserva de segurança:</label>
+                <input type="number" id="pct-reserva" value="10" min="0" max="50" onchange="atualizarResumo()">
+                <span>%</span>
+            </div>
+
+            <div class="linha"><span>Total Recebido</span><span class="valor v-verde" id="res-diaria">R$ 0,00</span></div>
+            <div class="linha"><span>KM Rodado</span><span class="valor v-dourado" id="res-km-dia">0 km</span></div>
+            <div class="linha"><span>Gastos do Dia</span><span class="valor v-vermelho" id="res-gastos">R$ 0,00</span></div>
+            <div class="linha"><span>Manutenção do Dia</span><span class="valor v-vermelho" id="res-manutencao-dia">R$ 0,00</span></div>
+            <div class="linha"><span>Custo Fixo do Dia</span><span class="valor v-vermelho" id="res-fixo-dia">R$ 0,00</span></div>
+            <div class="linha"><span>Reserva (<span id="res-pct">10</span>%)</span><span class="valor v-dourado" id="res-reserva">R$ 0,00</span></div>
+            <div class="linha" style="margin-top:12px; padding-top:12px; border-top:2px dashed #333;">
+                <strong>Lucro Real</strong>
+                <strong class="valor" id="res-livre">R$ 0,00</strong>
+            </div>
+        </div>
+
+        <div class="cartao">
+            <h2><i class="fas fa-calendar-week"></i> Esta Semana</h2>
+            <div class="linha"><span>Total Recebido</span><span class="valor v-verde" id="semana-ganho">R$ 0,00</span></div>
+            <div class="linha"><span>Total Gastos + Manutenção</span><span class="valor v-vermelho" id="semana-gasto">R$ 0,00</span></div>
+            <div class="linha"><span>KM Rodado</span><span class="valor v-dourado" id="semana-km">0 km</span></div>
+            <div class="linha"><strong>Lucro Semanal</strong><strong class="valor" id="semana-lucro">R$ 0,00</strong></div>
+        </div>
+
+        <div class="cartao">
+            <h2><i class="fas fa-calendar-alt"></i> Este Mês</h2>
+            <div class="linha"><span>Total Recebido</span><span class="valor v-verde" id="mes-ganho">R$ 0,00</span></div>
+            <div class="linha"><span>Total Custos Fixos</span><span class="valor v-vermelho" id="mes-fixo">R$ 0,00</span></div>
+            <div class="linha"><span>Total Gastos + Manutenção</span><span class="valor v-vermelho" id="mes-gasto">R$ 0,00</span></div>
+            <div class="linha"><span>KM Rodado</span><span class="valor v-dourado" id="mes-km">0 km</span></div>
+            <div class="linha"><span>Reserva Acumulada</span><span class="valor v-dourado" id="mes-reserva">R$ 0,00</span></div>
+            <div class="linha"><strong>Lucro Real Mensal</strong><strong class="valor" id="mes-lucro">R$ 0,00</strong></div>
+        </div>
+
+        <div class="cartao">
+            <h2><i class="fas fa-calendar"></i> Este Ano</h2>
+            <div class="linha"><span>Total Recebido</span><span class="valor v-verde" id="ano-ganho">R$ 0,00</span></div>
+            <div class="linha"><span>Total Custos Fixos</span><span class="valor v-vermelho" id="ano-fixo">R$ 0,00</span></div>
+            <div class="linha"><span>Total Gastos + Manutenção</span><span class="valor v-vermelho" id="ano-gasto">R$ 0,00</span></div>
+            <div class="linha"><span>KM Rodado Total</span><span class="valor v-dourado" id="ano-km">0 km</span></div>
+            <div class="linha"><strong>Lucro Real Anual</strong><strong class="valor" id="ano-lucro">R$ 0,00</strong></div>
+        </div>
+
+        <div class="aviso-reserva">
+            💰 <strong>GUARDE A RESERVA!</strong><br>
+            Coloque na poupança hoje mesmo. Não misture com os outros valores!
+        </div>
+        <div class="aviso-fixo">
+            ⚠️ <strong>CUSTO FIXO:</strong> Todo dia tem custo — IPVA, prestação, seguro, aluguel. Já descontado automaticamente!
+        </div>
+
+        <div class="cartao">
+            <h2><i class="fas fa-exclamation-triangle"></i> Próximas Trocas</h2>
+            <div id="avisos-manutencao">
+                <p style="color:#888; text-align:center; padding:10px;">Tudo em ordem! 🏍️✅</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="diaria" class="pagina">
+        <div class="cartao">
+            <h2><i class="fas fa-sack-dollar"></i> Lançar Diária</h2>
+            <label>Data</label>
+            <input type="date" id="diaria-data">
+            <label>Valor Recebido R$</label>
+            <input type="text" id="diaria-valor" placeholder="Ex: 230,00">
+            <button class="botao botao-principal" onclick="registrarDiaria()">
+                <i class="fas fa-check"></i> Registrar — Salva Automático ✅
+            </button>
+        </div>
+        <div class="cartao">
+            <h2><i class="fas fa-history"></i> Histórico de Diárias</h2>
+            <div class="resumo-rapido">
+                <div class="bloco">
+                    <div class="valor v-verde" id="diaria-total">R$ 0,00</div>
+                    <div class="etiqueta">Total</div>
+                </div>
+                <div class="bloco">
+                    <div class="valor" id="diaria-qtd">0</div>
+                    <div class="etiqueta">Lançamentos</div>
+                </div>
+                <div class="bloco">
+                    <div class="valor v-dourado" id="diaria-media">R$ 0,00</div>
+                    <div class="etiqueta">Média</div>
+                </div>
+            </div>
+            <div id="lista-diarias"></div>
+        </div>
+    </section>
+
+    <section id="fixos" class="pagina">
+        <div class="cartao">
+            <h2><i class="fas fa-home"></i> Custos Fixos Mensais</h2>
+            <p style="font-size:14px; color:#aaa; margin-bottom:16px;">Valores que paga TODO MÊS — abatem no lucro automaticamente</p>
+            
+            <label>IPVA / Licenciamento (mensal)</label>
+            <input type="text" id="fixo-ipva" placeholder="Ex: 85,00">
+            
+            <label>Prestação da Moto</label>
+            <input type="text" id="fixo-prestacao" placeholder="Ex: 350,00">
+            
+            <label>Seguro / Assistência</label>
+            <input type="text" id="fixo-seguro" placeholder="Ex: 60,00">
+            
+            <label>Aluguel / Garagem</label>
+            <input type="text" id="fixo-aluguel" placeholder="Ex: 200,00">
+            
+            <button class="botao botao-principal" onclick="salvarCustosFixos()">
+                <i class="fas fa-save"></i> Salvar Custos Fixos
+            </button>
+            
+            <div class="linha" style="margin-top:16px; padding-top:12px; border-top:1px solid #333;">
+                <span><strong>TOTAL FIXO MENSAL</strong></span>
+                <strong class="valor v-vermelho" id="total-fixo-mes">R$ 0,00</strong>
+            </div>
+            <p style="font-size:13px; color:#888; margin-top:8px;">→ Isso custa por dia: <span id="fixo-por-dia">R$ 0,00</span></p>
+        </div>
+    </section>
+
+    <section id="manutencao" class="pagina">
+        <div class="cartao">
+            <h2><i class="fas fa-wrench"></i> Lançar Manutenção</h2>
+            <label>Item / Serviço</label>
+            <div class="autocomplete-wrapper">
+                <input type="text" id="manut-descricao" placeholder="Ex: Troca de óleo, Pneu...">
+                <div class="sugestoes oculto" id="sugestoes-manut"></div>
+            </div>
+
+            <label>Valor R$</label>
+            <input type="text" id="manut-valor" placeholder="Peça + mão de obra">
+            <label>Data</label>
+            <input type="date" id="manut-data">
+            <label>KM da moto na hora</label>
+            <input type="number" id="manut-km" placeholder="Ex: 12500">
+            <button class="botao botao-verde" onclick="registrarManutencao()">
+                <i class="fas fa-plus"></i> Registrar — Salva ✅
+            </button>
+        </div>
+        <div class="cartao">
+            <h2><i class="fas fa-list"></i> Histórico de Manutenção</h2>
+            <div class="resumo-rapido">
+                <div class="bloco">
+                    <div class="valor v-verde" id="manut-total">R$ 0,00</div>
+                    <div class="etiqueta">Gasto total</div>
+                </div>
+                <div class="bloco">
+                    <div class="valor" id="manut-qtd">0</div>
+                    <div class="etiqueta">Lançamentos</div>
+                </div>
+                <div class="bloco">
+                    <div class="valor v-dourado" id="manut-km-atual">0 km</div>
+                    <div class="etiqueta">Último km</div>
+                </div>
+            </div>
+            <div id="lista-manut"></div>
+        </div>
+    </section>
+
+    <section id="gastos" class="pagina">
+        <div class="cartao">
+            <h2><i class="fas fa-file-invoice-dollar"></i> Lançar Outro Gasto</h2>
+            
+            <label>Categoria</label>
+            <select id="gasto-cat">
+                <option value="Alimentação">🍔 Alimentação / Lanche</option>
+                <option value="Acessórios">🎒 Acessórios / Equipamentos</option>
+                <option value="Combustível">⛽ Combustível</option>
+                <option value="Outros">📝 Outros Gastos</option>
+            </select>
+
+            <label>Descrição <small style="color:#888;">(opcional)</small></label>
+            <input type="text" id="gasto-desc" placeholder="Deixe em branco se não quiser">
+            
+            <label>Valor R$</label>
+            <input type="text" id="gasto-valor" placeholder="Ex: 35,90">
+            
+            <label>Data</label>
+            <input type="date" id="gasto-data">
+            
+            <button class="botao botao-vermelho" onclick="registrarGasto()">
+                <i class="fas fa-minus-circle"></i> Lançar — Salva ✅
+            </button>
+        </div>
+        <div class="cartao">
+            <h2><i class="fas fa-list"></i> Histórico de Gastos</h2>
+            <div class="resumo-rapido">
+                <div class="bloco">
+                    <div class="valor v-vermelho" id="gastos-total">R$ 0,00</div>
+                    <div class="etiqueta">Total gasto</div>
+                </div>
+                <div class="bloco">
+                    <div class="valor" id="gastos-qtd">0</div>
+                    <div class="etiqueta">Lançamentos</div>
+                </div>
+            </div>
+            <div id="lista-gastos"></div>
+        </div>
+    </section>
+
+    <section id="km" class="pagina">
+        <div class="cartao">
+            <h2><i class="fas fa-road"></i> Controle de Percurso</h2>
+            
+            <div class="aviso-km">
+                ☀️ <strong>Começo do dia:</strong> Coloca o KM Inicial e já salva.<br>
+                🌙 <strong>Fim do dia:</strong> Coloca o KM Final e fecha o registro!
+            </div>
+
+            <label>KM Inicial (começo do dia)</label>
+            <input type="number" id="km-inicial" placeholder="Ex: 12300" oninput="atualizarExibicaoKm()">
+            <button class="botao botao-verde" onclick="salvarKmInicial()">
+                <i class="fas fa-sun"></i> Salvar Início do Dia
+            </button>
+
+            <div id="bloco-final" class="oculto">
+                <label>KM Final (fim do dia)</label>
+                <input type="number" id="km-final" placeholder="Ex: 12650" oninput="atualizarExibicaoKm()">
+                <button class="botao botao-principal" onclick="fecharDiaKm()">
+                    <i class="fas fa-flag-checkered"></i> Fechar Dia — Salvar Tudo ✅
+                </button>
+            </div>
+
+            <div class="linha" style="margin-top: 16px;">
+                <span>KM Inicial de Hoje</span>
+                <strong class="valor v-dourado" id="exibe-inicial">—</strong>
+            </div>
+            <div class="linha">
+                <span>KM Final de Hoje</span>
+                <strong class="valor v-dourado" id="exibe-final">—</strong>
+            </div>
+            <div class="linha">
+                <span>Rodado Hoje</span>
+                <strong class="valor v-verde" id="km-total-dia">0 km</strong>
+            </div>
+            <div class="linha">
+                <span>Total Geral na Moto</span>
+                <strong class="valor v-dourado" id="km-geral">0 km</strong>
+            </div>
+        </div>
+        <div class="cartao">
+            <h2><i class="fas fa-history"></i> Histórico de KM</h2>
+            <div class="resumo-rapido">
+                <div class="bloco">
+                    <div class="valor v-dourado" id="km-mes">0 km</div>
+                    <div class="etiqueta">Este mês</div>
+                </div>
+                <div class="bloco">
+                    <div class="valor" id="km-media-dia">0 km</div>
+                    <div class="etiqueta">Média/dia</div>
+                </div>
+            </div>
+            <div id="lista-km"></div>
+        </div>
+    </section>
+
+    <section id="backup" class="pagina">
+        <div class="cartao">
+            <h2><i class="fas fa-cloud-download"></i> Cópia de Segurança</h2>
+            <p style="font-size:14px; color:#aaa; margin-bottom:20px;">
+                Faça cópia e guarde. Se trocar de celular, é só restaurar! 🔒
+            </p>
+            
+            <button class="botao botao-verde" onclick="baixarCopia()">
+                <i class="fas fa-download"></i> Baixar Cópia (Salvar no celular)
+            </button>
+            
+            <div style="margin:20px 0; padding:16px; background:#2a2a2a; border-radius:12px;">
+                <label style="font-weight:bold; display:block; margin-bottom:10px;">Restaurar Cópia:</label>
+                <input type="file" id="arquivo-copia" accept=".json" onchange="restaurarCopia(event)">
+                <small style="color:#888;">Escolha o arquivo que você baixou antes</small>
+            </div>
+            
+            <div style="margin-top:20px; padding:16px; background:rgba(34,197,94,0.08); border-radius:12px; border-left:3px solid var(--verde);">
+                <p style="font-size:14px; line-height:1.8;">
+                    💡 <strong>Dicas:</strong><br>
+                    • Baixe uma vez por mês e guarde no Google Drive ou WhatsApp<br>
+                    • Restaurar SUBSTITUI tudo — confirme antes!<br>
+                    • Os dados ficam salvos no próprio navegador
+                </p>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<footer class="rodape">
+    <p>👑 Rei da Diária © 2026 — Tudo Salvo Automaticamente</p>
+</footer>
+
 <script>
-let dados = carregarDados();
-let periodoAtual = 'dia';
+const ITENS_MANUTENCAO = {
+    "Troca de óleo do motor": { km: 3000, tempoMeses: 6, categoria: "Óleo" },
+    "Filtro de óleo": { km: 3000, tempoMeses: 6, categoria: "Filtros" },
+    "Filtro de ar": { km: 10000, tempoMeses: 12, categoria: "Filtros" },
+    "Pneu dianteiro": { km: 18000, tempoMeses: null, categoria: "Pneus" },
+    "Pneu traseiro": { km: 15000, tempoMeses: null, categoria: "Pneus" },
+    "Pastilha de freio dianteiro": { km: 10000, tempoMeses: null, categoria: "Freios" },
+    "Kit relação (coroa/pinhão/corrente)": { km: 25000, tempoMeses: null, categoria: "Transmissão" },
+    "Revisão geral preventiva": { km: 5000, tempoMeses: 6, categoria: "Revisão" },
+    "Corrente": { km: 12000, tempoMeses: null, categoria: "Transmissão" },
+    "Embreagem": { km: 20000, tempoMeses: null, categoria: "Motor" }
+};
 
-function carregarDados() {
-    const salvos = localStorage.getItem('reiDaDiaria');
-    if (!salvos) {
-        return {
-            porcentagemReserva: 10,
-            registros: {},
-            kmInicial: null,
-            kmFinal: null,
-            custosFixos: { ipva:0, seguro:0, prestacao:0, aluguel:0, app:0, outros:0 }
-        };
-    }
-    return JSON.parse(salvos);
+let idEdicaoAtivo = null;
+let dataVisualizada = dataHoje();
+
+function formatarDinheiro(valor) {
+    return `R$ ${parseFloat(valor || 0).toFixed(2).replace('.', ',')}`;
 }
-
-function salvarDados() {
-    localStorage.setItem('reiDaDiaria', JSON.stringify(dados));
-    atualizarTela();
+function parseDinheiro(texto) {
+    return parseFloat((texto || '0').toString().replace(/\./g, '').replace(',', '.')) || 0;
 }
-
-function getDataHoje() {
+function dataHoje() {
     return new Date().toISOString().split('T')[0];
 }
-
-function formatarData(dataStr) {
-    if (!dataStr) return '—';
-    const [ano, mes, dia] = dataStr.split('-');
-    return `${dia}/${mes}/${ano}`;
+function getSemana(dt) {
+    const d = new Date(dt + 'T00:00:00');
+    const diaSemana = d.getDay();
+    const inicioSemana = new Date(d);
+    inicioSemana.setDate(d.getDate() - diaSemana);
+    return inicioSemana.toISOString().split('T')[0];
 }
-
-function formatarValor(valor) {
-    return Number(valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+function mesAno(dt) {
+    return dt.substring(0, 7);
 }
-
-function pegarRegistro(data) {
-    if (!dados.registros[data]) {
-        dados.registros[data] = {
-            ganhos: [], gastos: [], manutencoes: [],
-            kmInicial: null, kmFinal: null
-        };
-    }
-    return dados.registros[data];
+function ano(dt) {
+    return dt.substring(0, 4);
 }
-
-function atualizarDataTopo() {
-    const agora = new Date();
-    const dias = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
-    document.getElementById('dataAtual').textContent = 
-        `${dias[agora.getDay()]}, ${agora.getDate().toString().padStart(2,'0')}/${(agora.getMonth()+1).toString().padStart(2,'0')}/${agora.getFullYear()}`;
+function somarRodadoAte(dataLimite = dataHoje()) {
+    return dados.kmLancados
+        .filter(k => k.data <= dataLimite)
+        .reduce((s, k) => s + k.rodado, 0);
 }
-
-function trocarAba(nome) {
-    document.querySelectorAll('.aba').forEach(a => a.classList.remove('ativa'));
-    document.querySelectorAll('nav button').forEach(b => b.classList.remove('ativo'));
-    document.getElementById(`aba${nome}`).classList.add('ativa');
-    document.getElementById(`nav${nome}`).classList.add('ativo');
-    if (nome === 'Manutencao') document.getElementById('dataManutencao').value = getDataHoje();
-    if (nome === 'Gastos') preencherCustosFixosTela();
-}
-
-function salvarPorcentagem() {
-    dados.porcentagemReserva = Number(document.getElementById('porcentagemReserva').value) || 0;
-    salvarDados();
-    alert(`✅ ${dados.porcentagemReserva}% salvo!`);
-}
-
-function salvarCustosFixos() {
-    dados.custosFixos.ipva = Number(document.getElementById('custoIpva').value) || 0;
-    dados.custosFixos.seguro = Number(document.getElementById('custoSeguro').value) || 0;
-    dados.custosFixos.prestacao = Number(document.getElementById('custoPrestacao').value) || 0;
-    dados.custosFixos.aluguel = Number(document.getElementById('custoAluguel').value) || 0;
-    dados.custosFixos.app = Number(document.getElementById('custoApp').value) || 0;
-    dados.custosFixos.outros = Number(document.getElementById('custoOutrosFixo').value) || 0;
-    const total = Object.values(dados.custosFixos).reduce((s,v)=>s+v,0);
-    document.getElementById('totalFixoMensal').textContent = formatarValor(total);
-    salvarDados();
-}
-
-function preencherCustosFixosTela() {
-    document.getElementById('custoIpva').value = dados.custosFixos.ipva || '';
-    document.getElementById('custoSeguro').value = dados.custosFixos.seguro || '';
-    document.getElementById('custoPrestacao').value = dados.custosFixos.prestacao || '';
-    document.getElementById('custoAluguel').value = dados.custosFixos.aluguel || '';
-    document.getElementById('custoApp').value = dados.custosFixos.app || '';
-    document.getElementById('custoOutrosFixo').value = dados.custosFixos.outros || '';
-    const total = Object.values(dados.custosFixos).reduce((s,v)=>s+v,0);
-    document.getElementById('totalFixoMensal').textContent = formatarValor(total);
-}
-
-function atualizarKmRodado() {
-    const ini = Number(document.getElementById('kmInicial').value) || 0;
-    const fim = Number(document.getElementById('kmFinal').value) || 0;
-    document.getElementById('kmRodado').textContent = `${Math.max(0, fim - ini)} km`;
-}
-
-function salvarKm() {
-    const reg = pegarRegistro(getDataHoje());
-    reg.kmInicial = dados.kmInicial = Number(document.getElementById('kmInicial').value) || null;
-    reg.kmFinal = dados.kmFinal = Number(document.getElementById('kmFinal').value) || null;
-    salvarDados();
-    alert('✅ Km salvo!');
-}
-
-function lancarGanho() {
-    const valor = Number(document.getElementById('valorGanho').value);
-    if (!valor || valor <= 0) { alert('Informe o valor!'); return; }
-    const reg = pegarRegistro(getDataHoje());
-    reg.ganhos.push({ valor, obs: document.getElementById('obsGanho').value || '', data: new Date().toISOString() });
-    document.getElementById('valorGanho').value = '';
-    document.getElementById('obsGanho').value = '';
-    salvarDados();
-}
-
-function lancarGasto() {
-    const valor = Number(document.getElementById('valorGasto').value);
-    if (!valor || valor <= 0) { alert('Informe o valor!'); return; }
-    const reg = pegarRegistro(getDataHoje());
-    reg.gastos.push({
-        categoria: document.getElementById('categoriaGasto').value,
-        valor,
-        descricao: document.getElementById('descricaoGasto').value || '',
-        data: new Date().toISOString()
-    });
-    document.getElementById('valorGasto').value = '';
-    document.getElementById('descricaoGasto').value = '';
-    salvarDados();
-}
-
-const sugestoesManutencao = [
-    { nome: 'óleo', proximoKm: 1000, proximoMeses: 1 },
-    { nome: 'filtro', proximoKm: 5000, proximoMeses: 3 },
-    { nome: 'pastilha', proximoKm: 8000, proximoMeses: 6 },
-    { nome: 'pneu', proximoKm: 15000, proximoMeses: 12 },
-    { nome: 'correia', proximoKm: 10000, proximoMeses: 8 },
-    { nome: 'bateria', proximoKm: 20000, proximoMeses: 24 },
-    { nome: 'vela', proximoKm: 12000, proximoMeses: 12 }
-];
-
-function normalizarTexto(t) {
-    return t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-}
-
-function sugerirManutencao(digitado) {
-    if (!digitado || digitado.length < 2) return;
-    const dig = normalizarTexto(digitado);
-    const kmAtual = Number(document.getElementById('kmTroca').value) || 0;
-    for (const s of sugestoesManutencao) {
-        if (normalizarTexto(s.nome).includes(dig)) {
-            if (kmAtual > 0) document.getElementById('proximoKmMeta').value = kmAtual + s.proximoKm;
-            if (document.getElementById('dataManutencao').value) {
-                const d = new Date(document.getElementById('dataManutencao').value);
-                d.setMonth(d.getMonth() + s.proximoMeses);
-                document.getElementById('proximaDataMeta').value = d.toISOString().split('T')[0];
-            }
-            return;
-        }
+function getCorEStatus(porcentagem) {
+    if (porcentagem >= 51) {
+        return { cor: 'var(--verde)', texto: '🟢 TRANQUILO — dentro do prazo', classe: 'v-verde' };
+    } else if (porcentagem >= 30) {
+        return { cor: 'var(--amarelo)', texto: '🟡 ATENÇÃO — aproximando da troca!', classe: 'v-amarelo' };
+    } else {
+        return { cor: 'var(--vermelho)', texto: '🔴 URGENTE — TROCAR JÁ!', classe: 'v-vermelho' };
     }
 }
 
-function lancarManutencao() {
-    const nome = document.getElementById('nomeManutencao').value.trim();
-    if (!nome) { alert('Informe o item!'); return; }
-    const reg = pegarRegistro(getDataHoje());
-    reg.manutencoes.push({
-        nome,
-        dataTroca: document.getElementById('dataManutencao').value,
-        kmTroca: Number(document.getElementById('kmTroca').value) || null,
-        proximoKmMeta: Number(document.getElementById('proximoKmMeta').value) || null,
-        proximaDataMeta: document.getElementById('proximaDataMeta').value || null,
-        valorPeca: Number(document.getElementById('valorPeca').value) || 0,
-        valorMaoObra: Number(document.getElementById('valorMaoObra').value) || 0,
-        valorTotal: Number(document.getElementById('valorTotalManutencao').value) || 0
-    });
-    document.getElementById('nomeManutencao').value = '';
-    document.getElementById('proximoKmMeta').value = '';
-    document.getElementById('proximaDataMeta').value = '';
-    document.getElementById('valorPeca').value = '';
-    document.getElementById('valorMaoObra').value = '';
-    document.getElementById('valorTotalManutencao').value = '';
-    salvarDados();
-}
-
-function calcularProgresso(item, kmAtual) {
-    let porcentagem = 100, cor = 'var(--verde)', textoStatus = 'Tudo em dia ✅';
-
-    if (item.proximoKmMeta && item.kmTroca && kmAtual > item.kmTroca) {
-        const total = item.proximoKmMeta - item.kmTroca;
-        const percorrido = kmAtual - item.kmTroca;
-        porcentagem = Math.max(0, Math.min(100, ((total - percorrido) / total) * 100));
-    } else if (item.proximaDataMeta && item.dataTroca) {
-        const hoje = new Date();
-        const inicio = new Date(item.dataTroca);
-        const fim = new Date(item.proximaDataMeta);
-        const totalMs = fim - inicio;
-        if (totalMs > 0) porcentagem = Math.max(0, Math.min(100, ((totalMs - (hoje - inicio)) / totalMs) * 100));
-    }
-
-    if (porcentagem <= 30) { cor = 'var(--vermelho)'; textoStatus = '⚠️ TROCAR JÁ!'; }
-    else if (porcentagem <= 50) { cor = 'var(--amarelo)'; textoStatus = '⏳ Chegando perto...'; }
-
-    return { porcentagem: Math.round(porcentagem), cor, textoStatus };
-}
-
-function mudarPeriodo(p) {
-    periodoAtual = p;
-    ['dia','semana','mes','ano'].forEach(per => {
-        const btn = document.getElementById(`btn${per.charAt(0).toUpperCase() + per.slice(1)}`);
-        if (per === p) { btn.style.background = 'var(--dourado)'; btn.style.color = 'black'; }
-        else { btn.style.background = '#333'; btn.style.color = 'white'; }
-    });
-    const nomes = { dia: 'Hoje', semana: 'Esta Semana', mes: 'Este Mês', ano: 'Este Ano' };
-    document.getElementById('tituloPeriodo').textContent = nomes[p];
-    atualizarTela();
-}
-
-function coletarRegistrosDoPeriodo(periodo = periodoAtual) {
-    const hoje = new Date();
-    const registros = [];
-    for (const [data, reg] of Object.entries(dados.registros)) {
-        const d = new Date(data);
-        let incluir = false;
-        switch (periodo) {
-            case 'dia': incluir = data === getDataHoje(); break;
-            case 'semana':
-                const inicioSemana = new Date(hoje);
-                inicioSemana.setDate(hoje.getDate() - hoje.getDay());
-                const fimSemana = new Date(inicioSemana); fimSemana.setDate(inicioSemana.getDate() + 6);
-                incluir = d >= inicioSemana && d <= fimSemana;
-                break;
-            case 'mes': incluir = d.getMonth() === hoje.getMonth() && d.getFullYear() === hoje.getFullYear(); break;
-            case 'ano': incluir = d.getFullYear() === hoje.getFullYear(); break;
-        }
-        if (incluir) registros.push({ data, reg });
-    }
-    return registros;
-}
-
-function calcularTotais(regs) {
-    let ganhos = 0, gastos = 0, manut = 0;
-    for (const { reg } of regs) {
-        ganhos += reg.ganhos.reduce((s, g) => s + g.valor, 0);
-        gastos += reg.gastos.reduce((s, g) => s + g.valor, 0);
-        manut += reg.manutencoes.reduce((s, m) => s + (m.valorTotal || m.valorPeca + m.valorMaoObra), 0);
-    }
-    return { ganhos, gastos, manutencao: manut, totalGastos: gastos + manut };
-}
-
-function gerarAlertasManutencao() {
-    const kmAtualGlobal = dados.kmFinal || dados.kmInicial || 0;
-    const alertas = [];
-    for (const { reg } of coletarRegistrosDoPeriodo('ano')) {
-        for (const m of reg.manutencoes) {
-            const prog = calcularProgresso(m, kmAtualGlobal);
-            if (prog.porcentagem <= 60) {
-                let classe = 'alerta-verde';
-                if (prog.porcentagem <= 30) classe = 'alerta-vermelho';
-                else if (prog.porcentagem <= 50) classe = 'alerta-amarelo';
-                alertas.push(`
-                <div class="alerta-manutencao ${classe}">
-                    <strong>🔧 ${m.nome}</strong> — ${prog.textoStatus}<br>
-                    <small>Próx. Km: ${m.proximoKmMeta || '—'} · Data: ${formatarData(m.proximaDataMeta)} · ${prog.porcentagem}%</small>
-                </div>`);
-            }
-        }
-    }
-    document.getElementById('alertasManutencao').innerHTML = alertas.join('') || '';
-}
-
-function gerarComparativos() {
-    const ontem = new Date(); ontem.setDate(ontem.getDate() - 1);
-    const regHoje = coletarRegistrosDoPeriodo('dia');
-    const regOntem = dados.registros[ontem.toISOString().split('T')[0]] ? [{ data: ontem, reg: dados.registros[ontem.toISOString().split('T')[0]] }] : [];
-    const totHoje = calcularTotais(regHoje);
-    const totOntem = calcularTotais(regOntem);
-    const difHoje = totHoje.ganhos - totOntem.ganhos;
-    const pctHoje = totOntem.ganhos > 0 ? ((difHoje / totOntem.ganhos) * 100).toFixed(1) : 0;
-
-    const semanaAtual = coletarRegistrosDoPeriodo('semana');
-    const hoje = new Date();
-    const inicioSemanaPassada = new Date(hoje); inicioSemanaPassada.setDate(hoje.getDate() - hoje.getDay() - 7);
-    const fimSemanaPassada = new Date(inicioSemanaPassada); fimSemanaPassada.setDate(inicioSemanaPassada.getDate() + 6);
-    let regSemanaPassada = [];
-    for (const [data, reg] of Object.entries(dados.registros)) {
-        const d = new Date(data);
-        if (d >= inicioSemanaPassada && d <= fimSemanaPassada) regSemanaPassada.push({ data, reg });
-    }
-    const totSemana = calcularTotais(semanaAtual);
-    const totSemanaPassada = calcularTotais(regSemanaPassada);
-    const difSemana = totSemana.ganhos - totSemanaPassada.ganhos;
-    const pctSemana = totSemanaPassada.ganhos > 0 ? ((difSemana / totSemanaPassada.ganhos) * 100).toFixed(1) : 0;
-
-    document.getElementById('blocoComparativoHoje').innerHTML = `
-    <div class="comparativo">
-        <span>Hoje × Ontem</span>
-        <span>${difHoje >= 0 ? '+' : ''}${formatarValor(difHoje)} 
-        <span class="${difHoje >= 0 ? 'cresceu' : 'caiu'}">${difHoje >= 0 ? '📈' : '📉'} ${pctHoje}%</span></span>
-    </div>`;
-
-    document.getElementById('blocoComparativoSemana').innerHTML = `
-    <div class="comparativo">
-        <span>Esta Semana × Passada</span>
-        <span>${difSemana >= 0 ? '+' : ''}${formatarValor(difSemana)} 
-        <span class="${difSemana >= 0 ? 'cresceu' : 'caiu'}">${difSemana >= 0 ? '📈' : '📉'} ${pctSemana}%</span></span>
-    </div>`;
-}
-
-function atualizarTela() {
-    const regs = coletarRegistrosDoPeriodo();
-    const totais = calcularTotais(regs);
-    const totalFixoMensal = Object.values(dados.custosFixos).reduce((s,v)=>s+v,0);
+function gerarEstimativaHTML(nomeItem, dataUltima, kmUltima) {
+    const itemPadrao = ITENS_MANUTENCAO[nomeItem];
+    if (!itemPadrao) return '';
     
-    // Proporção de custo fixo conforme período
-    const diasNoMes = 30;
-    let fator = 1;
-    if (periodoAtual === 'dia') fator = 1/diasNoMes;
-    else if (periodoAtual === 'semana') fator = 7/diasNoMes;
-    else if (periodoAtual === 'ano') fator = 12;
-    const custoFixoNoPeriodo = totalFixoMensal * fator;
-
-    const saldo = totais.ganhos - totais.totalGastos - custoFixoNoPeriodo;
-    const reserva = totais.ganhos * (dados.porcentagemReserva / 100);
-
-    document.getElementById('resumoRecebido').textContent = formatarValor(totais.ganhos);
-    document.getElementById('resumoGastos').textContent = formatarValor(totais.totalGastos);
-    document.getElementById('resumoFixos').textContent = formatarValor(custoFixoNoPeriodo);
-    document.getElementById('resumoMinimo').textContent = formatarValor(totais.totalGastos + custoFixoNoPeriodo);
-    document.getElementById('resumoSaldo').textContent = formatarValor(saldo);
-    document.getElementById('resumoSaldo').className = `resumo-valor ${saldo >= 0 ? 'verde' : 'vermelho'}`;
-    document.getElementById('resumoReserva').textContent = formatarValor(reserva);
-
-    // Listas
-    let htmlGanhos = '', htmlGastos = '', htmlManutencao = '';
-    const kmAtualGlobal = dados.kmFinal || dados.kmInicial || 0;
-    const icones = { combustivel:'⛽', alimentacao:'🍔', vestuario:'👕', mercado:'🏪', saude:'💊', acessorios:'🛡️', outros:'📌' };
-
-    for (const { data, reg } of regs) {
-        reg.ganhos.forEach(g => {
-            htmlGanhos += `<div class="item-lista"><div class="cima"><span class="nome">${formatarData(data)}</span><span class="valor verde">${formatarValor(g.valor)}</span></div>${g.obs ? `<p style="opacity:0.7;">${g.obs}</p>` : ''}</div>`;
-        });
-        reg.gastos.forEach(g => {
-            htmlGastos += `<div class="item-lista"><div class="cima"><span class="nome">${icones[g.categoria]||'📌'} ${g.categoria}</span><span class="valor vermelho">${formatarValor(g.valor)}</span></div>${g.descricao ? `<p style="opacity:0.7;">${g.descricao}</p>` : ''}<p style="font-size:0.75rem;opacity:0.5;">${formatarData(data)}</p></div>`;
-        });
-        reg.manutencoes.forEach(m => {
-            const prog = calcularProgresso(m, kmAtualGlobal);
-            const valorTotal = m.valorTotal || m.valorPeca + m.valorMaoObra;
-            htmlManutencao += `<div class="item-lista"><div class="cima"><span class="nome">🔧 ${m.nome}</span><span class="valor">${formatarValor(valorTotal)}</span></div><p style="font-size:0.85rem;">Troca: ${formatarData(m.dataTroca)} · Km: ${m.kmTroca||'—'}</p><p style="font-size:0.85rem;opacity:0.8;">Próx. Km: ${m.proximoKmMeta||'—'} · Próx. Data: ${formatarData(m.proximaDataMeta)}</p><div class="barra"><div style="width:${prog.porcentagem}%;background:${prog.cor};"></div></div><p style="font-size:0.8rem;margin-top:0.3rem;color:${prog.cor};">${prog.porcentagem}% · ${prog.textoStatus}</p></div>`;
-        });
+    const metaKm = dados.metasPersonalizadas[nomeItem] || itemPadrao.km;
+    const totalRodado = somarRodadoAte();
+    
+    const desdeUltima = Math.max(0, totalRodado - kmUltima);
+    const porcentagem = Math.min(100, Math.round((desdeUltima / metaKm) * 100));
+    const falta = Math.max(0, metaKm - desdeUltima);
+    
+    const status = getCorEStatus(porcentagem);
+    
+    let dataVencimentoTexto = '';
+    if (itemPadrao.tempoMeses) {
+        const proximaData = new Date(dataUltima + 'T00:00:00');
+        proximaData.setMonth(proximaData.getMonth() + itemPadrao.tempoMeses);
+        dataVencimentoTexto = proximaData.toISOString().split('T')[0].split('-').reverse().join('/');
     }
-
-    document.getElementById('listaGanhos').innerHTML = htmlGanhos || '<p style="opacity:0.6;">Nenhum ganho lançado.</p>';
-    document.getElementById('listaGastos').innerHTML = htmlGastos || '<p style="opacity:0.6;">Nenhum gasto lançado.</p>';
-    document.getElementById('listaManutencao').innerHTML = htmlManutencao || '<p style="opacity:0.6;">Nenhuma manutenção lançada.</p>';
-
-    document.getElementById('kmInicial').value = dados.kmInicial || '';
-    document.getElementById('kmFinal').value = dados.kmFinal || '';
-    atualizarKmRodado();
-    document.getElementById('porcentagemReserva').value = dados.porcentagemReserva;
-
-    gerarAlertasManutencao();
-    gerarComparativos();
+    
+    return `
+        <div class="estimativa-item">
+            <div style="font-size:13px; color:#aaa;">
+                Meta: ${metaKm.toLocaleString('pt-BR')} km · Última troca: ${kmUltima.toLocaleString('pt-BR')} km
+            </div>
+            <div class="barra-progresso">
+                <div class="barra-preenchida" style="width:${porcentagem}%; background:${status.cor};"></div>
+            </div>
+            <div class="status-texto ${status.classe}">${status.texto}</div>
+            <div class="info-km">
+                📊 Rodado desde troca: ${desdeUltima.toLocaleString('pt-BR')} km<br>
+                📍 Por KM: 
+                ${falta > 0 
+                    ? `Faltam ${falta.toLocaleString('pt-BR')} km para trocar` 
+                    : '✅ Limite de KM atingido — trocar JÁ!'}
+                ${dataVencimentoTexto ? `<br>📅 Por DATA: Vence em ${dataVencimentoTexto}` : ''}
+            </div>
+        </div>
+    `;
 }
 
-atualizarDataTopo();
-preencherCustosFixosTela();
-mudarPeriodo('dia');
-atualizarTela();
+function carregarDados() {
+    return {
+        diarias: JSON.parse(localStorage.getItem('rd-diarias') || '[]'),
+        manutencoes: JSON.parse(localStorage.getItem('rd-manut') || '[]'),
+        gastos: JSON.parse(localStorage.getItem('rd-gastos') || '[]'),
+        kmLancados: JSON.parse(localStorage.getItem('rd-km') || '[]'),
+        kmInicialHoje: JSON.parse(localStorage.getItem('rd-km-inicial') || '{"data":null,"valor":null}'),
+        ultimasTrocas: JSON.parse(localStorage.getItem('rd-trocas') || '{}'),
+        metasPersonalizadas: JSON.parse(localStorage.getItem('rd-metas') || '{}'),
+        pctReserva: parseFloat(localStorage.getItem('rd-pct') || '10'),
+        custosFixos: JSON.parse(localStorage.getItem('rd-fixos') || '{"ipva":0,"prestacao":0,"seguro":0,"aluguel":0}')
+    };
+}
+function salvarDados(chave, valor) {
+    localStorage.setItem(chave, JSON.stringify(valor));
+}
+let dados = carregarDados();
+
+function baixarCopia() {
+    const tudo = { data: new Date().toLocaleString('pt-BR'), versao: '1.0', dados };
+    const blob = new Blob([JSON.stringify(tudo, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `MTZ-ReiDaDiaria-${dataHoje()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    alert('✅ Cópia baixada! Guarde bem!');
+}
+function restaurarCopia(event) {
+    if (!confirm('⚠️ Vai SUBSTITUIR tudo? Tem certeza?')) return;
+    const arq = event.target.files[0]; if (!arq) return;
+    const leitor = new FileReader();
+    leitor.onload = e => {
+        try {
+            const c = JSON.parse(e.target.result);
+            if (!c.dados) throw '';
+            dados = c.dados;
+            Object.entries(dados).forEach(([k,v]) => salvarDados(`rd-${k}`, v));
+            atualizarResumo(); renderizarDiarias(); renderizarManutencoes(); renderizarGastos(); renderizarKm();
+            alert('✅ Restaurado!');
+        } catch { alert('❌ Arquivo inválido!'); }
+    };
+    leitor.readAsText(arq);
+    event.target.value = '';
+}
+
+document.querySelectorAll('.aba').forEach(aba => {
+    aba.addEventListener('click', () => {
+        document.querySelectorAll('.aba').forEach(a => a.classList.remove('ativa'));
+        aba.classList.add('ativa');
+        const id = aba.getAttribute('data-pagina');
+        document.querySelectorAll('.pagina').forEach(p => p.classList.remove('visivel'));
+        document.getElementById(id).classList.add('visivel');
+        if (id === 'resumo') atualizarResumo();
+        if (id === 'diaria') renderizarDiarias();
+        if (id === 'fixos') preencherFixos();
+        if (id === 'manutencao') renderizarManutencoes();
+        if (id === 'gastos') renderizarGastos();
+        if (id === 'km') { renderizarKm(); verificarEstadoDiaKm(); }
+    });
+});
+
+document.getElementById('diaria-data').value = dataHoje();
+document.getElementById('manut-data').value = dataHoje();
+document.getElementById('gasto-data').value = dataHoje();
+document.getElementById('data-selecionada').value = dataHoje();
+document.getElementById('data-selecionada').addEventListener('change', e => {
+    dataVisualizada = e.target.value;
+    atualizarResumo();
+});
+document.getElementById('pct-reserva').addEventListener('change', e => {
+    dados.pctReserva = parseFloat(e.target.value) || 10;
+    localStorage.setItem('rd-pct', dados.pctReserva);
+    atualizarResumo();
+});
+function irParaHoje() {
+    dataVisualizada = dataHoje();
+    document.getElementById('data-selecionada').value = dataVisualizada;
+    atualizarResumo();
+}
+
+// ========== CONTROLE DE KM — NOVO SISTEMA ==========
+function verificarEstadoDiaKm() {
+    const hoje = dataHoje();
+    const inicialSalvo = dados.kmInicialHoje;
+    
+    // Se tem inicial salvo de hoje
+    if (inicialSalvo.data === hoje && inicialSalvo.valor) {
+        document.getElementById('km-inicial').value = inicialSalvo.valor;
+        document.getElementById('exibe-inicial').textContent = inicialSalvo.valor.toLocaleString('pt-BR') + ' km';
+        document.getElementById('bloco-final').classList.remove('oculto');
+    } else {
+        // Limpa se é outro dia
+        document.getElementById('km-inicial').value = '';
+        document.getElementById('exibe-inicial').textContent = '—';
+        document.getElementById('km-final').value = '';
+        document.getElementById('exibe-final').textContent = '—';
+        document.getElementById('bloco-final').classList.add('oculto');
+    }
+    atualizarExibicaoKm();
+}
+
+function salvarKmInicial() {
+    const valor = parseInt(document.getElementById('km-inicial').value) || 0;
+    if (valor <= 0) {
+        alert('Digite o KM correto!');
+        return;
+    }
+    
+    dados.kmInicialHoje = {
+        data: dataHoje(),
+        valor: valor
+    };
+    salvarDados('rd-km-inicial', dados.kmInicialHoje);
+    
+    document.getElementById('exibe-inicial').textContent = valor.toLocaleString('pt-BR') + ' km';
+    document.getElementById('bloco-final').classList.remove('oculto');
+    
+    // JÁ ATUALIZA TUDO — manutenção, estimativas, resumo
+    atualizarResumo();
+    atualizarAvisosManutencao();
+    
+    alert(`✅ Início do dia salvo!\nKM Inicial: ${valor.toLocaleString('pt-BR')} km\nJá começamos a contar! 🏍️`);
+}
+
+function fecharDiaKm() {
+    const inicial = dados.kmInicialHoje.valor;
+    const final = parseInt(document.getElementById('km-final').value) || 0;
+    
+    if (!inicial || final <= inicial) {
+        alert('KM Final tem que ser maior que o Inicial!');
+        return;
+    }
+    
+    const rodado = final - inicial;
+    
+    // Registra o dia completo
+    dados.kmLancados.unshift({
+        id: Date.now(),
+        data: dataHoje(),
+        inicial: inicial,
+        final: final,
+        rodado: rodado
+    });
+    
+    // Limpa o inicial para o dia seguinte
+    dados.kmInicialHoje = { data: null, valor: null };
+    
+    salvarDados('rd-km', dados.kmLancados);
+    salvarDados('rd-km-inicial', dados.kmInicialHoje);
+    
+    document.getElementById('km-inicial').value = '';
+    document.getElementById('km-final').value = '';
+    document.getElementById('bloco-final').classList.add('oculto');
+    
+    renderizarKm();
+    atualizarResumo();
+    alert(`✅ Dia fechado!\nRodado: ${rodado.toLocaleString('pt-BR')} km\nAté amanhã! 🏍️💨`);
+}
+
+function atualizarExibicaoKm() {
+    const inicial = parseInt(document.getElementById('km-inicial').value) || 0;
+    const final = parseInt(document.getElementById('km-final').value) || 0;
+    
+    if (inicial > 0) {
+        document.getElementById('exibe-inicial').textContent = inicial.toLocaleString('pt-BR') + ' km';
+    } else {
+        document.getElementById('exibe-inicial').textContent = '—';
+    }
+    
+    if (final > 0) {
+        document.getElementById('exibe-final').textContent = final.toLocaleString('pt-BR') + ' km';
+    } else {
+        document.getElementById('exibe-final').textContent = '—';
+    }
+    
+    if (inicial > 0 && final > inicial) {
+        document.getElementById('km-total-dia').textContent = (final - inicial).toLocaleString('pt-BR') + ' km';
+    } else if (inicial > 0) {
+        document.getElementById('km-total-dia').textContent = 'Aguardando fim do dia...';
+    } else {
+        document.getElementById('km-total-dia').textContent = '0 km';
+    }
+    
+    // Atualiza total geral
+    const ultimoRegistro = dados.kmLancados[0];
+    const totalGeral = ultimoRegistro ? ultimoRegistro.final : (final || inicial);
+    document.getElementById('km-geral').textContent = totalGeral.toLocaleString('pt-BR') + ' km';
+}
+
+function preencherFixos() {
+    document.getElementById('fixo-ipva').value = dados.custosFixos.ipva || '';
+    document.getElementById('fixo-prestacao').value = dados.custosFixos.prestacao || '';
+    document.getElementById('fixo-seguro').value = dados.custosFixos.seguro || '';
+    document.getElementById('fixo-aluguel').value = dados.custosFixos.aluguel || '';
+    calcularTotalFixos();
+}
+function salvarCustosFixos() {
+    dados.custosFixos = {
+        ipva: parseDinheiro(document.getElementById('fixo-ipva').value),
+        prestacao: parseDinheiro(document.getElementById('fixo-prestacao').value),
+        seguro: parseDinheiro(document.getElementById('fixo-seguro').value),
+        aluguel: parseDinheiro(document.getElementById('fixo-aluguel').value)
+    };
+    salvarDados('rd-fixos', dados.custosFixos);
+    calcularTotalFixos(); atualizarResumo();
+    alert('✅ Salvo! Já descontando!');
+}
+function totalFixoMensal() {
+    const { ipva, prestacao, seguro, aluguel } = dados.custosFixos;
+    return ipva + prestacao + seguro + aluguel;
+}
+function calcularTotalFixos() {
+    const total = totalFixoMensal();
+    document.getElementById('total-fixo-mes').textContent = formatarDinheiro(total);
+    document.getElementById('fixo-por-dia').textContent = formatarDinheiro(total / 30);
+}
+
+function atualizarResumo() {
+    const data = dataVisualizada;
+    const sem = getSemana(data);
+    const mes = mesAno(data);
+    const anoAtual = ano(data);
+
+    // Filtrar por período
+    const diariasDia = dados.diarias.filter(d => d.data === data);
+    const diariasSem = dados.diarias.filter(d => getSemana(d.data) === sem);
+    const diariasMes = dados.diarias.filter(d => mesAno(d.data) === mes);
+    const diariasAno = dados.diarias.filter(d => ano(d.data) === anoAtual);
+
+    const gastosDia = dados.gastos.filter(g => g.data === data).reduce((s, g) => s + g.valor, 0);
+    const gastosSem = dados.gastos.filter(g => getSemana(g.data) === sem).reduce((s, g) => s + g.valor, 0);
+    const gastosMes = dados.gastos.filter(g => mesAno(g.data) === mes).reduce((s, g) => s + g.valor, 0);
+    const gastosAno = dados.gastos.filter(g => ano(g.data) === anoAtual).reduce((s, g) => s + g.valor, 0);
+
+    const manutDia = dados.manutencoes.filter(m => m.data === data).reduce((s, m) => s + m.valor, 0);
+    const manutSem = dados.manutencoes.filter(m => getSemana(m.data) === sem).reduce((s, m) => s + m.valor, 0);
+    const manutMes = dados.manutencoes.filter(m => mesAno(m.data) === mes).reduce((s, m) => s + m.valor, 0);
+    const manutAno = dados.manutencoes.filter(m => ano(m.data) === anoAtual).reduce((s, m) => s + m.valor, 0);
+
+    const kmDia = dados.kmLancados.find(k => k.data === data)?.rodado || 0;
+    const kmSem = dados.kmLancados.filter(k => getSemana(k.data) === sem).reduce((s, k) => s + k.rodado, 0);
+    const kmMes = dados.kmLancados.filter(k => mesAno(k.data) === mes).reduce((s, k) => s + k.rodado, 0);
+    const kmAno = dados.kmLancados.filter(k => ano(k.data) === anoAtual).reduce((s, k) => s + k.rodado, 0);
+
+    const totalFixoDia = totalFixoMensal() / 30;
+    const totalFixoMes = totalFixoMensal();
+    const diasNoMes = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
+    const totalFixoAno = totalFixoMes * 12;
+
+    const recDia = diariasDia.reduce((s, d) => s + d.valor, 0);
+    const recSem = diariasSem.reduce((s, d) => s + d.valor, 0);
+    const recMes = diariasMes.reduce((s, d) => s + d.valor, 0);
+    const recAno = diariasAno.reduce((s, d) => s + d.valor, 0);
+
+    const pct = dados.pctReserva / 100;
+    const resDia = recDia * pct;
+    const resMes = recMes * pct;
+
+    const lucroDia = recDia - gastosDia - manutDia - totalFixoDia - resDia;
+    const lucroSem = recSem - gastosSem - manutSem - (totalFixoDia * diariasSem.length) - (recSem * pct);
+    const lucroMes = recMes - gastosMes - manutMes - totalFixoMes - resMes;
+    const lucroAno = recAno - gastosAno - manutAno - totalFixoAno - (recAno * pct);
+
+    // Atualizar resumo rápido
+    document.getElementById('rapido-recebido').textContent = formatarDinheiro(recDia);
+    document.getElementById('rapido-km').textContent = `${kmDia} km`;
+    document.getElementById('rapido-media').textContent = diariasDia.length ? formatarDinheiro(recDia / diariasDia.length) : 'R$ 0,00';
+    document.getElementById('rapido-lancamentos').textContent = diariasDia.length;
+
+    // Resumo do dia
+    document.getElementById('res-diaria').textContent = formatarDinheiro(recDia);
+    document.getElementById('res-km-dia').textContent = `${kmDia} km`;
+    document.getElementById('res-gastos').textContent = formatarDinheiro(gastosDia);
+    document.getElementById('res-manutencao-dia').textContent = formatarDinheiro(manutDia);
+    document.getElementById('res-fixo-dia').textContent = formatarDinheiro(totalFixoDia);
+    document.getElementById('res-pct').textContent = dados.pctReserva;
+    document.getElementById('res-reserva').textContent = formatarDinheiro(resDia);
+    document.getElementById('res-livre').textContent = formatarDinheiro(lucroDia);
+    document.getElementById('res-livre').className = `valor ${lucroDia >= 0 ? 'v-verde' : 'v-vermelho'}`;
+
+    // Semana
+    document.getElementById('semana-ganho').textContent = formatarDinheiro(recSem);
+    document.getElementById('semana-gasto').textContent = formatarDinheiro(gastosSem + manutSem);
+    document.getElementById('semana-km').textContent = `${kmSem} km`;
+    document.getElementById('semana-lucro').textContent = formatarDinheiro(lucroSem);
+    document.getElementById('semana-lucro').className = `valor ${lucroSem >= 0 ? 'v-verde' : 'v-vermelho'}`;
+
+    // Mês
+    document.getElementById('mes-ganho').textContent = formatarDinheiro(recMes);
+    document.getElementById('mes-fixo').textContent = formatarDinheiro(totalFixoMes);
+    document.getElementById('mes-gasto').textContent = formatarDinheiro(gastosMes + manutMes);
+    document.getElementById('mes-km').textContent = `${kmMes} km`;
+    document.getElementById('mes-reserva').textContent = formatarDinheiro(resMes);
+    document.getElementById('mes-lucro').textContent = formatarDinheiro(lucroMes);
+    document.getElementById('mes-lucro').className = `valor ${lucroMes >= 0 ? 'v-verde' : 'v-vermelho'}`;
+
+    // Ano
+    document.getElementById('ano-ganho').textContent = formatarDinheiro(recAno);
+    document.getElementById('ano-fixo').textContent = formatarDinheiro(totalFixoAno);
+    document.getElementById('ano-gasto').textContent = formatarDinheiro(gastosAno + manutAno);
+    document.getElementById('ano-km').textContent = `${kmAno} km`;
+    document.getElementById('ano-lucro').textContent = formatarDinheiro(lucroAno);
+    document.getElementById('ano-lucro').className = `valor ${lucroAno >= 0 ? 'v-verde' : 'v-vermelho'}`;
+
+    // Título
+    const hoje = dataHoje();
+    document.getElementById('titulo-dia-atual').innerHTML = 
+        data === hoje ? '<i class="fas fa-calendar-day"></i> Resumo — Hoje' 
+                       : `<i class="fas fa-calendar-day"></i> Resumo — ${data.split('-').reverse().join('/')}`;
+
+    atualizarAvisosManutencao();
+}
+
+function atualizarAvisosManutencao() {
+    const container = document.getElementById('avisos-manutencao');
+    const itens = Object.keys(dados.ultimasTrocas);
+    
+    if (!itens.length) {
+        container.innerHTML = '<p style="color:#888; text-align:center; padding:10px;">Nenhuma troca registrada ainda 🏍️</p>';
+        return;
+    }
+
+    let html = '';
+    itens.forEach(nome => {
+        const troca = dados.ultimasTrocas[nome];
+        html += `
+            <div style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #2a2a2a;">
+                <strong style="color:var(--dourado);">${nome}</strong><br>
+                <small style="color:#888;">Última troca: ${troca.data} · ${troca.km} km</small>
+                ${gerarEstimativaHTML(nome, troca.data, troca.km)}
+            </div>
+        `;
+    });
+    container.innerHTML = html;
+}
+
+function registrarDiaria() {
+    const data = document.getElementById('diaria-data').value;
+    const valor = parseDinheiro(document.getElementById('diaria-valor').value);
+    if (!data || valor <= 0) { alert('Preencha data e valor corretamente!'); return; }
+    
+    dados.diarias.unshift({ id: Date.now(), data, valor });
+    salvarDados('rd-diarias', dados.diarias);
+    
+    document.getElementById('diaria-valor').value = '';
+    atualizarResumo(); renderizarDiarias();
+    alert('✅ Diária registrada!');
+}
+
+function renderizarDiarias() {
+    const total = dados.diarias.reduce((s, d) => s + d.valor, 0);
+    document.getElementById('diaria-total').textContent = formatarDinheiro(total);
+    document.getElementById('diaria-qtd').textContent = dados.diarias.length;
+    document.getElementById('diaria-media').textContent = dados.diarias.length ? formatarDinheiro(total / dados.diarias.length) : 'R$ 0,00';
+
+    const lista = document.getElementById('lista-diarias');
+    if (!dados.diarias.length) {
+        lista.innerHTML = '<p style="color:#888; text-align:center; padding:10px;">Nenhuma diária lançada ainda</p>';
+        return;
+    }
+
+    lista.innerHTML = dados.diarias.map(d => `
+        <div class="item-lista">
+            <div class="item-cabecalho">
+                <div>
+                    <strong>${d.data.split('-').reverse().join('/')}</strong><br>
+                    <span class="valor v-verde">${formatarDinheiro(d.valor)}</span>
+                </div>
+                <div class="acoes-item">
+                    <button class="botao botao-editar botao-pequeno" onclick="editarDiaria(${d.id})">
+                        <i class="fas fa-pen"></i> Editar
+                    </button>
+                    <button class="botao botao-vermelho botao-pequeno" onclick="excluirDiaria(${d.id})">
+                        <i class="fas fa-trash"></i> Excluir
+                    </button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function editarDiaria(id) {
+    const d = dados.diarias.find(x => x.id === id);
+    if (!d) return;
+    const novoValor = prompt(`Editar valor de ${d.data}:\nDe: ${formatarDinheiro(d.valor)}\nNovo valor:`, d.valor.toString().replace('.', ','));
+    if (novoValor === null) return;
+    d.valor = parseDinheiro(novoValor);
+    salvarDados('rd-diarias', dados.diarias);
+    atualizarResumo(); renderizarDiarias();
+    alert('✅ Atualizado!');
+}
+
+function excluirDiaria(id) {
+    if (!confirm('Excluir esta diária?')) return;
+    dados.diarias = dados.diarias.filter(d => d.id !== id);
+    salvarDados('rd-diarias', dados.diarias);
+    atualizarResumo(); renderizarDiarias();
+    alert('✅ Excluído!');
+}
+
+// Autocomplete Manutenção
+const inputManut = document.getElementById('manut-descricao');
+const sugestoesManut = document.getElementById('sugestoes-manut');
+inputManut.addEventListener('input', () => {
+    const texto = inputManut.value.toLowerCase().trim();
+    if (!texto) { sugestoesManut.classList.add('oculto'); return; }
+    const matches = Object.keys(ITENS_MANUTENCAO).filter(n => n.toLowerCase().includes(texto));
+    if (!matches.length) { sugestoesManut.classList.add('oculto'); return; }
+    sugestoesManut.classList.remove('oculto');
+    sugestoesManut.innerHTML = matches.map(m => `<div class="sugestao" onclick="document.getElementById('manut-descricao').value='${m}'; this.parentElement.classList.add('oculto');">${m}</div>`).join('');
+});
+document.addEventListener('click', e => {
+    if (!inputManut.contains(e.target) && !sugestoesManut.contains(e.target)) {
+        sugestoesManut.classList.add('oculto');
+    }
+});
+
+function registrarManutencao() {
+    const desc = document.getElementById('manut-descricao').value.trim();
+    const valor = parseDinheiro(document.getElementById('manut-valor').value);
+    const data = document.getElementById('manut-data').value;
+    const km = parseInt(document.getElementById('manut-km').value) || 0;
+
+    if (!desc || valor <= 0 || !data || km <= 0) {
+        alert('Preencha todos os campos corretamente!'); return;
+    }
+
+    dados.manutencoes.unshift({ id: Date.now(), desc, valor, data, km });
+    // Atualizar última troca deste item
+    dados.ultimasTrocas[desc] = { data, km };
+
+    salvarDados('rd-manut', dados.manutencoes);
+    salvarDados('rd-trocas', dados.ultimasTrocas);
+
+    document.getElementById('manut-descricao').value = '';
+    document.getElementById('manut-valor').value = '';
+    document.getElementById('manut-km').value = '';
+
+    atualizarResumo(); renderizarManutencoes();
+    alert('✅ Manutenção registrada! Estimativas atualizadas!');
+}
+
+function renderizarManutencoes() {
+    const total = dados.manutencoes.reduce((s, m) => s + m.valor, 0);
+    const ultimoKm = dados.manutencoes[0]?.km || 0;
+    document.getElementById('manut-total').textContent = formatarDinheiro(total);
+    document.getElementById('manut-qtd').textContent = dados.manutencoes.length;
+    document.getElementById('manut-km-atual').textContent = `${ultimoKm} km`;
+
+    const lista = document.getElementById('lista-manut');
+    if (!dados.manutencoes.length) {
+        lista.innerHTML = '<p style="color:#888; text-align:center; padding:10px;">Nenhuma manutenção registrada</p>';
+        return;
+    }
+
+    lista.innerHTML = dados.manutencoes.map(m => `
+        <div class="item-lista">
+            <div class="item-cabecalho">
+                <div>
+                    <strong>${m.desc}</strong><br>
+                    <small style="color:#888;">${m.data.split('-').reverse().join('/')} · ${m.km} km</small><br>
+                    <span class="valor v-vermelho">${formatarDinheiro(m.valor)}</span>
+                </div>
+                <div class="acoes-item">
+                    <button class="botao botao-vermelho botao-pequeno" onclick="excluirManutencao(${m.id})">
+                        <i class="fas fa-trash"></i> Excluir
+                    </button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function excluirManutencao(id) {
+    if (!confirm('Excluir este registro?')) return;
+    dados.manutencoes = dados.manutencoes.filter(m => m.id !== id);
+    salvarDados('rd-manut', dados.manutencoes);
+    atualizarResumo(); renderizarManutencoes();
+    alert('✅ Excluído!');
+}
+
+function registrarGasto() {
+    const cat = document.getElementById('gasto-cat').value;
+    const desc = document.getElementById('gasto-desc').value.trim() || cat;
+    const valor = parseDinheiro(document.getElementById('gasto-valor').value);
+    const data = document.getElementById('gasto-data').value;
+
+    if (!data || valor <= 0) { alert('Preencha data e valor corretamente!'); return; }
+
+    dados.gastos.unshift({ id: Date.now(), categoria: cat, desc, valor, data });
+    salvarDados('rd-gastos', dados.gastos);
+
+    document.getElementById('gasto-desc').value = '';
+    document.getElementById('gasto-valor').value = '';
+
+    atualizarResumo(); renderizarGastos();
+    alert('✅ Gasto registrado!');
+}
+
+function renderizarGastos() {
+    const total = dados.gastos.reduce((s, g) => s + g.valor, 0);
+    document.getElementById('gastos-total').textContent = formatarDinheiro(total);
+    document.getElementById('gastos-qtd').textContent = dados.gastos.length;
+
+    const lista = document.getElementById('lista-gastos');
+    if (!dados.gastos.length) {
+        lista.innerHTML = '<p style="color:#888; text-align:center; padding:10px;">Nenhum gasto lançado</p>';
+        return;
+    }
+
+    lista.innerHTML = dados.gastos.map(g => `
+        <div class="item-lista">
+            <div class="item-cabecalho">
+                <div>
+                    <strong>${g.categoria}</strong><br>
+                    <small style="color:#888;">${g.data.split('-').reverse().join('/')}</small><br>
+                    <span class="valor v-vermelho">${formatarDinheiro(g.valor)}</span>
+                </div>
+                <div class="acoes-item">
+                    <button class="botao botao-vermelho botao-pequeno" onclick="excluirGasto(${g.id})">
+                        <i class="fas fa-trash"></i> Excluir
+                    </button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function excluirGasto(id) {
+    if (!confirm('Excluir este gasto?')) return;
+    dados.gastos = dados.gastos.filter(g => g.id !== id);
+    salvarDados('rd-gastos', dados.gastos);
+    atualizarResumo(); renderizarGastos();
+    alert('✅ Excluído!');
+}
+
+function renderizarKm() {
+    const mesAtual = mesAno(dataHoje());
+    const kmMes = dados.kmLancados.filter(k => mesAno(k.data) === mesAtual).reduce((s, k) => s + k.rodado, 0);
+    const diasComRegistro = dados.kmLancados.length;
+    const media = diasComRegistro > 0 ? Math.round(dados.kmLancados.reduce((s, k) => s + k.rodado, 0) / diasComRegistro) : 0;
+
+    document.getElementById('km-mes').textContent = `${kmMes.toLocaleString('pt-BR')} km`;
+    document.getElementById('km-media-dia').textContent = `${media.toLocaleString('pt-BR')} km`;
+
+    const lista = document.getElementById('lista-km');
+    if (!dados.kmLancados.length) {
+        lista.innerHTML = '<p style="color:#888; text-align:center; padding:10px;">Nenhum registro de km ainda</p>';
+        return;
+    }
+
+    lista.innerHTML = dados.kmLancados.map(k => `
+        <div class="item-lista">
+            <div class="linha" style="border:none; padding:4px 0;">
+                <strong>${k.data.split('-').reverse().join('/')}</strong>
+                <span class="valor v-dourado">${k.rodado.toLocaleString('pt-BR')} km</span>
+            </div>
+            <div class="linha" style="border:none; padding:4px 0; font-size:13px; color:#88;">
+                Início: ${k.inicial.toLocaleString('pt-BR')} km → Fim: ${k.final.toLocaleString('pt-BR')} km
+            </div>
+            <div class="acoes-item">
+                <button class="botao botao-vermelho botao-pequeno" onclick="excluirRegistroKm(${k.id})">
+                    <i class="fas fa-trash"></i> Excluir
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function excluirRegistroKm(id) {
+    if (!confirm('Excluir este registro de km? Isso afeta as estimativas de manutenção!')) return;
+    dados.kmLancados = dados.kmLancados.filter(k => k.id !== id);
+    salvarDados('rd-km', dados.kmLancados);
+    renderizarKm(); atualizarResumo();
+    alert('✅ Excluído!');
+}
+
+// Inicialização
+verificarEstadoDiaKm();
+atualizarResumo();
+preencherFixos();
 </script>
+
 </body>
     </html>
