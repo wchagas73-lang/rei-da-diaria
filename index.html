@@ -671,6 +671,48 @@ function lancarGasto() {
     alert(`✅ Lançado em ${formatarData(dataEscolhida)}!`);
 }
 
+function excluirItem(tipo, indice, data) {
+    if (!confirm('Tem certeza que quer excluir este item?')) return;
+    const reg = pegarRegistro(data);
+    reg[tipo].splice(indice, 1);
+    salvarDados();
+    alert('✅ Excluído!');
+}
+
+function editarGanho(indice, data) {
+    const reg = pegarRegistro(data);
+    const g = reg.ganhos[indice];
+    document.getElementById('dataGanho').value = data;
+    const opcao = Array.from(document.getElementById('fonteGanho').options).find(o => o.text === g.fonte || o.value === g.fonte);
+    if (opcao && opcao.value !== 'Outros') {
+        document.getElementById('fonteGanho').value = opcao.value;
+        document.getElementById('campoOutraFonte').style.display = 'none';
+    } else {
+        document.getElementById('fonteGanho').value = 'Outros';
+        document.getElementById('campoOutraFonte').style.display = 'flex';
+        document.getElementById('outraFonte').value = g.fonte;
+    }
+    document.getElementById('valorGanho').value = g.valor;
+    document.getElementById('obsGanho').value = g.obs || '';
+    reg.ganhos.splice(indice, 1);
+    salvarDados();
+    trocarAba('Ganhos');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function editarGasto(indice, data) {
+    const reg = pegarRegistro(data);
+    const g = reg.gastos[indice];
+    document.getElementById('dataGasto').value = data;
+    document.getElementById('categoriaGasto').value = g.categoria;
+    document.getElementById('valorGasto').value = g.valor;
+    document.getElementById('descricaoGasto').value = g.descricao || '';
+    reg.gastos.splice(indice, 1);
+    salvarDados();
+    trocarAba('Gastos');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 function normalizarTexto(t) {
     return t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 }
@@ -729,47 +771,11 @@ function usarSugestao(nome, proxKm, proxMeses) {
 function atualizarSugestaoKm() {
     const nome = normalizarTexto(document.getElementById('nomeManutencao').value || '');
     const item = listaPecas.find(p => normalizarTexto(p.nome) === nome);
-    if (!item || item.proximoKm === 0) return;
+        if (!item || !item.proximoKm) return;
     const kmTroca = Number(document.getElementById('kmTroca').value) || kmAtualParaCalculo();
     if (kmTroca > 0) {
         document.getElementById('proximoKmMeta').value = kmTroca + item.proximoKm;
     }
-}
-
-function limparFormularioManutencao() {
-    document.getElementById('nomeManutencao').value = '';
-    document.getElementById('dataManutencao').value = getDataHoje();
-    document.getElementById('kmTroca').value = '';
-    document.getElementById('proximoKmMeta').value = '';
-    document.getElementById('proximaDataMeta').value = '';
-    document.getElementById('valorPeca').value = '';
-    document.getElementById('valorMaoObra').value = '';
-    document.getElementById('valorTotalManutencao').value = '';
-    document.getElementById('caixaSugestoes').innerHTML = '';
-    window.editandoManutencao = null;
-    const btn = document.getElementById('btnSalvarManut');
-    btn.textContent = '💾 Salvar Manutenção';
-    btn.onclick = lancarManutencao;
-}
-
-function lancarManutencao() {
-    const nome = document.getElementById('nomeManutencao').value.trim();
-    if (!nome) { alert('Digite ou escolha o item!'); return; }
-    const dataEscolhida = document.getElementById('dataManutencao').value || getDataHoje();
-    const reg = pegarRegistro(dataEscolhida);
-    reg.manutencoes.push({
-        nome,
-        dataTroca: dataEscolhida,
-        kmTroca: Number(document.getElementById('kmTroca').value) || kmAtualParaCalculo(),
-        proximoKmMeta: Number(document.getElementById('proximoKmMeta').value) || null,
-        proximaDataMeta: document.getElementById('proximaDataMeta').value || null,
-        valorPeca: Number(document.getElementById('valorPeca').value) || 0,
-        valorMaoObra: Number(document.getElementById('valorMaoObra').value) || 0,
-                valorTotal: Number(document.getElementById('valorTotalManutencao').value) || 0
-    });
-    limparFormularioManutencao();
-    salvarDados();
-    alert(`✅ ${nome} salvo em ${formatarData(dataEscolhida)}!`);
 }
 
 function calcularProgressoManutencao(item) {
@@ -806,6 +812,41 @@ function getTextoStatus(cor) {
     return '🔴 PRECISA TROCAR!';
 }
 
+function lancarManutencao() {
+    const nome = document.getElementById('nomeManutencao').value.trim();
+    if (!nome) { alert('Digite o nome do item!'); return; }
+    
+    const dataTroca = document.getElementById('dataManutencao').value || getDataHoje();
+    const reg = pegarRegistro(dataTroca);
+    
+    reg.manutencoes.push({
+        nome: nome,
+        dataTroca: dataTroca,
+        kmTroca: Number(document.getElementById('kmTroca').value) || null,
+        proximoKmMeta: Number(document.getElementById('proximoKmMeta').value) || null,
+        proximaDataMeta: document.getElementById('proximaDataMeta').value || null,
+        valorPeca: Number(document.getElementById('valorPeca').value) || 0,
+        valorMaoObra: Number(document.getElementById('valorMaoObra').value) || 0,
+        valorTotal: Number(document.getElementById('valorTotalManutencao').value) || 0
+    });
+    
+    limparFormularioManutencao();
+    salvarDados();
+    alert(`✅ ${nome} salvo em ${formatarData(dataTroca)}!`);
+}
+
+function limparFormularioManutencao() {
+    document.getElementById('nomeManutencao').value = '';
+    document.getElementById('dataManutencao').value = getDataHoje();
+    document.getElementById('kmTroca').value = '';
+    document.getElementById('proximoKmMeta').value = '';
+    document.getElementById('proximaDataMeta').value = '';
+    document.getElementById('valorPeca').value = '';
+    document.getElementById('valorMaoObra').value = '';
+    document.getElementById('valorTotalManutencao').value = '';
+    document.getElementById('caixaSugestoes').innerHTML = '';
+}
+
 function atualizarListaManutencao() {
     const todasManutencoes = [];
     Object.values(dados.registros).forEach(reg => {
@@ -819,7 +860,7 @@ function atualizarListaManutencao() {
         return;
     }
     
-    lista.innerHTML = todasManutencoes.map((item, idx) => {
+    lista.innerHTML = todasManutencoes.map(item => {
         const { progressoKm, progressoData } = calcularProgressoManutencao(item);
         const progresso = progressoKm !== null ? progressoKm : progressoData;
         const cor = progresso !== null ? getCorStatus(progresso) : null;
@@ -930,7 +971,7 @@ function atualizarListas(periodo = 'dia') {
     listaGastos.innerHTML = '';
     
     registrosFiltrados.forEach(({ data, reg }) => {
-        reg.ganhos.forEach(g => {
+        reg.ganhos.forEach((g, idx) => {
             totalRecebido += g.valor;
             listaGanhos.innerHTML += `
             <div class="item-lista">
@@ -939,10 +980,14 @@ function atualizarListas(periodo = 'dia') {
                     <span class="valor verde">+ ${formatarValor(g.valor)}</span>
                 </div>
                 <p style="font-size:0.75rem;opacity:0.6;">📅 ${formatarData(data)}</p>
+                <div class="botoes-lado" style="margin-top:0.4rem;">
+                    <button class="secundario" style="padding:0.4rem 0.6rem;font-size:0.8rem;flex:1;" onclick="editarGanho(${idx}, '${data}')">✏️ Editar</button>
+                    <button class="secundario" style="padding:0.4rem 0.6rem;font-size:0.8rem;flex:1;color:var(--vermelho);" onclick="excluirItem('ganhos', ${idx}, '${data}')">🗑️ Excluir</button>
+                </div>
             </div>`;
         });
         
-        reg.gastos.forEach(g => {
+        reg.gastos.forEach((g, idx) => {
             totalGastos += g.valor;
             const icones = {
                 alimentacao: '🍔', combustivel: '⛽', acessorios: '🛡️', mercado: '🏪',
@@ -956,6 +1001,10 @@ function atualizarListas(periodo = 'dia') {
                     <span class="valor vermelho">- ${formatarValor(g.valor)}</span>
                 </div>
                 <p style="font-size:0.75rem;opacity:0.6;">📅 ${formatarData(data)}${g.descricao ? ' · ' + g.descricao : ''}</p>
+                <div class="botoes-lado" style="margin-top:0.4rem;">
+                    <button class="secundario" style="padding:0.4rem 0.6rem;font-size:0.8rem;flex:1;" onclick="editarGasto(${idx}, '${data}')">✏️ Editar</button>
+                    <button class="secundario" style="padding:0.4rem 0.6rem;font-size:0.8rem;flex:1;color:var(--vermelho);" onclick="excluirItem('gastos', ${idx}, '${data}')">🗑️ Excluir</button>
+                </div>
             </div>`;
         });
         
@@ -968,8 +1017,8 @@ function atualizarListas(periodo = 'dia') {
     if (listaGastos.innerHTML === '') listaGastos.innerHTML = '<p style="opacity:0.6;text-align:center;padding:1rem;">Nenhum gasto lançado</p>';
     
     const diasNoMes = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0).getDate();
-    const diasPassados = hoje.getDate();
-    const custoFixoDiario = (Object.values(dados.custosFixos).reduce((s,v)=>(typeof v==='number'?s+v:s),0)) / diasNoMes;
+    const custoFixoTotal = Object.values(dados.custosFixos).reduce((s,v) => (typeof v === 'number' ? s + v : s), 0);
+    const custoFixoDiario = custoFixoTotal / diasNoMes;
     const custoFixoPeriodo = custoFixoDiario * (periodo === 'dia' ? 1 : periodo === 'semana' ? 7 : periodo === 'mes' ? diasNoMes : 365);
     
     const lucro = totalRecebido - totalGastos - totalManutencao;
@@ -1005,9 +1054,10 @@ window.onload = function() {
     document.getElementById('dataGanho').value = getDataHoje();
     document.getElementById('dataGasto').value = getDataHoje();
     document.getElementById('dataManutencao').value = getDataHoje();
+    document.getElementById('porcentagemReserva').value = dados.porcentagemReserva;
     preencherCustosFixosTela();
     mudarPeriodo('dia');
 }
 </script>
 </body>
-</html>
+                </html>
