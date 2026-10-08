@@ -54,10 +54,7 @@
         .alerta-verde { background: rgba(34, 197, 94, 0.1); border-color: var(--verde); }
         .alerta-amarelo { background: rgba(245, 158, 11, 0.1); border-color: var(--amarelo); }
         .alerta-vermelho { background: rgba(239, 68, 68, 0.1); border-color: var(--vermelho); }
-        .comparativo { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid #333; }
-        .cresceu { color: var(--verde); }
-        .caiu { color: var(--vermelho); }
-        .sugestoes { margin-top: 0.5rem; font-size: 0.8rem; opacity: 0.7; }
+        .sugestoes { margin-top: 0.5rem; font-size: 0.8rem; }
         .sugestao-item { padding: 0.5rem 0.7rem; background: #2a2a2a; border-radius: 6px; margin: 0.3rem 0; cursor: pointer; border-left: 2px solid var(--dourado); }
         .sugestao-item:hover { background: #3a3a3a; }
         .dica-manual { font-size: 0.75rem; opacity: 0.6; margin-top: 0.4rem; }
@@ -305,14 +302,14 @@
             <div>
                 <label>Próximo Km (meta)</label>
                 <input type="number" id="proximoKmMeta" placeholder="Deixe vazio se for só por data">
-                <p class="dica-campo">💡 Deixe vazio se for só por data</p>
+                <p class="dica-campo">💡 Deixe vazio se for só por data — pode apagar!</p>
             </div>
         </div>
         <div class="linha-lado">
             <div>
                 <label>Próxima Data (meta)</label>
                 <input type="date" id="proximaDataMeta">
-                <p class="dica-campo">💡 Deixe vazio se for só por km — pode apagar!</p>
+                <p class="dica-campo">💡 Deixe vazio se for só por km</p>
             </div>
             <div>
                 <label>Valor Peça (R$)</label>
@@ -363,55 +360,72 @@
 let dados = carregarDados();
 let periodoAtual = 'dia';
 
-// ✅ LISTA COMPLETA — ITENS SEPARADOS PARA ESCOLHA INDIVIDUAL
+// ✅ LISTA COMPLETA DE A a Z — BUSCA SEM ACENTO
 const listaPecas = [
-    { nome: 'óleo do motor', proximoKm: 6000, proximoMeses: 12, descricao: 'Troca de óleo — Honda: 6.000 km ou 1 ano' },
-    { nome: 'filtro de óleo', proximoKm: 6000, proximoMeses: 12, descricao: 'Filtro de óleo' },
-    { nome: 'filtro de ar', proximoKm: 18000, proximoMeses: 24, descricao: 'Filtro de ar — Honda: 18.000 km' },
-    { nome: 'filtro de combustível', proximoKm: 12000, proximoMeses: 12, descricao: 'Filtro de gasolina — Honda: 12.000 km' },
-    { nome: 'óleo de câmbio', proximoKm: 5000, proximoMeses: 6, descricao: 'Óleo da transmissão' },
-    
-    // 🛑 FREIOS — SEPARADOS INDIVIDUALMENTE
-    { nome: 'pastilha de freio dianteiro', proximoKm: 15000, proximoMeses: 12, descricao: 'Freio dianteiro — média: 15.000 km' },
-    { nome: 'pastilha de freio traseiro', proximoKm: 18000, proximoMeses: 12, descricao: 'Freio traseiro — média: 18.000 km' },
-    { nome: 'lona de freio traseiro', proximoKm: 6000, proximoMeses: 6, descricao: 'Lona/sapata — inspecionar a cada 6.000 km' },
-    { nome: 'disco de freio dianteiro', proximoKm: 24000, proximoMeses: 24, descricao: 'Disco dianteiro — inspecionar' },
-    { nome: 'disco de freio traseiro', proximoKm: 28000, proximoMeses: 24, descricao: 'Disco traseiro — inspecionar' },
-    { nome: 'fluido de freio', proximoKm: 0, proximoMeses: 24, descricao: 'Trocar a cada 2 anos' },
-    { nome: 'mangueira de freio', proximoKm: 12000, proximoMeses: 12, descricao: 'Inspecionar' },
-    
-    // 🛞 PNEUS — SEPARADOS
-    { nome: 'pneu dianteiro', proximoKm: 10000, proximoMeses: 12, descricao: 'Roda da frente' },
-    { nome: 'pneu traseiro', proximoKm: 8000, proximoMeses: 12, descricao: 'Roda de trás — desgasta mais rápido' },
-    
-    // ⛓️ TRANSMISSÃO
-    { nome: 'corrente de transmissão', proximoKm: 1000, proximoMeses: 1, descricao: 'Lubrificar a cada 1.000 km' },
-    { nome: 'coroa', proximoKm: 20000, proximoMeses: 18, descricao: 'Parte do kit relação' },
-    { nome: 'pinhão', proximoKm: 20000, proximoMeses: 18, descricao: 'Parte do kit relação' },
-    { nome: 'kit relação completo', proximoKm: 20000, proximoMeses: 18, descricao: 'Corrente + coroa + pinhão juntos' },
-    
-    // 🔧 SUSPENSÃO
-    { nome: 'óleo da suspensão dianteira', proximoKm: 24000, proximoMeses: 24, descricao: 'Trocar óleo do garfo — Honda: 24.000 km' },
-    { nome: 'retentor do garfo dianteiro', proximoKm: 24000, proximoMeses: 24, descricao: 'Vedações do garfo' },
-    { nome: 'amortecedor traseiro', proximoKm: 6000, proximoMeses: 6, descricao: 'Inspecionar' },
-    
-    // 🔩 ROLAMENTOS
-    { nome: 'rolamento roda dianteira', proximoKm: 40000, proximoMeses: 36, descricao: 'Roda da frente' },
-    { nome: 'rolamento roda traseira', proximoKm: 40000, proximoMeses: 36, descricao: 'Roda de trás' },
-    { nome: 'rolamento caixa de direção', proximoKm: 24000, proximoMeses: 24, descricao: 'Mesa da direção' },
-    
-    // ⚡ MOTOR/IGNIÇÃO
-    { nome: 'vela de ignição', proximoKm: 12000, proximoMeses: 12, descricao: 'Honda: 12.000 km' },
-    { nome: 'regulagem de válvulas', proximoKm: 6000, proximoMeses: 6, descricao: 'Folga das válvulas — Honda: 6.000 km' },
-    { nome: 'embreagem', proximoKm: 30000, proximoMeses: 24, descricao: 'Discos e cabo' },
+    { nome: 'acelerador', proximoKm: 6000, proximoMeses: 0, descricao: 'Inspeção' },
+    { nome: 'alavanca de embreagem', proximoKm: 6000, proximoMeses: 0, descricao: 'Inspeção/lubrificação' },
+    { nome: 'manete de embreagem', proximoKm: 6000, proximoMeses: 0, descricao: 'Inspeção/lubrificação' },
+    { nome: 'alavanca de freio', proximoKm: 6000, proximoMeses: 0, descricao: 'Inspeção/lubrificação' },
+    { nome: 'manete de freio', proximoKm: 6000, proximoMeses: 0, descricao: 'Inspeção/lubrificação' },
+    { nome: 'amortecedor traseiro', proximoKm: 6000, proximoMeses: 0, descricao: 'Inspeção' },
+    { nome: 'antena corta-pipa', proximoKm: 0, proximoMeses: 12, descricao: 'Preventivo' },
+    { nome: 'aro das rodas', proximoKm: 6000, proximoMeses: 0, descricao: 'Inspeção' },
+    { nome: 'arruela do bujão de óleo', proximoKm: 6000, proximoMeses: 0, descricao: 'A cada troca de óleo' },
+    { nome: 'alinhamento das rodas', proximoKm: 12000, proximoMeses: 0, descricao: 'Preventivo' },
     { nome: 'bateria', proximoKm: 0, proximoMeses: 36, descricao: 'Estimativa: 3 anos' },
-    
-    // 📌 OUTROS
-    { nome: 'injeção eletrônica', proximoKm: 12000, proximoMeses: 12, descricao: 'Limpeza/diagnóstico' },
-    { nome: 'bico injetor', proximoKm: 24000, proximoMeses: 24, descricao: 'Limpeza preventiva' },
-    { nome: 'caixa de direção', proximoKm: 12000, proximoMeses: 12, descricao: 'Inspecionar e lubrificar' },
-    { nome: 'cabo do acelerador', proximoKm: 6000, proximoMeses: 6, descricao: 'Inspecionar/lubrificar' },
-    { nome: 'cabo da embreagem', proximoKm: 6000, proximoMeses: 6, descricao: 'Inspecionar/lubrificar' },
+    { nome: 'balança traseira', proximoKm: 12000, proximoMeses: 0, descricao: 'Inspeção' },
+    { nome: 'bico injetor', proximoKm: 24000, proximoMeses: 0, descricao: 'Limpeza preventiva' },
+    { nome: 'bobina de ignição', proximoKm: 0, proximoMeses: 0, descricao: 'Sem intervalo fixo' },
+    { nome: 'bomba de combustível', proximoKm: 0, proximoMeses: 0, descricao: 'Sem intervalo fixo' },
+    { nome: 'buchas da balança', proximoKm: 24000, proximoMeses: 0, descricao: 'Inspeção/lubrificação' },
+    { nome: 'buchas da roda traseira', proximoKm: 24000, proximoMeses: 0, descricao: 'Inspeção' },
+    { nome: 'coxins da roda traseira', proximoKm: 24000, proximoMeses: 0, descricao: 'Inspeção' },
+    { nome: 'buzina', proximoKm: 6000, proximoMeses: 0, descricao: 'Inspeção' },
+    { nome: 'cabo do acelerador', proximoKm: 6000, proximoMeses: 0, descricao: 'Inspeção' },
+    { nome: 'cabo da embreagem', proximoKm: 6000, proximoMeses: 0, descricao: 'Inspeção/lubrificação' },
+    { nome: 'cachimbo da vela', proximoKm: 0, proximoMeses: 36, descricao: 'Preventivo: 3 anos' },
+    { nome: 'caixa de direção', proximoKm: 12000, proximoMeses: 0, descricao: 'Inspeção/ajuste' },
+    { nome: 'cavalete lateral', proximoKm: 6000, proximoMeses: 0, descricao: 'Inspeção/lubrificação' },
+    { nome: 'corrente de comando', proximoKm: 0, proximoMeses: 0, descricao: 'Sem troca fixa' },
+    { nome: 'corrente de transmissão', proximoKm: 1000, proximoMeses: 0, descricao: 'Lubrificar a cada 1.000 km' },
+    { nome: 'coroa', proximoKm: 20000, proximoMeses: 0, descricao: 'Kit relação' },
+    { nome: 'disco de freio dianteiro', proximoKm: 24000, proximoMeses: 0, descricao: 'Inspeção' },
+    { nome: 'disco de freio traseiro', proximoKm: 28000, proximoMeses: 0, descricao: 'Inspeção' },
+    { nome: 'dreno do filtro de ar', proximoKm: 6000, proximoMeses: 0, descricao: 'Honda' },
+    { nome: 'discos da embreagem', proximoKm: 30000, proximoMeses: 0, descricao: 'Inspeção' },
+    { nome: 'embreagem', proximoKm: 30000, proximoMeses: 0, descricao: 'Inspeção' },
+    { nome: 'escapamento', proximoKm: 6000, proximoMeses: 0, descricao: 'Inspeção' },
+    { nome: 'estator', proximoKm: 0, proximoMeses: 0, descricao: 'Sem intervalo fixo' },
+    { nome: 'eixo da roda dianteira', proximoKm: 12000, proximoMeses: 0, descricao: 'Inspeção/lubrificação' },
+    { nome: 'eixo da roda traseira', proximoKm: 12000, proximoMeses: 0, descricao: 'Inspeção/lubrificação' },
+    { nome: 'farol', proximoKm: 6000, proximoMeses: 0, descricao: 'Inspeção/ajuste' },
+    { nome: 'filtro de ar', proximoKm: 18000, proximoMeses: 0, descricao: 'Honda' },
+    { nome: 'filtro de combustível', proximoKm: 12000, proximoMeses: 0, descricao: 'Honda' },
+    { nome: 'filtro de óleo', proximoKm: 6000, proximoMeses: 12, descricao: 'A cada troca de óleo' },
+    { nome: 'fluido de freio', proximoKm: 0, proximoMeses: 24, descricao: 'Trocar a cada 2 anos' },
+    { nome: 'óleo da suspensão dianteira', proximoKm: 24000, proximoMeses: 0, descricao: 'Honda' },
+    { nome: 'óleo de câmbio', proximoKm: 5000, proximoMeses: 6, descricao: 'Óleo da transmissão' },
+    { nome: 'óleo do motor', proximoKm: 6000, proximoMeses: 12, descricao: '6.000 km ou 1 ano — Honda' },
+    { nome: 'fusíveis', proximoKm: 0, proximoMeses: 0, descricao: 'Sem intervalo fixo' },
+    { nome: 'garfo dianteiro', proximoKm: 6000, proximoMeses: 0, descricao: 'Inspeção' },
+    { nome: 'guidão', proximoKm: 6000, proximoMeses: 0, descricao: 'Inspeção' },
+    { nome: 'graxa da caixa de direção', proximoKm: 24000, proximoMeses: 0, descricao: 'Preventivo' },
+    { nome: 'injeção eletrônica', proximoKm: 12000, proximoMeses: 0, descricao: 'Diagnóstico/limpeza' },
+    { nome: 'kit relação completo', proximoKm: 20000, proximoMeses: 0, descricao: 'Corrente + coroa + pinhão' },
+    { nome: 'lona de freio traseiro', proximoKm: 6000, proximoMeses: 0, descricao: 'Inspeção' },
+    { nome: 'mangueira de freio', proximoKm: 12000, proximoMeses: 0, descricao: 'Inspeção' },
+    { nome: 'pinhão', proximoKm: 20000, proximoMeses: 0, descricao: 'Kit relação' },
+    { nome: 'pastilha de freio dianteiro', proximoKm: 15000, proximoMeses: 0, descricao: 'Inspeção' },
+    { nome: 'pastilha de freio traseiro', proximoKm: 18000, proximoMeses: 0, descricao: 'Inspeção' },
+    { nome: 'pneu dianteiro', proximoKm: 10000, proximoMeses: 0, descricao: 'Revisão' },
+    { nome: 'pneu traseiro', proximoKm: 8000, proximoMeses: 0, descricao: 'Revisão' },
+    { nome: 'pressão dos pneus', proximoKm: 1000, proximoMeses: 0, descricao: 'Verificar semanalmente' },
+    { nome: 'regulagem de válvulas', proximoKm: 6000, proximoMeses: 0, descricao: 'Honda' },
+    { nome: 'retentor do garfo', proximoKm: 24000, proximoMeses: 0, descricao: 'Revisão' },
+    { nome: 'rolamento roda dianteira', proximoKm: 40000, proximoMeses: 0, descricao: 'Preventivo' },
+    { nome: 'rolamento roda traseira', proximoKm: 40000, proximoMeses: 0, descricao: 'Preventivo' },
+    { nome: 'rolamento caixa de direção', proximoKm: 24000, proximoMeses: 0, descricao: 'Revisão' },
+    { nome: 'vela de ignição', proximoKm: 12000, proximoMeses: 0, descricao: 'Honda' },
     { nome: 'outro serviço', proximoKm: 0, proximoMeses: 0, descricao: 'Serviço/manutenção geral' }
 ];
 
@@ -581,11 +595,11 @@ function normalizarTexto(t) {
 
 function mostrarSugestoes(digitado) {
     const caixa = document.getElementById('caixaSugestoes');
-    if (!digitado || digitado.length < 2) { caixa.innerHTML = ''; return; }
+    if (!digitado || digitado.length < 1) { caixa.innerHTML = ''; return; }
     const dig = normalizarTexto(digitado);
     const encontrados = listaPecas.filter(p => 
         normalizarTexto(p.nome).includes(dig) || normalizarTexto(p.descricao).includes(dig)
-    ).slice(0, 5);
+    ).slice(0, 6);
     
     if (encontrados.length === 0) { caixa.innerHTML = ''; return; }
     caixa.innerHTML = encontrados.map(p => `
@@ -604,7 +618,13 @@ function usarSugestao(nome, proxKm, proxMeses) {
     } else {
         document.getElementById('proximoKmMeta').value = '';
     }
-    document.getElementById('proximaDataMeta').value = '';
+    if (proxMeses > 0) {
+        const proxData = new Date();
+        proxData.setMonth(proxData.getMonth() + proxMeses);
+        document.getElementById('proximaDataMeta').value = proxData.toISOString().split('T')[0];
+    } else {
+        document.getElementById('proximaDataMeta').value = '';
+    }
     document.getElementById('caixaSugestoes').innerHTML = '';
 }
 
@@ -676,84 +696,110 @@ function calcularProgresso(item, kmAtual) {
 }
 
 function mudarPeriodo(p) {
-    periodoAtual = p;
+        periodoAtual = p;
     ['dia','semana','mes','ano'].forEach(per => {
         const btn = document.getElementById(`btn${per.charAt(0).toUpperCase() + per.slice(1)}`);
-        btn.style.background = per === p ? 'var(--dourado)' : '#333';
-        btn.style.color = per === p ? '#000' : '#fff';
+        if (per === p) btn.style.background = 'var(--dourado)';
+        else btn.style.background = '#333';
     });
+
     const nomes = { dia: 'Hoje', semana: 'Esta Semana', mes: 'Este Mês', ano: 'Este Ano' };
     document.getElementById('tituloPeriodo').textContent = nomes[p];
     atualizarTela();
 }
 
-function coletarRegistrosPeriodo(periodo) {
+function calcularTotaisPeriodo(periodo) {
     const hoje = new Date();
-    hoje.setHours(0, 0, 0, 0);
-    return Object.entries(dados.registros).filter(([dataStr]) => {
-        const d = new Date(dataStr + 'T00:00:00');
-        switch(periodo) {
-            case 'dia': return dataStr === getDataHoje();
-            case 'semana':
-                const inicioSemana = new Date(hoje);
-                inicioSemana.setDate(hoje.getDate() - hoje.getDay());
-                inicioSemana.setHours(0, 0, 0, 0);
-                return d >= inicioSemana;
-            case 'mes': return d.getMonth() === hoje.getMonth() && d.getFullYear() === hoje.getFullYear();
-            case 'ano': return d.getFullYear() === hoje.getFullYear();
-        }
-    }).map(([_, reg]) => reg);
-}
+    let dataInicio;
 
-function calcularTotais(regs) {
+    switch(periodo) {
+        case 'dia':
+            dataInicio = new Date(hoje);
+            break;
+        case 'semana':
+            const diaSemana = hoje.getDay();
+            dataInicio = new Date(hoje);
+            dataInicio.setDate(hoje.getDate() - diaSemana);
+            break;
+        case 'mes':
+            dataInicio = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+            break;
+        case 'ano':
+            dataInicio = new Date(hoje.getFullYear(), 0, 1);
+            break;
+    }
+    dataInicio.setHours(0,0,0,0);
+
     let ganhos = 0, gastos = 0, manutencao = 0;
-    regs.forEach(reg => {
-        ganhos += reg.ganhos.reduce((s, g) => s + g.valor, 0);
-        gastos += reg.gastos.reduce((s, g) => s + g.valor, 0);
-        manutencao += reg.manutencoes.reduce((s, m) => s + (m.valorTotal || m.valorPeca + m.valorMaoObra), 0);
-    });
-    return { ganhos, gastos, manutencao, totalGeral: gastos + manutencao };
+
+    for (const [dataStr, reg] of Object.entries(dados.registros)) {
+        const dataReg = new Date(dataStr + 'T00:00:00');
+        if (dataReg >= dataInicio) {
+            ganhos += reg.ganhos.reduce((s,g) => s + g.valor, 0);
+            gastos += reg.gastos.reduce((s,g) => s + g.valor, 0);
+            manutencao += reg.manutencoes.reduce((s,m) => s + (m.valorTotal || m.valorPeca + m.valorMaoObra), 0);
+        }
+    }
+
+    const diasNoMes = 30;
+    const custoFixoMensal = Object.values(dados.custosFixos).reduce((s,v) => s+v, 0);
+    let custoFixoPeriodo = 0;
+    switch(periodo) {
+        case 'dia': custoFixoPeriodo = custoFixoMensal / diasNoMes; break;
+        case 'semana': custoFixoPeriodo = custoFixoMensal * 7 / diasNoMes; break;
+        case 'mes': custoFixoPeriodo = custoFixoMensal; break;
+        case 'ano': custoFixoPeriodo = custoFixoMensal * 12; break;
+    }
+
+    return { ganhos, gastos, manutencao, custoFixoPeriodo, totalGeral: gastos + manutencao };
 }
 
 function gerarAlertasManutencao() {
     const kmAtual = kmAtualParaCalculo();
     const alertas = [];
-    Object.values(dados.registros).forEach(reg => {
-        reg.manutencoes.forEach(m => {
+
+    for (const reg of Object.values(dados.registros)) {
+        for (const m of reg.manutencoes) {
             const prog = calcularProgresso(m, kmAtual);
-            if (prog.porcentagem <= 60) {
-                let classe = prog.porcentagem <= 30 ? 'alerta-vermelho' : prog.porcentagem <= 50 ? 'alerta-amarelo' : 'alerta-verde';
-                alertas.push(`
-                    <div class="alerta-manutencao ${classe}">
-                        <strong>🔧 ${m.nome}</strong> — ${prog.status}<br>
-                        <small>Próx. Km: ${m.proximoKmMeta || '—'} · Data: ${formatarData(m.proximaDataMeta)} · ${prog.porcentagem}%</small>
-                    </div>
-                `);
+            if (prog.porcentagem <= 50) {
+                alertas.push({
+                    nome: m.nome,
+                    porcentagem: prog.porcentagem,
+                    corClasse: prog.porcentagem <= 30 ? 'alerta-vermelho' : 'alerta-amarelo',
+                    status: prog.status,
+                    proxKm: m.proximoKmMeta ? `${m.proximoKmMeta} km` : '—',
+                    proxData: m.proximaDataMeta ? formatarData(m.proximaDataMeta) : '—'
+                });
             }
-        });
-    });
-    document.getElementById('alertasManutencao').innerHTML = alertas.join('');
+        }
+    }
+
+    alertas.sort((a,b) => a.porcentagem - b.porcentagem);
+
+    const container = document.getElementById('alertasManutencao');
+    if (alertas.length === 0) {
+        container.innerHTML = `<div class="alerta-manutencao alerta-verde">✅ Tudo em dia! Nenhuma troca próxima.</div>`;
+        return;
+    }
+
+    container.innerHTML = alertas.map(a => `
+        <div class="alerta-manutencao ${a.corClasse}">
+            <strong>${a.nome}</strong><br>
+            ${a.status} · ${a.porcentagem}% restante<br>
+            Próximo: ${a.proxKm} | ${a.proxData}
+        </div>
+    `).join('');
 }
 
 function atualizarTela() {
-    const regs = coletarRegistrosPeriodo(periodoAtual);
-    const totais = calcularTotais(regs);
-    const totalFixoMensal = Object.values(dados.custosFixos).reduce((s,v) => s+v, 0);
-    
-    const diasNoMes = 30;
-    let fator = 1;
-    if (periodoAtual === 'dia') fator = diasNoMes;
-    if (periodoAtual === 'semana') fator = diasNoMes / 7;
-    if (periodoAtual === 'ano') fator = 12;
-    
-    const custoFixoPeriodo = totalFixoMensal / fator;
-    const lucroReal = totais.ganhos - totais.totalGeral - custoFixoPeriodo;
-       const valorReserva = lucroReal * (dados.porcentagemReserva / 100);
+    const totais = calcularTotaisPeriodo(periodoAtual);
+    const lucroReal = totais.ganhos - totais.totalGeral - totais.custoFixoPeriodo;
+    const valorReserva = lucroReal * (dados.porcentagemReserva / 100);
 
     document.getElementById('resumoRecebido').textContent = formatarValor(totais.ganhos);
     document.getElementById('resumoGastos').textContent = formatarValor(totais.totalGeral);
-    document.getElementById('resumoFixos').textContent = formatarValor(custoFixoPeriodo);
-    document.getElementById('resumoMinimo').textContent = formatarValor(custoFixoPeriodo);
+    document.getElementById('resumoFixos').textContent = formatarValor(totais.custoFixoPeriodo);
+    document.getElementById('resumoMinimo').textContent = formatarValor(totais.custoFixoPeriodo);
     document.getElementById('resumoSaldo').textContent = formatarValor(lucroReal);
     document.getElementById('resumoReserva').textContent = formatarValor(valorReserva);
 
@@ -766,7 +812,6 @@ function atualizarListas() {
     const regHoje = pegarRegistro(hoje);
     const kmAtual = kmAtualParaCalculo();
     
-    // Ganhos
     document.getElementById('listaGanhos').innerHTML = regHoje.ganhos.length === 0
         ? '<p style="opacity:0.5;text-align:center;">Nenhum ganho lançado hoje</p>'
         : regHoje.ganhos.map((g, i) => `
@@ -779,7 +824,6 @@ function atualizarListas() {
             </div>
         `).join('');
 
-    // Gastos
     document.getElementById('listaGastos').innerHTML = regHoje.gastos.length === 0
         ? '<p style="opacity:0.5;text-align:center;">Nenhum gasto lançado hoje</p>'
         : regHoje.gastos.map((g, i) => `
@@ -792,11 +836,11 @@ function atualizarListas() {
             </div>
         `).join('');
 
-    // Manutenção — barra de progresso visível em cada item
     document.getElementById('listaManutencao').innerHTML = regHoje.manutencoes.length === 0
         ? '<p style="opacity:0.5;text-align:center;">Nenhuma manutenção lançada hoje</p>'
         : regHoje.manutencoes.map((m, i) => {
             const prog = calcularProgresso(m, kmAtual);
+            const totalItem = m.valorTotal || m.valorPeca + m.valorMaoObra;
             return `
                 <div class="item-lista">
                     <div class="cima">
@@ -805,7 +849,7 @@ function atualizarListas() {
                     </div>
                     <p style="margin:0.3rem 0;font-size:0.9rem;">
                         Km troca: ${m.kmTroca || '—'} · Próx. Km: ${m.proximoKmMeta || '—'}<br>
-                        Próx. troca: ${formatarData(m.proximaDataMeta)}
+                        Próx. troca: ${m.proximaDataMeta ? formatarData(m.proximaDataMeta) : '—'}
                     </p>
                     <div class="barra">
                         <div style="width:${prog.porcentagem}%;background:${prog.cor};"></div>
@@ -814,7 +858,7 @@ function atualizarListas() {
                         ${prog.porcentagem}% — ${prog.status}
                     </p>
                     <p style="font-size:0.8rem;opacity:0.7;">
-                        Peça: ${formatarValor(m.valorPeca)} · Mão obra: ${formatarValor(m.valorMaoObra)} · Total: <strong>${formatarValor(m.valorTotal || m.valorPeca + m.valorMaoObra)}</strong>
+                        Peça: ${formatarValor(m.valorPeca)} · Mão obra: ${formatarValor(m.valorMaoObra)} · Total: <strong>${formatarValor(totalItem)}</strong>
                     </p>
                     <button class="secundario" style="padding:0.4rem;font-size:0.8rem;margin-top:0.4rem;" onclick="excluirItem('manutencao', ${i})">Excluir</button>
                 </div>
@@ -831,7 +875,6 @@ function excluirItem(tipo, indice) {
     salvarDados();
 }
 
-// Inicialização
 document.addEventListener('DOMContentLoaded', () => {
     atualizarDataTopo();
     preencherCustosFixosTela();
