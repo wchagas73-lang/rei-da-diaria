@@ -54,9 +54,6 @@
         .alerta-verde { background: rgba(34, 197, 94, 0.1); border-color: var(--verde); }
         .alerta-amarelo { background: rgba(245, 158, 11, 0.1); border-color: var(--amarelo); }
         .alerta-vermelho { background: rgba(239, 68, 68, 0.1); border-color: var(--vermelho); }
-        .comparativo { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid #333; }
-        .cresceu { color: var(--verde); }
-        .caiu { color: var(--vermelho); }
         .sugestoes { margin-top: 0.5rem; font-size: 0.8rem; opacity: 0.7; }
         .sugestao-item { padding: 0.5rem 0.7rem; background: #2a2a2a; border-radius: 6px; margin: 0.3rem 0; cursor: pointer; border-left: 2px solid var(--dourado); }
         .sugestao-item:hover { background: #3a3a3a; }
@@ -363,15 +360,12 @@
 let dados = carregarDados();
 let periodoAtual = 'dia';
 
-// ✅ LISTA COMPLETA — ITENS SEPARADOS PARA ESCOLHA INDIVIDUAL
 const listaPecas = [
     { nome: 'óleo do motor', proximoKm: 6000, proximoMeses: 12, descricao: 'Troca de óleo — Honda: 6.000 km ou 1 ano' },
     { nome: 'filtro de óleo', proximoKm: 6000, proximoMeses: 12, descricao: 'Filtro de óleo' },
     { nome: 'filtro de ar', proximoKm: 18000, proximoMeses: 24, descricao: 'Filtro de ar — Honda: 18.000 km' },
     { nome: 'filtro de combustível', proximoKm: 12000, proximoMeses: 12, descricao: 'Filtro de gasolina — Honda: 12.000 km' },
     { nome: 'óleo de câmbio', proximoKm: 5000, proximoMeses: 6, descricao: 'Óleo da transmissão' },
-    
-    // 🛑 FREIOS — SEPARADOS INDIVIDUALMENTE
     { nome: 'pastilha de freio dianteiro', proximoKm: 15000, proximoMeses: 12, descricao: 'Freio dianteiro — média: 15.000 km' },
     { nome: 'pastilha de freio traseiro', proximoKm: 18000, proximoMeses: 12, descricao: 'Freio traseiro — média: 18.000 km' },
     { nome: 'lona de freio traseiro', proximoKm: 6000, proximoMeses: 6, descricao: 'Lona/sapata — inspecionar a cada 6.000 km' },
@@ -379,34 +373,22 @@ const listaPecas = [
     { nome: 'disco de freio traseiro', proximoKm: 28000, proximoMeses: 24, descricao: 'Disco traseiro — inspecionar' },
     { nome: 'fluido de freio', proximoKm: 0, proximoMeses: 24, descricao: 'Trocar a cada 2 anos' },
     { nome: 'mangueira de freio', proximoKm: 12000, proximoMeses: 12, descricao: 'Inspecionar' },
-    
-    // 🛞 PNEUS — SEPARADOS
     { nome: 'pneu dianteiro', proximoKm: 10000, proximoMeses: 12, descricao: 'Roda da frente' },
     { nome: 'pneu traseiro', proximoKm: 8000, proximoMeses: 12, descricao: 'Roda de trás — desgasta mais rápido' },
-    
-    // ⛓️ TRANSMISSÃO
     { nome: 'corrente de transmissão', proximoKm: 1000, proximoMeses: 1, descricao: 'Lubrificar a cada 1.000 km' },
     { nome: 'coroa', proximoKm: 20000, proximoMeses: 18, descricao: 'Parte do kit relação' },
     { nome: 'pinhão', proximoKm: 20000, proximoMeses: 18, descricao: 'Parte do kit relação' },
     { nome: 'kit relação completo', proximoKm: 20000, proximoMeses: 18, descricao: 'Corrente + coroa + pinhão juntos' },
-    
-    // 🔧 SUSPENSÃO
     { nome: 'óleo da suspensão dianteira', proximoKm: 24000, proximoMeses: 24, descricao: 'Trocar óleo do garfo — Honda: 24.000 km' },
     { nome: 'retentor do garfo dianteiro', proximoKm: 24000, proximoMeses: 24, descricao: 'Vedações do garfo' },
     { nome: 'amortecedor traseiro', proximoKm: 6000, proximoMeses: 6, descricao: 'Inspecionar' },
-    
-    // 🔩 ROLAMENTOS
     { nome: 'rolamento roda dianteira', proximoKm: 40000, proximoMeses: 36, descricao: 'Roda da frente' },
     { nome: 'rolamento roda traseira', proximoKm: 40000, proximoMeses: 36, descricao: 'Roda de trás' },
     { nome: 'rolamento caixa de direção', proximoKm: 24000, proximoMeses: 24, descricao: 'Mesa da direção' },
-    
-    // ⚡ MOTOR/IGNIÇÃO
     { nome: 'vela de ignição', proximoKm: 12000, proximoMeses: 12, descricao: 'Honda: 12.000 km' },
     { nome: 'regulagem de válvulas', proximoKm: 6000, proximoMeses: 6, descricao: 'Folga das válvulas — Honda: 6.000 km' },
     { nome: 'embreagem', proximoKm: 30000, proximoMeses: 24, descricao: 'Discos e cabo' },
     { nome: 'bateria', proximoKm: 0, proximoMeses: 36, descricao: 'Estimativa: 3 anos' },
-    
-    // 📌 OUTROS
     { nome: 'injeção eletrônica', proximoKm: 12000, proximoMeses: 12, descricao: 'Limpeza/diagnóstico' },
     { nome: 'bico injetor', proximoKm: 24000, proximoMeses: 24, descricao: 'Limpeza preventiva' },
     { nome: 'caixa de direção', proximoKm: 12000, proximoMeses: 12, descricao: 'Inspecionar e lubrificar' },
@@ -581,13 +563,22 @@ function normalizarTexto(t) {
 
 function mostrarSugestoes(digitado) {
     const caixa = document.getElementById('caixaSugestoes');
-    if (!digitado || digitado.length < 2) { caixa.innerHTML = ''; return; }
+    if (!digitado || digitado.length < 1) {
+        caixa.innerHTML = '';
+        return;
+    }
     const dig = normalizarTexto(digitado);
-    const encontrados = listaPecas.filter(p => 
-        normalizarTexto(p.nome).includes(dig) || normalizarTexto(p.descricao).includes(dig)
-    ).slice(0, 5);
+    const encontrados = listaPecas.filter(p => {
+        const nomeNormal = normalizarTexto(p.nome);
+        const descNormal = normalizarTexto(p.descricao);
+        return nomeNormal.includes(dig) || descNormal.includes(dig);
+    }).slice(0, 6);
     
-    if (encontrados.length === 0) { caixa.innerHTML = ''; return; }
+    if (encontrados.length === 0) {
+        caixa.innerHTML = '<p style="opacity:0.5; font-size:0.8rem;">Nenhuma sugestão — digite o nome manualmente</p>';
+        return;
+    }
+    
     caixa.innerHTML = encontrados.map(p => `
         <div class="sugestao-item" onclick="usarSugestao('${p.nome}', ${p.proximoKm}, ${p.proximoMeses})">
             <strong>${p.nome}</strong><br>
@@ -598,13 +589,26 @@ function mostrarSugestoes(digitado) {
 
 function usarSugestao(nome, proxKm, proxMeses) {
     document.getElementById('nomeManutencao').value = nome;
-    const kmTroca = Number(document.getElementById('kmTroca').value) || kmAtualParaCalculo();
+    const kmAtual = kmAtualParaCalculo();
+    const kmTroca = Number(document.getElementById('kmTroca').value) || kmAtual;
+    
     if (kmTroca > 0 && proxKm > 0) {
         document.getElementById('proximoKmMeta').value = kmTroca + proxKm;
     } else {
         document.getElementById('proximoKmMeta').value = '';
     }
-    document.getElementById('proximaDataMeta').value = '';
+    
+    if (proxMeses > 0) {
+        const proxData = new Date();
+        proxData.setMonth(proxData.getMonth() + proxMeses);
+        const ano = proxData.getFullYear();
+        const mes = String(proxData.getMonth() + 1).padStart(2, '0');
+        const dia = String(proxData.getDate()).padStart(2, '0');
+        document.getElementById('proximaDataMeta').value = `${ano}-${mes}-${dia}`;
+    } else {
+        document.getElementById('proximaDataMeta').value = '';
+    }
+    
     document.getElementById('caixaSugestoes').innerHTML = '';
 }
 
@@ -718,47 +722,37 @@ function calcularTotais(regs) {
 function gerarAlertasManutencao() {
     const kmAtual = kmAtualParaCalculo();
     const alertas = [];
-    Object.values(dados.registros).forEach(reg => {
+    
+    Object.entries(dados.registros).forEach(([dataReg, reg]) => {
         reg.manutencoes.forEach(m => {
             const prog = calcularProgresso(m, kmAtual);
-            if (prog.porcentagem <= 60) {
-                let classe = prog.porcentagem <= 30 ? 'alerta-vermelho' : prog.porcentagem <= 50 ? 'alerta-amarelo' : 'alerta-verde';
+            
+            if (prog.porcentagem <= 50) {
+                let classe = prog.porcentagem <= 30 ? 'alerta-vermelho' : 'alerta-amarelo';
                 alertas.push(`
                     <div class="alerta-manutencao ${classe}">
-                        <strong>🔧 ${m.nome}</strong> — ${prog.status}<br>
-                        <small>Próx. Km: ${m.proximoKmMeta || '—'} · Data: ${formatarData(m.proximaDataMeta)} · ${prog.porcentagem}%</small>
+                        <strong>${m.nome}</strong><br>
+                        Lançado em: ${formatarData(dataReg)} · Km troca: ${m.kmTroca || '—'}<br>
+                        Próximo Km: ${m.proximoKmMeta || '—'} · Próx. Data: ${formatarData(m.proximaDataMeta)}
+                        <div class="barra" style="margin:0.4rem 0 0 0;">
+                            <div style="width:${prog.porcentagem}%;background:${prog.cor};"></div>
+                        </div>
+                        <small style="font-weight:bold;">${prog.porcentagem}% restante — ${prog.status}</small>
                     </div>
                 `);
             }
         });
     });
-    document.getElementById('alertasManutencao').innerHTML = alertas.join('');
-}
-
-function atualizarTela() {
-    const regs = coletarRegistrosPeriodo(periodoAtual);
-    const totais = calcularTotais(regs);
-    const totalFixoMensal = Object.values(dados.custosFixos).reduce((s,v) => s+v, 0);
     
-    const diasNoMes = 30;
-    let fator = 1;
-    if (periodoAtual === 'dia') fator = diasNoMes;
-    if (periodoAtual === 'semana') fator = diasNoMes / 7;
-    if (periodoAtual === 'ano') fator = 12;
-    
-    const custoFixoPeriodo = totalFixoMensal / fator;
-    const lucroReal = totais.ganhos - totais.totalGeral - custoFixoPeriodo;
-       const valorReserva = lucroReal * (dados.porcentagemReserva / 100);
-
-    document.getElementById('resumoRecebido').textContent = formatarValor(totais.ganhos);
-    document.getElementById('resumoGastos').textContent = formatarValor(totais.totalGeral);
-    document.getElementById('resumoFixos').textContent = formatarValor(custoFixoPeriodo);
-    document.getElementById('resumoMinimo').textContent = formatarValor(custoFixoPeriodo);
-    document.getElementById('resumoSaldo').textContent = formatarValor(lucroReal);
-    document.getElementById('resumoReserva').textContent = formatarValor(valorReserva);
-
-    gerarAlertasManutencao();
-    atualizarListas();
+    if (alertas.length === 0) {
+        document.getElementById('alertasManutencao').innerHTML = `
+            <div style="text-align:center; padding:1rem; opacity:0.7;">
+                ✅ Tudo em dia! Nenhuma troca próxima ou vencida.
+            </div>
+        `;
+    } else {
+        document.getElementById('alertasManutencao').innerHTML = alertas.join('');
+    }
 }
 
 function atualizarListas() {
@@ -766,7 +760,7 @@ function atualizarListas() {
     const regHoje = pegarRegistro(hoje);
     const kmAtual = kmAtualParaCalculo();
     
-    // Ganhos
+    // GANHOS
     document.getElementById('listaGanhos').innerHTML = regHoje.ganhos.length === 0
         ? '<p style="opacity:0.5;text-align:center;">Nenhum ganho lançado hoje</p>'
         : regHoje.ganhos.map((g, i) => `
@@ -779,7 +773,7 @@ function atualizarListas() {
             </div>
         `).join('');
 
-    // Gastos
+    // GASTOS
     document.getElementById('listaGastos').innerHTML = regHoje.gastos.length === 0
         ? '<p style="opacity:0.5;text-align:center;">Nenhum gasto lançado hoje</p>'
         : regHoje.gastos.map((g, i) => `
@@ -792,16 +786,33 @@ function atualizarListas() {
             </div>
         `).join('');
 
-    // Manutenção — barra de progresso visível em cada item
-    document.getElementById('listaManutencao').innerHTML = regHoje.manutencoes.length === 0
-        ? '<p style="opacity:0.5;text-align:center;">Nenhuma manutenção lançada hoje</p>'
-        : regHoje.manutencoes.map((m, i) => {
+    // MANUTENÇÃO — TODAS AS DATAS, ORDENADAS
+    const todasManutencoes = [];
+    Object.entries(dados.registros).forEach(([dataRegistro, registro]) => {
+        if (registro.manutencoes && registro.manutencoes.length > 0) {
+            registro.manutencoes.forEach((m, indice) => {
+                todasManutencoes.push({
+                    dataRegistro,
+                    manutencao: m,
+                    indice,
+                    ehHoje: dataRegistro === hoje
+                });
+            });
+        }
+    });
+    todasManutencoes.sort((a, b) => b.dataRegistro.localeCompare(a.dataRegistro));
+
+    document.getElementById('listaManutencao').innerHTML = todasManutencoes.length === 0
+        ? '<p style="opacity:0.5;text-align:center;">Nenhuma manutenção lançada ainda</p>'
+        : todasManutencoes.map(({ dataRegistro, manutencao: m, indice, ehHoje }) => {
             const prog = calcularProgresso(m, kmAtual);
+            const marcadorHoje = ehHoje ? '<span style="background:var(--dourado);color:#000;padding:0.1rem 0.4rem;border-radius:4px;font-size:0.7rem;">HOJE</span>' : '';
+            const totalManut = m.valorTotal || (m.valorPeca + m.valorMaoObra);
             return `
-                <div class="item-lista">
+                <div class="item-lista" style="${ehHoje ? 'border-width:4px;' : ''}">
                     <div class="cima">
                         <span class="nome">🔧 ${m.nome}</span>
-                        <span>${formatarData(m.dataTroca)}</span>
+                        <span>${marcadorHoje} ${formatarData(dataRegistro)}</span>
                     </div>
                     <p style="margin:0.3rem 0;font-size:0.9rem;">
                         Km troca: ${m.kmTroca || '—'} · Próx. Km: ${m.proximoKmMeta || '—'}<br>
@@ -814,9 +825,9 @@ function atualizarListas() {
                         ${prog.porcentagem}% — ${prog.status}
                     </p>
                     <p style="font-size:0.8rem;opacity:0.7;">
-                        Peça: ${formatarValor(m.valorPeca)} · Mão obra: ${formatarValor(m.valorMaoObra)} · Total: <strong>${formatarValor(m.valorTotal || m.valorPeca + m.valorMaoObra)}</strong>
+                        Peça: ${formatarValor(m.valorPeca)} · Mão obra: ${formatarValor(m.valorMaoObra)} · Total: <strong>${formatarValor(totalManut)}</strong>
                     </p>
-                    <button class="secundario" style="padding:0.4rem;font-size:0.8rem;margin-top:0.4rem;" onclick="excluirItem('manutencao', ${i})">Excluir</button>
+                    ${ehHoje ? `<button class="secundario" style="padding:0.4rem;font-size:0.8rem;margin-top:0.4rem;" onclick="excluirItem('manutencao', ${indice})">Excluir</button>` : '<p style="font-size:0.75rem;opacity:0.4;margin-top:0.3rem;">Lançado em outro dia — só pode excluir no dia do lançamento</p>'}
                 </div>
             `;
         }).join('');
@@ -831,19 +842,47 @@ function excluirItem(tipo, indice) {
     salvarDados();
 }
 
-// Inicialização
+function atualizarTela() {
+    const regs = coletarRegistrosPeriodo(periodoAtual);
+    const totais = calcularTotais(regs);
+    const fixoMensal = Object.values(dados.custosFixos).reduce((s,v) => s+v, 0);
+    
+    document.getElementById('resumoRecebido').textContent = formatarValor(totais.ganhos);
+    document.getElementById('resumoGastos').textContent = formatarValor(totais.gastos + totais.manutencao);
+    document.getElementById('resumoFixos').textContent = formatarValor(fixoMensal);
+    
+    const diasNoMes = 30;
+    const fixoDiario = fixoMensal / diasNoMes;
+    document.getElementById('resumoMinimo').textContent = formatarValor(fixoDiario);
+    
+    const saldo = totais.ganhos - (totais.gastos + totais.manutencao);
+    document.getElementById('resumoSaldo').textContent = formatarValor(saldo);
+    document.getElementById('resumoSaldo').className = saldo >= 0 ? 'resumo-valor verde' : 'resumo-valor vermelho';
+    
+    const reserva = saldo * (dados.porcentagemReserva / 100);
+    document.getElementById('resumoReserva').textContent = formatarValor(Math.max(0, reserva));
+    
+    document.getElementById('porcentagemReserva').value = dados.porcentagemReserva;
+    
+    atualizarListas();
+    gerarAlertasManutencao();
+}
+
+// INICIALIZAÇÃO
 document.addEventListener('DOMContentLoaded', () => {
     atualizarDataTopo();
     preencherCustosFixosTela();
-    document.getElementById('porcentagemReserva').value = dados.porcentagemReserva;
     document.getElementById('dataGanho').value = getDataHoje();
     document.getElementById('dataGasto').value = getDataHoje();
     document.getElementById('dataManutencao').value = getDataHoje();
+    
     if (dados.kmInicial) document.getElementById('kmInicial').value = dados.kmInicial;
     if (dados.kmFinal) document.getElementById('kmFinal').value = dados.kmFinal;
     atualizarKmRodado();
+    
     mudarPeriodo('dia');
+    atualizarTela();
 });
 </script>
 </body>
-    </html>
+</html>
