@@ -327,7 +327,7 @@
             </div>
         </div>
         <div class="botoes-lado">
-            <button class="primario" onclick="lancarManutencao()" style="flex:2;">Salvar Manutenção</button>
+            <button class="primario" id="btnSalvarManut" onclick="lancarManutencao()" style="flex:2;">Salvar Manutenção</button>
             <button class="secundario" onclick="limparFormularioManutencao()" style="flex:1;">Limpar Tudo</button>
         </div>
     </div>
@@ -359,6 +359,7 @@
 <script>
 let dados = carregarDados();
 let periodoAtual = 'dia';
+window.editandoManutencao = null;
 
 const listaPecas = [
     { nome: 'óleo do motor', proximoKm: 6000, proximoMeses: 12, descricao: 'Troca de óleo — Honda: 6.000 km ou 1 ano' },
@@ -632,6 +633,10 @@ function limparFormularioManutencao() {
     document.getElementById('valorMaoObra').value = '';
     document.getElementById('valorTotalManutencao').value = '';
     document.getElementById('caixaSugestoes').innerHTML = '';
+    window.editandoManutencao = null;
+    const btn = document.getElementById('btnSalvarManut');
+    btn.textContent = 'Salvar Manutenção';
+    btn.onclick = lancarManutencao;
 }
 
 function lancarManutencao() {
@@ -759,7 +764,7 @@ function atualizarListas() {
     const hoje = getDataHoje();
     const regHoje = pegarRegistro(hoje);
     const kmAtual = kmAtualParaCalculo();
-    
+
     // GANHOS
     document.getElementById('listaGanhos').innerHTML = regHoje.ganhos.length === 0
         ? '<p style="opacity:0.5;text-align:center;">Nenhum ganho lançado hoje</p>'
@@ -769,24 +774,31 @@ function atualizarListas() {
                     <span class="nome">${g.obs || 'Entrega/Ganho'}</span>
                     <span class="valor verde">${formatarValor(g.valor)}</span>
                 </div>
-                <button class="secundario" style="padding:0.4rem;font-size:0.8rem;" onclick="excluirItem('ganho', ${i})">Excluir</button>
+                <button class="secundario" style="padding:0.4rem;font-size:0.8rem;margin-top:0.3rem;" onclick="excluirItem('ganho', ${i})">🗑️ Excluir</button>
             </div>
         `).join('');
 
     // GASTOS
     document.getElementById('listaGastos').innerHTML = regHoje.gastos.length === 0
         ? '<p style="opacity:0.5;text-align:center;">Nenhum gasto lançado hoje</p>'
-        : regHoje.gastos.map((g, i) => `
-            <div class="item-lista">
-                <div class="cima">
-                    <span class="nome">${g.categoria.replace(/^./, c => c.toUpperCase())}${g.descricao ? ' — ' + g.descricao : ''}</span>
-                    <span class="valor vermelho">${formatarValor(g.valor)}</span>
+        : regHoje.gastos.map((g, i) => {
+            const catNomes = {
+                alimentacao: 'Alimentação', combustivel: 'Combustível', acessorios: 'Acessórios',
+                mercado: 'Mercado', farmacia: 'Saúde/Farmácia', vestuario: 'Vestuário',
+                transporte: 'Transporte', lazer: 'Lazer', contas: 'Contas', outros: 'Outros'
+            };
+            return `
+                <div class="item-lista">
+                    <div class="cima">
+                        <span class="nome">${catNomes[g.categoria] || g.categoria}${g.descricao ? ' — ' + g.descricao : ''}</span>
+                        <span class="valor vermelho">${formatarValor(g.valor)}</span>
+                    </div>
+                    <button class="secundario" style="padding:0.4rem;font-size:0.8rem;margin-top:0.3rem;" onclick="excluirItem('gasto', ${i})">🗑️ Excluir</button>
                 </div>
-                <button class="secundario" style="padding:0.4rem;font-size:0.8rem;" onclick="excluirItem('gasto', ${i})">Excluir</button>
-            </div>
-        `).join('');
+            `;
+        }).join('');
 
-    // MANUTENÇÃO — TODAS AS DATAS, ORDENADAS
+    // MANUTENÇÃO — TODAS AS DATAS · EDITÁVEL
     const todasManutencoes = [];
     Object.entries(dados.registros).forEach(([dataRegistro, registro]) => {
         if (registro.manutencoes && registro.manutencoes.length > 0) {
@@ -822,12 +834,15 @@ function atualizarListas() {
                         <div style="width:${prog.porcentagem}%;background:${prog.cor};"></div>
                     </div>
                     <p style="font-size:0.85rem;color:${prog.cor};margin:0.3rem 0;">
-                        ${prog.porcentagem}% — ${prog.status}
+                        ${prog.porcentagem}% restante — ${prog.status}
                     </p>
                     <p style="font-size:0.8rem;opacity:0.7;">
                         Peça: ${formatarValor(m.valorPeca)} · Mão obra: ${formatarValor(m.valorMaoObra)} · Total: <strong>${formatarValor(totalManut)}</strong>
                     </p>
-                    ${ehHoje ? `<button class="secundario" style="padding:0.4rem;font-size:0.8rem;margin-top:0.4rem;" onclick="excluirItem('manutencao', ${indice})">Excluir</button>` : '<p style="font-size:0.75rem;opacity:0.4;margin-top:0.3rem;">Lançado em outro dia — só pode excluir no dia do lançamento</p>'}
+                    <div class="botoes-lado" style="margin-top:0.5rem;">
+                        <button class="secundario" style="flex:1;padding:0.4rem;font-size:0.8rem;" onclick="editarManutencao('${dataRegistro}', ${indice})">✏️ Editar</button>
+                        <button class="secundario" style="flex:1;padding:0.4rem;font-size:0.8rem;background:rgba(239,68,68,0.2);" onclick="excluirManutencao('${dataRegistro}', ${indice})">🗑️ Excluir</button>
+                    </div>
                 </div>
             `;
         }).join('');
@@ -838,8 +853,72 @@ function excluirItem(tipo, indice) {
     const reg = pegarRegistro(getDataHoje());
     if (tipo === 'ganho') reg.ganhos.splice(indice, 1);
     if (tipo === 'gasto') reg.gastos.splice(indice, 1);
-    if (tipo === 'manutencao') reg.manutencoes.splice(indice, 1);
     salvarDados();
+}
+
+function excluirManutencao(dataRegistro, indice) {
+    if (!confirm('Tem certeza que quer excluir este lançamento?\nIsso não pode ser desfeito!')) return;
+    if (dados.registros[dataRegistro]?.manutencoes) {
+        dados.registros[dataRegistro].manutencoes.splice(indice, 1);
+        if (dados.registros[dataRegistro].manutencoes.length === 0 &&
+            dados.registros[dataRegistro].ganhos.length === 0 &&
+            dados.registros[dataRegistro].gastos.length === 0) {
+            delete dados.registros[dataRegistro];
+        }
+        salvarDados();
+        alert('✅ Excluído com sucesso!');
+    }
+}
+
+function editarManutencao(dataRegistro, indice) {
+    const m = dados.registros[dataRegistro]?.manutencoes?.[indice];
+    if (!m) return;
+    
+    document.getElementById('nomeManutencao').value = m.nome;
+    document.getElementById('dataManutencao').value = dataRegistro;
+    document.getElementById('kmTroca').value = m.kmTroca || '';
+    document.getElementById('proximoKmMeta').value = m.proximoKmMeta || '';
+    document.getElementById('proximaDataMeta').value = m.proximaDataMeta || '';
+    document.getElementById('valorPeca').value = m.valorPeca || '';
+    document.getElementById('valorMaoObra').value = m.valorMaoObra || '';
+    document.getElementById('valorTotalManutencao').value = m.valorTotal || '';
+    
+    window.editandoManutencao = { dataRegistro, indice };
+    
+    const botaoSalvar = document.getElementById('btnSalvarManut');
+    botaoSalvar.textContent = '💾 Salvar Alteração';
+    botaoSalvar.onclick = salvarEdicaoManutencao;
+    
+    trocarAba('Manutencao');
+    alert('✏️ Preencha os dados e clique em Salvar Alteração!');
+}
+
+function salvarEdicaoManutencao() {
+    const { dataRegistro, indice } = window.editandoManutencao || {};
+    if (!dataRegistro) return;
+    
+    const nome = document.getElementById('nomeManutencao').value.trim();
+    if (!nome) { alert('Digite o item!'); return; }
+    
+    dados.registros[dataRegistro].manutencoes[indice] = {
+        nome,
+        dataTroca: document.getElementById('dataManutencao').value || dataRegistro,
+        kmTroca: Number(document.getElementById('kmTroca').value) || null,
+        proximoKmMeta: Number(document.getElementById('proximoKmMeta').value) || null,
+        proximaDataMeta: document.getElementById('proximaDataMeta').value || null,
+        valorPeca: Number(document.getElementById('valorPeca').value) || 0,
+        valorMaoObra: Number(document.getElementById('valorMaoObra').value) || 0,
+        valorTotal: Number(document.getElementById('valorTotalManutencao').value) || 0
+    };
+    
+    const botaoSalvar = document.getElementById('btnSalvarManut');
+    botaoSalvar.textContent = 'Salvar Manutenção';
+    botaoSalvar.onclick = lancarManutencao;
+    
+    window.editandoManutencao = null;
+    limparFormularioManutencao();
+    salvarDados();
+    alert('✅ Alterado com sucesso!');
 }
 
 function atualizarTela() {
@@ -847,20 +926,23 @@ function atualizarTela() {
     const totais = calcularTotais(regs);
     const fixoMensal = Object.values(dados.custosFixos).reduce((s,v) => s+v, 0);
     
+    let divisorPeriodo = 30;
+    if (periodoAtual === 'semana') divisorPeriodo = 7;
+    if (periodoAtual === 'dia') divisorPeriodo = 1;
+    if (periodoAtual === 'ano') divisorPeriodo = 365;
+    const fixoProporcional = (fixoMensal / 30) * divisorPeriodo;
+    
     document.getElementById('resumoRecebido').textContent = formatarValor(totais.ganhos);
-    document.getElementById('resumoGastos').textContent = formatarValor(totais.gastos + totais.manutencao);
-    document.getElementById('resumoFixos').textContent = formatarValor(fixoMensal);
+    document.getElementById('resumoGastos').textContent = formatarValor(totais.totalGeral);
+    document.getElementById('resumoFixos').textContent = formatarValor(fixoProporcional);
+    document.getElementById('resumoMinimo').textContent = formatarValor(fixoProporcional);
     
-    const diasNoMes = 30;
-    const fixoDiario = fixoMensal / diasNoMes;
-    document.getElementById('resumoMinimo').textContent = formatarValor(fixoDiario);
-    
-    const saldo = totais.ganhos - (totais.gastos + totais.manutencao);
+    const saldo = totais.ganhos - totais.totalGeral;
     document.getElementById('resumoSaldo').textContent = formatarValor(saldo);
-    document.getElementById('resumoSaldo').className = saldo >= 0 ? 'resumo-valor verde' : 'resumo-valor vermelho';
+    document.getElementById('resumoSaldo').className = `resumo-valor ${saldo >= 0 ? 'verde' : 'vermelho'}`;
     
-    const reserva = saldo * (dados.porcentagemReserva / 100);
-    document.getElementById('resumoReserva').textContent = formatarValor(Math.max(0, reserva));
+    const reserva = saldo > 0 ? saldo * (dados.porcentagemReserva / 100) : 0;
+    document.getElementById('resumoReserva').textContent = formatarValor(reserva);
     
     document.getElementById('porcentagemReserva').value = dados.porcentagemReserva;
     
