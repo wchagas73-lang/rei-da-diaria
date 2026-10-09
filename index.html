@@ -65,6 +65,10 @@
         .periodo-botoes button.ativo { background: var(--dourado); color: #000; font-weight: 600; }
         #caixaImportar { margin-top: 1rem; padding: 1rem; background: #252525; border-radius: 8px; }
         small { opacity: 0.6; font-size: 0.75rem; }
+        .input-com-botao { display: flex; gap: 0.5rem; align-items: center; }
+        .input-com-botao input { flex: 1; }
+        .btn-limpar-data { padding: 0.75rem; background: #444; border: none; border-radius: 8px; color: white; cursor: pointer; transition: 0.2s; }
+        .btn-limpar-data:hover { background: var(--vermelho); }
     </style>
 </head>
 <body>
@@ -167,8 +171,8 @@
             <h4 style="margin-bottom:0.8rem;color:var(--verde);">🌅 Início do Dia</h4>
             <div class="linha">
                 <div>
-                    <label>Km Inicial</label>
-                    <input type="number" id="kmInicial" placeholder="Ex: 50000" oninput="atualizarKmRodado();">
+                    <label>Km Inicial — <small>digite e já fica salvo automaticamente</small></label>
+                    <input type="number" id="kmInicial" placeholder="Ex: 50000" oninput="atualizarKmRodado();salvarKmAutomatico();">
                 </div>
             </div>
         </div>
@@ -177,8 +181,8 @@
             <h4 style="margin-bottom:0.8rem;color:var(--amarelo);">🌇 Fechamento do Dia</h4>
             <div class="linha">
                 <div>
-                    <label>Km Final</label>
-                    <input type="number" id="kmFinal" placeholder="Ex: 52000" oninput="atualizarKmRodado();">
+                    <label>Km Final — <small>digite no fim do dia</small></label>
+                    <input type="number" id="kmFinal" placeholder="Ex: 52000" oninput="atualizarKmRodado();salvarKmAutomatico();">
                 </div>
             </div>
         </div>
@@ -189,7 +193,7 @@
                 <p class="resumo-valor" id="kmRodado">—</p>
             </div>
         </div>
-        <button class="primario" style="margin-top:1rem;width:100%;" onclick="salvarKm()">💾 Salvar Quilometragem</button>
+        <button class="secundario" style="margin-top:0.5rem;width:100%;" onclick="salvarKmManual()">💾 Salvar Manualmente</button>
     </div>
 </section>
 
@@ -250,11 +254,11 @@
                     <option value="combustivel">⛽ Combustível</option>
                     <option value="acessorios">🛡️ Acessórios</option>
                     <option value="mercado">🏪 Mercado</option>
-                    <option value="farmacia">💊 Farmácia</option>
+                    <option value="farmacia">💊 Farmácia / Saúde</option>
                     <option value="vestuario">👕 Vestuário</option>
                     <option value="transporte">🚌 Transporte</option>
                     <option value="lazer">🎮 Lazer</option>
-                    <option value="contas">📄 Contas</option>
+                    <option value="contas">📄 Contas Fixas</option>
                     <option value="outros">📌 Outros</option>
                 </select>
             </div>
@@ -328,13 +332,16 @@
             </div>
             <div>
                 <label>🎯 Próximo Km (meta)</label>
-                <input type="number" id="proximoKmMeta" placeholder="Deixe vazio se for só por data">
+                <input type="number" id="proximoKmMeta" placeholder="Deixe vazio se usar só por data">
                 <p class="dica-campo">Ex: 51000 = trocar daqui a 1.000 km</p>
             </div>
             <div>
                 <label>📅 Próxima Data (meta)</label>
-                <input type="date" id="proximaDataMeta">
-                <p class="dica-campo">Ex: daqui a 3 meses</p>
+                <div class="input-com-botao">
+                    <input type="date" id="proximaDataMeta">
+                    <button type="button" class="btn-limpar-data" onclick="document.getElementById('proximaDataMeta').value=''" title="Limpar data">🗑️</button>
+                </div>
+                <p class="dica-campo">Deixe em branco = usar só por km</p>
             </div>
             <div class="linha-lado">
                 <div>
@@ -386,20 +393,35 @@ let dados = carregarDados();
 let periodoAtual = 'dia';
 
 const listaPecas = [
-    { nome: 'óleo do motor', proximoKm: 1000, proximoMeses: 3, descricao: 'Troca de óleo — geralmente a cada 1.000 km ou 3 meses' },
-    { nome: 'filtro de óleo', proximoKm: 1000, proximoMeses: 3, descricao: 'Trocar junto com o óleo' },
-    { nome: 'filtro de ar', proximoKm: 5000, proximoMeses: 6, descricao: 'Verificar e limpar a cada 5.000 km' },
-    { nome: 'filtro de combustível', proximoKm: 5000, proximoMeses: 6, descricao: 'Trocar a cada 5.000 km' },
-    { nome: 'corrente e coroa e pinhão', proximoKm: 8000, proximoMeses: 12, descricao: 'Kit transmissão' },
-    { nome: 'pastilha de freio dianteira', proximoKm: 6000, proximoMeses: 12, descricao: 'Verificar a cada 6.000 km' },
-    { nome: 'pastilha de freio traseira', proximoKm: 8000, proximoMeses: 12, descricao: 'Verificar a cada 8.000 km' },
-    { nome: 'pneu dianteiro', proximoKm: 15000, proximoMeses: 24, descricao: 'Trocar quando chegar no limite' },
-    { nome: 'pneu traseiro', proximoKm: 12000, proximoMeses: 18, descricao: 'Desgaste maior na traseira' },
-    { nome: 'vela de ignição', proximoKm: 5000, proximoMeses: 6, descricao: 'Trocar a cada 5.000 km' },
-    { nome: 'bateria', proximoKm: null, proximoMeses: 24, descricao: 'Durabilidade média 2 anos' },
-    { nome: 'óleo de transmissão', proximoKm: 5000, proximoMeses: 6, descricao: 'Trocar a cada 5.000 km' },
-    { nome: 'embreagem', proximoKm: 15000, proximoMeses: 24, descricao: 'Depende do uso' },
-    { nome: 'revisão geral', proximoKm: 3000, proximoMeses: 3, descricao: 'Revisão periódica recomendada' }
+    { nome: 'Acelerador', proximoKm: 6000, proximoMeses: null, descricao: 'Inspeção' },
+    { nome: 'Alavanca de embreagem', proximoKm: 6000, proximoMeses: null, descricao: 'Inspeção/lubrificação' },
+    { nome: 'Alavanca de freio', proximoKm: 6000, proximoMeses: null, descricao: 'Inspeção/lubrificação' },
+    { nome: 'Amortecedor traseiro', proximoKm: 6000, proximoMeses: null, descricao: 'Inspeção' },
+    { nome: 'Antena corta-pipa', proximoKm: null, proximoMeses: 12, descricao: 'Preventivo' },
+    { nome: 'Aro das rodas', proximoKm: 6000, proximoMeses: null, descricao: 'Inspeção' },
+    { nome: 'Arruela do bujão de óleo', proximoKm: null, proximoMeses: null, descricao: 'Trocar a cada troca de óleo' },
+    { nome: 'Alinhamento das rodas', proximoKm: 12000, proximoMeses: null, descricao: 'Preventivo' },
+    { nome: 'Bateria', proximoKm: null, proximoMeses: 36, descricao: 'Estimativa preventiva' },
+    { nome: 'Balança traseira', proximoKm: 12000, proximoMeses: null, descricao: 'Inspeção' },
+    { nome: 'Bico injetor', proximoKm: 24000, proximoMeses: null, descricao: 'Limpeza' },
+    { nome: 'Cabo de embreagem', proximoKm: 8000, proximoMeses: null, descricao: 'Verificar/trocar' },
+    { nome: 'Cabo de freio', proximoKm: 8000, proximoMeses: null, descricao: 'Verificar/trocar' },
+    { nome: 'Corrente', proximoKm: 4000, proximoMeses: null, descricao: 'Lubrificar/ajustar' },
+    { nome: 'Coroa e pinhão', proximoKm: 12000, proximoMeses: null, descricao: 'Trocar conjunto' },
+    { nome: 'Embreagem', proximoKm: 15000, proximoMeses: null, descricao: 'Verificar desgaste' },
+    { nome: 'Filtro de ar', proximoKm: 5000, proximoMeses: null, descricao: 'Limpar/trocar' },
+    { nome: 'Filtro de combustível', proximoKm: 5000, proximoMeses: null, descricao: 'Trocar' },
+    { nome: 'Filtro de óleo', proximoKm: 1000, proximoMeses: null, descricao: 'Trocar junto com óleo' },
+    { nome: 'Freio dianteiro lona', proximoKm: 6000, proximoMeses: null, descricao: 'Verificar desgaste' },
+    { nome: 'Freio dianteiro pastilha', proximoKm: 8000, proximoMeses: null, descricao: 'Verificar desgaste' },
+    { nome: 'Freio traseiro lona', proximoKm: 6000, proximoMeses: null, descricao: 'Verificar desgaste' },
+    { nome: 'Freio traseiro pastilha', proximoKm: 8000, proximoMeses: null, descricao: 'Verificar desgaste' },
+    { nome: 'Óleo do motor', proximoKm: 1000, proximoMeses: 3, descricao: 'Trocar' },
+    { nome: 'Óleo de transmissão', proximoKm: 5000, proximoMeses: 6, descricao: 'Trocar' },
+    { nome: 'Pneu dianteiro', proximoKm: 15000, proximoMeses: null, descricao: 'Trocar quando desgastado' },
+    { nome: 'Pneu traseiro', proximoKm: 12000, proximoMeses: null, descricao: 'Trocar quando desgastado' },
+    { nome: 'Revisão geral', proximoKm: 3000, proximoMeses: 3, descricao: 'Verificação completa' },
+    { nome: 'Vela de ignição', proximoKm: 5000, proximoMeses: null, descricao: 'Trocar' }
 ];
 
 function carregarDados() {
@@ -424,7 +446,6 @@ function salvarDados() {
 }
 
 function getDataHoje() {
-    // ✅ Fuso horário de Brasília (UTC-3)
     const agora = new Date();
     const brasilia = new Date(agora.toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }));
     const ano = brasilia.getFullYear();
@@ -524,6 +545,43 @@ function atualizarKmRodado() {
     }
 }
 
+function salvarKmAutomatico() {
+    const data = document.getElementById('dataKm').value || getDataHoje();
+    const reg = pegarRegistro(data);
+    
+    const kmIni = document.getElementById('kmInicial').value;
+    const kmFin = document.getElementById('kmFinal').value;
+    
+    reg.kmInicial = kmIni ? Number(kmIni) : null;
+    reg.kmFinal = kmFin ? Number(kmFin) : null;
+    dados.kmInicial = reg.kmInicial;
+    dados.kmFinal = reg.kmFinal;
+    
+    salvarDados();
+    atualizarAlertasManutencao();
+}
+
+function salvarKmManual() {
+    const data = document.getElementById('dataKm').value || getDataHoje();
+    const reg = pegarRegistro(data);
+    const kmIni = document.getElementById('kmInicial').value;
+    const kmFin = document.getElementById('kmFinal').value;
+    
+    reg.kmInicial = kmIni ? Number(kmIni) : null;
+    reg.kmFinal = kmFin ? Number(kmFin) : null;
+    dados.kmInicial = reg.kmInicial;
+    dados.kmFinal = reg.kmFinal;
+    salvarDados();
+    
+    let mensagem = `✅ Dados de ${formatarData(data)} salvos!\n`;
+    if (reg.kmInicial && !reg.kmFinal) {
+        mensagem += `📍 Km Inicial: ${reg.kmInicial}\nÀ noite é só voltar e colocar o Km Final!`;
+    } else if (reg.kmInicial && reg.kmFinal) {
+        mensagem += `📍 Início: ${reg.kmInicial} · Final: ${reg.kmFinal}\n🛵 Rodado: ${reg.kmFinal - reg.kmInicial} km`;
+    }
+    alert(mensagem);
+}
+
 function carregarKmDaData() {
     const data = document.getElementById('dataKm').value;
     if (!data) { alert('Escolha uma data!'); return; }
@@ -531,17 +589,6 @@ function carregarKmDaData() {
     document.getElementById('kmInicial').value = reg.kmInicial || '';
     document.getElementById('kmFinal').value = reg.kmFinal || '';
     atualizarKmRodado();
-}
-
-function salvarKm() {
-    const data = document.getElementById('dataKm').value || getDataHoje();
-    const reg = pegarRegistro(data);
-    reg.kmInicial = Number(document.getElementById('kmInicial').value) || null;
-    reg.kmFinal = Number(document.getElementById('kmFinal').value) || null;
-    dados.kmInicial = reg.kmInicial;
-    dados.kmFinal = reg.kmFinal;
-    salvarDados();
-    alert(`✅ Km salvo para ${formatarData(data)}!`);
 }
 
 function kmAtualParaCalculo() {
@@ -659,12 +706,22 @@ function mostrarSugestoes(digitado) {
         return;
     }
     
-    caixa.innerHTML = encontrados.map(p => `
+    caixa.innerHTML = encontrados.map(p => {
+        let info = '';
+        if (p.proximoKm && p.proximoMeses) {
+            info = `${p.proximoKm} km / ${p.proximoMeses} meses`;
+        } else if (p.proximoKm) {
+            info = `${p.proximoKm} km`;
+        } else if (p.proximoMeses) {
+            info = `${p.proximoMeses} meses`;
+        }
+        return `
         <div class="sugestao-item" onclick="usarSugestao('${p.nome}', ${p.proximoKm || 'null'}, ${p.proximoMeses || 'null'})">
             <strong>${p.nome}</strong>
-            <small style="display:block;opacity:0.6;">${p.descricao}</small>
+            <small style="display:block;opacity:0.6;">${info} — ${p.descricao}</small>
         </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 function usarSugestao(nome, proxKm, proxMeses) {
@@ -676,11 +733,7 @@ function usarSugestao(nome, proxKm, proxMeses) {
         document.getElementById('kmTroca').value = kmAtual;
         document.getElementById('proximoKmMeta').value = kmAtual + proxKm;
     }
-    if (proxMeses) {
-        const proxima = new Date();
-        proxima.setMonth(proxima.getMonth() + proxMeses);
-        document.getElementById('proximaDataMeta').value = proxima.toISOString().split('T')[0];
-    }
+    // Data meta fica VAZIA por padrão — preencha se precisar
 }
 
 function atualizarSugestaoKm() {
@@ -699,284 +752,312 @@ function lancarManutencao() {
     if (!nome) { alert('Digite o nome do item!'); return; }
     
     const dataTroca = document.getElementById('dataManutencao').value || getDataHoje();
+    const proxDataMeta = document.getElementById('proximaDataMeta').value || null;
+    const proxKmMeta = document.getElementById('proximoKmMeta').value ? Number(document.getElementById('proximoKmMeta').value) : null;
+    
+    if (!proxDataMeta && !proxKmMeta) {
+        alert('⚠️ Coloque pelo menos o Próximo Km OU a Próxima Data!');
+        return;
+    }
+    
+    const valorPeca = Number(document.getElementById('valorPeca').value) || 0;
+    const valorMaoObra = Number(document.getElementById('valorMaoObra').value) || 0;
+    const valorTotal = Number(document.getElementById('valorTotalManutencao').value) || (valorPeca + valorMaoObra);
+    
     const reg = pegarRegistro(dataTroca);
     
     reg.manutencoes.push({
-        nome: nome,
+                nome: nome,
         dataTroca: dataTroca,
-        kmTroca: Number(document.getElementById('kmTroca').value) || null,
-        proximoKmMeta: Number(document.getElementById('proximoKmMeta').value) || null,
-        proximaDataMeta: document.getElementById('proximaDataMeta').value || null,
-        valorPeca: Number(document.getElementById('valorPeca').value) || 0,
-        valorMaoObra: Number(document.getElementById('valorMaoObra').value) || 0,
-        valorTotal: Number(document.getElementById('valorTotalManutencao').value) || 0
+        kmTroca: document.getElementById('kmTroca').value ? Number(document.getElementById('kmTroca').value) : null,
+        proximoKmMeta: proxKmMeta,
+        proximaDataMeta: proxDataMeta,
+        valorPeca: valorPeca,
+        valorMaoObra: valorMaoObra,
+        valorTotal: valorTotal
     });
     
     limparFormularioManutencao();
     salvarDados();
-    alert(`✅ ${nome} salvo em ${formatarData(dataTroca)}!`);
+    alert(`✅ Manutenção salva!`);
 }
 
 function limparFormularioManutencao() {
     document.getElementById('nomeManutencao').value = '';
-    document.getElementById('dataManutencao').value = getDataHoje();
+    document.getElementById('caixaSugestoes').innerHTML = '';
+    document.getElementById('dataManutencao').value = '';
     document.getElementById('kmTroca').value = '';
     document.getElementById('proximoKmMeta').value = '';
     document.getElementById('proximaDataMeta').value = '';
     document.getElementById('valorPeca').value = '';
     document.getElementById('valorMaoObra').value = '';
     document.getElementById('valorTotalManutencao').value = '';
-    document.getElementById('caixaSugestoes').innerHTML = '';
-}
-
-function calcularProgresso(item) {
-    const kmAtual = kmAtualParaCalculo();
-    let progressoKm = null, progressoData = null;
-    
-    if (item.proximoKmMeta && item.kmTroca) {
-        const total = item.proximoKmMeta - item.kmTroca;
-        const percorrido = Math.max(0, kmAtual - item.kmTroca);
-        progressoKm = Math.min(100, Math.round((percorrido / total) * 100));
-    }
-    
-    if (item.proximaDataMeta && item.dataTroca) {
-        const dataTroca = new Date(item.dataTroca);
-        const dataMeta = new Date(item.proximaDataMeta);
-        const hoje = new Date();
-        const totalDias = Math.max(1, (dataMeta - dataTroca) / (1000 * 60 * 60 * 24));
-        const passados = Math.max(0, (hoje - dataTroca) / (1000 * 60 * 60 * 24));
-        progressoData = Math.min(100, Math.round((passados / totalDias) * 100));
-    }
-    
-    return { progressoKm, progressoData };
-}
-
-function getCorStatus(progresso) {
-    if (progresso >= 51) return 'verde';
-    if (progresso >= 30) return 'amarelo';
-    return 'vermelho';
-}
-
-function getTextoStatus(cor) {
-    if (cor === 'verde') return '✅ Dentro do prazo';
-    if (cor === 'amarelo') return '⚠️ Chegando perto';
-    return '🔴 PRECISA TROCAR!';
-}
-
-function atualizarListaManutencao() {
-    const todas = [];
-    Object.values(dados.registros).forEach(reg => {
-        if (reg.manutencoes) todas.push(...reg.manutencoes);
-    });
-    todas.sort((a, b) => new Date(b.dataTroca) - new Date(a.dataTroca));
-    
-    const lista = document.getElementById('listaManutencao');
-    if (todas.length === 0) {
-        lista.innerHTML = '<p style="opacity:0.6;text-align:center;padding:1rem;">Nenhuma manutenção lançada ainda</p>';
-        return;
-    }
-    
-    lista.innerHTML = todas.map(item => {
-        const { progressoKm, progressoData } = calcularProgresso(item);
-        const progresso = progressoKm !== null ? progressoKm : progressoData;
-        const cor = progresso !== null ? getCorStatus(progresso) : null;
-        const statusTexto = cor ? getTextoStatus(cor) : 'Sem estimativa';
-        
-        return `
-        <div class="item-lista">
-            <div class="cima">
-                <span class="nome">🔧 ${item.nome}</span>
-                <span class="valor">${formatarValor(item.valorTotal)}</span>
-            </div>
-            <p style="font-size:0.85rem;opacity:0.7;">
-                📅 Troca em: ${formatarData(item.dataTroca)} · 
-                ${item.kmTroca ? `📍 Km: ${item.kmTroca}` : ''}
-            </p>
-            ${item.proximoKmMeta || item.proximaDataMeta ? `
-            <div style="margin-top:0.5rem;padding:0.7rem;background:#2a2a2a;border-radius:6px;">
-                <p style="font-size:0.85rem;margin-bottom:0.4rem;">
-                    📌 Próximo: ${item.proximoKmMeta ? item.proximoKmMeta + ' km' : ''}
-                    ${item.proximoKmMeta && item.proximaDataMeta ? ' · ' : ''}
-                    ${item.proximaDataMeta ? formatarData(item.proximaDataMeta) : ''}
-                </p>
-                ${progresso !== null ? `
-                <div class="barra">
-                    <div style="width:${progresso}%;background:var(--${cor});">                </div>
-                <p style="font-size:0.8rem;margin-top:0.3rem;">
-                    ${progresso}% usado — <strong style="color:var(--${cor});">${statusTexto}</strong>
-                </p>
-                ` : ''}
-            </div>
-            ` : ''}
-        </div>`;
-    }).join('');
-}
-
-function atualizarAlertasManutencao() {
-    const todas = [];
-    Object.values(dados.registros).forEach(reg => {
-        if (reg.manutencoes) todas.push(...reg.manutencoes);
-    });
-    
-    const alertasDiv = document.getElementById('alertasManutencao');
-    const alertas = [];
-    
-    todas.forEach(item => {
-        const { progressoKm, progressoData } = calcularProgresso(item);
-        const progresso = progressoKm !== null ? progressoKm : progressoData;
-        if (progresso !== null && progresso >= 30) {
-            const cor = getCorStatus(progresso);
-            alertas.push({ item, progresso, cor });
-        }
-    });
-    
-    alertas.sort((a, b) => b.progresso - a.progresso);
-    
-    if (alertas.length === 0) {
-        alertasDiv.innerHTML = '';
-        return;
-    }
-    
-    alertasDiv.innerHTML = `<h4 style="margin-bottom:0.5rem;color:var(--dourado);">🔔 Avisos de Manutenção</h4>` +
-        alertas.slice(0, 5).map(a => `
-        <div class="alerta-manutencao alerta-${a.cor}">
-            <strong>${a.item.nome}</strong> — ${a.progresso}% concluído
-            <br><small>Próximo: ${a.item.proximoKmMeta ? a.item.proximoKmMeta + ' km' : formatarData(a.item.proximaDataMeta)}</small>
-        </div>
-        `).join('');
-}
-
-function calcularTotaisPeriodo(periodo) {
-    const hoje = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }));
-    let dataInicio;
-    
-    switch (periodo) {
-        case 'dia': dataInicio = new Date(hoje); break;
-        case 'semana': dataInicio = new Date(hoje); dataInicio.setDate(hoje.getDate() - 6); break;
-        case 'mes': dataInicio = new Date(hoje.getFullYear(), hoje.getMonth(), 1); break;
-        case 'ano': dataInicio = new Date(hoje.getFullYear(), 0, 1); break;
-    }
-    
-    let totalRecebido = 0, totalGastos = 0, totalManutencao = 0;
-    let ganhosLista = [], gastosLista = [];
-    
-    Object.entries(dados.registros).forEach(([dataStr, reg]) => {
-        const dataReg = new Date(dataStr + 'T00:00:00');
-        if (dataReg >= dataInicio && dataReg <= hoje) {
-            reg.ganhos.forEach(g => { totalRecebido += g.valor; ganhosLista.push({ ...g, dataStr }); });
-            reg.gastos.forEach(g => { totalGastos += g.valor; gastosLista.push({ ...g, dataStr }); });
-            reg.manutencoes.forEach(m => { totalManutencao += m.valorTotal; });
-        }
-    });
-    
-    const diasNoMes = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0).getDate();
-    const custoFixoTotal = Object.values(dados.custosFixos).reduce((s, v) => s + v, 0);
-    const custoFixoDiario = custoFixoTotal / diasNoMes;
-    
-    let diasNoPeriodo;
-    if (periodo === 'dia') diasNoPeriodo = 1;
-    else if (periodo === 'semana') diasNoPeriodo = 7;
-    else if (periodo === 'mes') diasNoPeriodo = diasNoMes;
-    else if (periodo === 'ano') diasNoPeriodo = 365;
-    
-    const custoFixoPeriodo = custoFixoDiario * diasNoPeriodo;
-    const lucroReal = totalRecebido - totalGastos - totalManutencao - custoFixoPeriodo;
-    const reserva = Math.max(0, lucroReal * (dados.porcentagemReserva / 100));
-    const minimoParaCobrir = totalGastos + totalManutencao + custoFixoPeriodo;
-    
-    return { totalRecebido, totalGastos, totalManutencao, custoFixoPeriodo, lucroReal, reserva, minimoParaCobrir, ganhosLista, gastosLista };
-}
-
-function atualizarListas(periodo) {
-    periodoAtual = periodo;
-    const titulos = { dia: 'Hoje', semana: 'Esta Semana', mes: 'Este Mês', ano: 'Este Ano' };
-    document.getElementById('tituloPeriodo').textContent = titulos[periodo];
-    
-    ['Dia', 'Semana', 'Mes', 'Ano'].forEach(p => document.getElementById(`btn${p}`).classList.remove('ativo'));
-    document.getElementById(`btn${periodo.charAt(0).toUpperCase() + periodo.slice(1)}`).classList.add('ativo');
-    
-    const totais = calcularTotaisPeriodo(periodo);
-    
-    document.getElementById('resumoRecebido').textContent = formatarValor(totais.totalRecebido);
-    document.getElementById('resumoGastos').textContent = formatarValor(totais.totalGastos + totais.totalManutencao);
-    document.getElementById('resumoFixos').textContent = formatarValor(totais.custoFixoPeriodo);
-    document.getElementById('resumoSaldo').textContent = formatarValor(totais.lucroReal);
-    document.getElementById('resumoReserva').textContent = formatarValor(totais.reserva);
-    document.getElementById('resumoMinimo').textContent = formatarValor(totais.minimoParaCobrir);
-    
-    atualizarListaGanhos(totais.ganhosLista);
-    atualizarListaGastos(totais.gastosLista);
-    atualizarListaManutencao();
-    atualizarAlertasManutencao();
-}
-
-function atualizarListaGanhos(ganhos) {
-    const lista = document.getElementById('listaGanhos');
-    if (ganhos.length === 0) {
-        lista.innerHTML = '<p style="opacity:0.6;text-align:center;padding:1rem;">Nenhum ganho lançado neste período</p>';
-        return;
-    }
-    
-    const categorias = { MTZExpress: 'MTZ Express', iFood: 'iFood', '99': '99', Uber: 'Uber', Rappi: 'Rappi' };
-    
-    lista.innerHTML = ganhos.map((g, i) => `
-    <div class="item-lista">
-        <div class="cima">
-            <span class="nome">📱 ${g.fonte}</span>
-            <span class="valor verde">+ ${formatarValor(g.valor)}</span>
-        </div>
-        <p style="font-size:0.85rem;opacity:0.7;">📅 ${formatarData(g.dataStr)}${g.obs ? ` · ${g.obs}` : ''}</p>
-        <div class="botoes-lado" style="margin-top:0.5rem;">
-            <button class="secundario" style="font-size:0.85rem;padding:0.4rem 0.6rem;" onclick="editarGanho(${i}, '${g.dataStr}')">✏️ Editar</button>
-            <button class="secundario" style="font-size:0.85rem;padding:0.4rem 0.6rem;color:var(--vermelho);" onclick="excluirItem('ganhos', ${i}, '${g.dataStr}')">🗑️ Excluir</button>
-        </div>
-    </div>`).join('');
-}
-
-function atualizarListaGastos(gastos) {
-    const icones = {
-        alimentacao: '🍔', combustivel: '⛽', acessorios: '🛡️', mercado: '🏪',
-        farmacia: '💊', vestuario: '👕', transporte: '🚌', lazer: '🎮',
-        contas: '📄', outros: '📌'
-    };
-    
-    const lista = document.getElementById('listaGastos');
-    if (gastos.length === 0) {
-        lista.innerHTML = '<p style="opacity:0.6;text-align:center;padding:1rem;">Nenhum gasto lançado neste período</p>';
-        return;
-    }
-    
-    lista.innerHTML = gastos.map((g, i) => `
-    <div class="item-lista">
-        <div class="cima">
-            <span class="nome">${icones[g.categoria] || '📌'} ${g.categoria.charAt(0).toUpperCase() + g.categoria.slice(1)}</span>
-            <span class="valor vermelho">- ${formatarValor(g.valor)}</span>
-        </div>
-        <p style="font-size:0.85rem;opacity:0.7;">📅 ${formatarData(g.dataStr)}${g.descricao ? ` · ${g.descricao}` : ''}</p>
-        <div class="botoes-lado" style="margin-top:0.5rem;">
-            <button class="secundario" style="font-size:0.85rem;padding:0.4rem 0.6rem;" onclick="editarGasto(${i}, '${g.dataStr}')">✏️ Editar</button>
-            <button class="secundario" style="font-size:0.85rem;padding:0.4rem 0.6rem;color:var(--vermelho);" onclick="excluirItem('gastos', ${i}, '${g.dataStr}')">🗑️ Excluir</button>
-        </div>
-    </div>`).join('');
 }
 
 function mudarPeriodo(p) {
     periodoAtual = p;
+    document.querySelectorAll('.periodo-botoes button').forEach(b => b.classList.remove('ativo'));
+    document.getElementById(`btn${p.charAt(0).toUpperCase() + p.slice(1)}`).classList.add('ativo');
+    
+    const titulos = { dia: 'Hoje', semana: 'Esta Semana', mes: 'Este Mês', ano: 'Este Ano' };
+    document.getElementById('tituloPeriodo').textContent = titulos[p];
     atualizarListas(p);
 }
 
+function getDatasPorPeriodo(periodo) {
+    const hoje = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }));
+    const datas = [];
+    
+    switch(periodo) {
+        case 'dia':
+            datas.push(getDataHoje());
+            break;
+        case 'semana':
+            const diaSemana = hoje.getDay();
+            const inicioSemana = new Date(hoje);
+            inicioSemana.setDate(hoje.getDate() - diaSemana);
+            for (let i = 0; i < 7; i++) {
+                const d = new Date(inicioSemana);
+                d.setDate(inicioSemana.getDate() + i);
+                datas.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`);
+            }
+            break;
+        case 'mes':
+            const ano = hoje.getFullYear();
+            const mes = hoje.getMonth();
+            const diasNoMes = new Date(ano, mes + 1, 0).getDate();
+            for (let i = 1; i <= diasNoMes; i++) {
+                datas.push(`${ano}-${String(mes+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`);
+            }
+            break;
+        case 'ano':
+            const anoAtual = hoje.getFullYear();
+            for (let m = 0; m < 12; m++) {
+                const dias = new Date(anoAtual, m + 1, 0).getDate();
+                for (let d = 1; d <= dias; d++) {
+                    datas.push(`${anoAtual}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`);
+                }
+            }
+            break;
+    }
+    return datas;
+}
+
+function atualizarListas(periodo) {
+    const datas = getDatasPorPeriodo(periodo);
+    
+    let totalRecebido = 0;
+    let totalGastos = 0;
+    let totalManutencao = 0;
+    const todosGanhos = [];
+    const todosGastos = [];
+    const todasManutencoes = [];
+    
+    for (const data of Object.keys(dados.registros).sort().reverse()) {
+        const reg = dados.registros[data];
+        todosGanhos.push(...reg.ganhos.map(g => ({...g, data})));
+        todosGastos.push(...reg.gastos.map(g => ({...g, data})));
+        todasManutencoes.push(...reg.manutencoes.map(m => ({...m, data})));
+        
+        if (datas.includes(data)) {
+            totalRecebido += reg.ganhos.reduce((s, g) => s + g.valor, 0);
+            totalGastos += reg.gastos.reduce((s, g) => s + g.valor, 0);
+            totalManutencao += reg.manutencoes.reduce((s, m) => s + m.valorTotal, 0);
+        }
+    }
+    
+    const totalFixosMensal = Object.values(dados.custosFixos).reduce((s, v) => s + v, 0);
+    const totalGeralGastos = totalGastos + totalManutencao;
+    const reserva = totalRecebido * (dados.porcentagemReserva / 100);
+    const lucro = totalRecebido - totalGeralGastos;
+    const minimoDia = periodo === 'dia' ? (totalFixosMensal / 30).toFixed(2) : totalFixosMensal.toFixed(2);
+    
+    document.getElementById('resumoRecebido').textContent = formatarValor(totalRecebido);
+    document.getElementById('resumoGastos').textContent = formatarValor(totalGeralGastos);
+    document.getElementById('resumoFixos').textContent = formatarValor(periodo === 'mes' ? totalFixosMensal : (periodo === 'dia' ? totalFixosMensal / 30 : 0));
+    document.getElementById('resumoSaldo').textContent = formatarValor(lucro);
+    document.getElementById('resumoReserva').textContent = formatarValor(reserva);
+    document.getElementById('resumoMinimo').textContent = formatarValor(Number(minimoDia));
+    
+    // Lista Ganhos
+    const listaGanhosEl = document.getElementById('listaGanhos');
+    if (todosGanhos.length === 0) {
+        listaGanhosEl.innerHTML = '<p style="opacity:0.6;text-align:center;">Nenhum ganho lançado ainda</p>';
+    } else {
+        listaGanhosEl.innerHTML = todosGanhos.map((g, i) => `
+            <div class="item-lista">
+                <div class="cima">
+                    <span class="nome">${g.fonte}</span>
+                    <span class="valor verde">${formatarValor(g.valor)}</span>
+                </div>
+                <div style="font-size:0.85rem;opacity:0.7;">
+                    📅 ${formatarData(g.data)} ${g.obs ? `· ${g.obs}` : ''}
+                </div>
+                <div style="margin-top:0.5rem;display:flex;gap:0.5rem;">
+                    <button class="secundario" style="padding:0.3rem 0.6rem;font-size:0.8rem;" onclick="editarGanho(${i}, '${g.data}')">✏️ Editar</button>
+                    <button class="secundario" style="padding:0.3rem 0.6rem;font-size:0.8rem;color:var(--vermelho);" onclick="excluirItem('ganhos', ${i}, '${g.data}')">🗑️ Excluir</button>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    // Lista Gastos
+    const listaGastosEl = document.getElementById('listaGastos');
+    const nomesCategorias = {
+        alimentacao: '🍔 Alimentação',
+        combustivel: '⛽ Combustível',
+        acessorios: '🛡️ Acessórios',
+        mercado: '🏪 Mercado',
+        farmacia: '💊 Farmácia/Saúde',
+        vestuario: '👕 Vestuário',
+        transporte: '🚌 Transporte',
+        lazer: '🎮 Lazer',
+        contas: '📄 Contas Fixas',
+        outros: '📌 Outros'
+    };
+    if (todosGastos.length === 0) {
+        listaGastosEl.innerHTML = '<p style="opacity:0.6;text-align:center;">Nenhum gasto lançado ainda</p>';
+    } else {
+        listaGastosEl.innerHTML = todosGastos.map((g, i) => `
+            <div class="item-lista">
+                <div class="cima">
+                    <span class="nome">${nomesCategorias[g.categoria] || g.categoria}</span>
+                    <span class="valor vermelho">${formatarValor(g.valor)}</span>
+                </div>
+                <div style="font-size:0.85rem;opacity:0.7;">
+                    📅 ${formatarData(g.data)} ${g.descricao ? `· ${g.descricao}` : ''}
+                </div>
+                <div style="margin-top:0.5rem;display:flex;gap:0.5rem;">
+                    <button class="secundario" style="padding:0.3rem 0.6rem;font-size:0.8rem;" onclick="editarGasto(${i}, '${g.data}')">✏️ Editar</button>
+                    <button class="secundario" style="padding:0.3rem 0.6rem;font-size:0.8rem;color:var(--vermelho);" onclick="excluirItem('gastos', ${i}, '${g.data}')">🗑️ Excluir</button>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    // Lista Manutenção
+    const listaManutencaoEl = document.getElementById('listaManutencao');
+    if (todasManutencoes.length === 0) {
+        listaManutencaoEl.innerHTML = '<p style="opacity:0.6;text-align:center;">Nenhuma manutenção lançada ainda</p>';
+    } else {
+        listaManutencaoEl.innerHTML = todasManutencoes.map((m, i) => `
+            <div class="item-lista">
+                <div class="cima">
+                    <span class="nome">🔧 ${m.nome}</span>
+                    <span class="valor">${formatarValor(m.valorTotal)}</span>
+                </div>
+                <div style="font-size:0.85rem;opacity:0.7;line-height:1.5;">
+                    📅 Troca: ${formatarData(m.dataTroca)} · ${m.kmTroca ? `📍 ${m.kmTroca} km` : ''}<br>
+                    🎯 Próx: ${m.proximoKmMeta ? `${m.proximoKmMeta} km` : ''} ${m.proximaDataMeta ? formatarData(m.proximaDataMeta) : ''}
+                    ${m.valorPeca ? `<br>Peças: ${formatarValor(m.valorPeca)}` : ''}
+                    ${m.valorMaoObra ? ` · Mão de obra: ${formatarValor(m.valorMaoObra)}` : ''}
+                </div>
+                <div style="margin-top:0.5rem;display:flex;gap:0.5rem;">
+                    <button class="secundario" style="padding:0.3rem 0.6rem;font-size:0.8rem;" onclick="editarManutencao(${i}, '${m.data}')">✏️ Editar</button>
+                    <button class="secundario" style="padding:0.3rem 0.6rem;font-size:0.8rem;color:var(--vermelho);" onclick="excluirManutencao(${i}, '${m.data}')">🗑️ Excluir</button>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    atualizarAlertasManutencao();
+}
+
+function editarManutencao(indice, data) {
+    const reg = pegarRegistro(data);
+    const m = reg.manutencoes[indice];
+    document.getElementById('dataManutencao').value = m.dataTroca;
+    document.getElementById('nomeManutencao').value = m.nome;
+    document.getElementById('kmTroca').value = m.kmTroca || '';
+    document.getElementById('proximoKmMeta').value = m.proximoKmMeta || '';
+    document.getElementById('proximaDataMeta').value = m.proximaDataMeta || '';
+    document.getElementById('valorPeca').value = m.valorPeca || '';
+    document.getElementById('valorMaoObra').value = m.valorMaoObra || '';
+    document.getElementById('valorTotalManutencao').value = m.valorTotal || '';
+    reg.manutencoes.splice(indice, 1);
+    salvarDados();
+    trocarAba('Manutencao');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function excluirManutencao(indice, data) {
+    if (!confirm('Tem certeza que quer excluir esta manutenção?')) return;
+    const reg = pegarRegistro(data);
+    reg.manutencoes.splice(indice, 1);
+    salvarDados();
+    alert('✅ Excluído!');
+}
+
+function atualizarAlertasManutencao() {
+    const kmAtual = kmAtualParaCalculo();
+    const hoje = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }));
+    const alertasEl = document.getElementById('alertasManutencao');
+    const alertas = [];
+    
+    for (const data of Object.keys(dados.registros)) {
+        const reg = dados.registros[data];
+        for (const m of reg.manutencoes) {
+            let status = null;
+            let texto = '';
+            
+            // Verifica por KM
+            if (m.proximoKmMeta && m.kmTroca && kmAtual > 0) {
+                const limite = m.proximoKmMeta;
+                const faltando = limite - kmAtual;
+                const percorrido = kmAtual - m.kmTroca;
+                const total = limite - m.kmTroca;
+                const porcentagem = percorrido / total;
+                
+                if (faltando <= 0) {
+                    status = 'vermelho';
+                    texto = `🔴 ${m.nome}: VENCEU! ${Math.abs(faltando)} km ultrapassado`;
+                } else if (porcentagem >= 0.8) {
+                    status = 'amarelo';
+                    texto = `🟡 ${m.nome}: Faltam ${faltando} km para trocar`;
+                }
+            }
+            
+            // Verifica por Data
+            if (m.proximaDataMeta) {
+                const proximaData = new Date(m.proximaDataMeta + 'T00:00:00');
+                const diffDias = Math.ceil((proximaData - hoje) / (1000 * 60 * 60 * 24));
+                
+                if (diffDias <= 0) {
+                    status = 'vermelho';
+                    texto = `🔴 ${m.nome}: VENCEU hoje! (${formatarData(m.proximaDataMeta)})`;
+                } else if (diffDias <= 15) {
+                    status = 'amarelo';
+                    texto = `🟡 ${m.nome}: Vence em ${diffDias} dias (${formatarData(m.proximaDataMeta)})`;
+                }
+            }
+            
+            if (status && texto) {
+                alertas.push({ status, texto });
+            }
+        }
+    }
+    
+    if (alertas.length === 0) {
+        alertasEl.innerHTML = '<div class="alerta-manutencao alerta-verde">✅ Tudo em dia! Nenhuma manutenção pendente.</div>';
+    } else {
+        alertasEl.innerHTML = alertas.map(a => 
+            `<div class="alerta-manutencao alerta-${a.status}">${a.texto}</div>`
+        ).join('');
+    }
+}
+
 function exportarDados() {
-    const texto = JSON.stringify(dados, null, 2);
+    const texto = btoa(unescape(encodeURIComponent(JSON.stringify(dados))));
     navigator.clipboard.writeText(texto).then(() => {
-        alert('✅ Dados copiados!\nGuarde esse código em um lugar seguro!');
+        alert('✅ Backup copiado!\nGuarde esse código em um lugar seguro.');
     }).catch(() => {
-        const textarea = document.createElement('textarea');
-        textarea.value = texto;
-        document.body.appendChild(textarea);
-        textarea.select();
+        const area = document.createElement('textarea');
+        area.value = texto;
+        document.body.appendChild(area);
+        area.select();
         document.execCommand('copy');
-        document.body.removeChild(textarea);
-        alert('✅ Dados copiados!');
+        document.body.removeChild(area);
+        alert('✅ Backup copiado!');
     });
 }
 
@@ -991,37 +1072,35 @@ function esconderImportar() {
 
 function importarDados() {
     const texto = document.getElementById('textoBackup').value.trim();
-    if (!texto) { alert('Cole seu código de backup!'); return; }
+    if (!texto) { alert('Cole o código de backup!'); return; }
+    if (!confirm('⚠️ Isso vai substituir todos os dados atuais. Tem certeza?')) return;
     
     try {
-        const novosDados = JSON.parse(texto);
-        if (!novosDados.registros) throw new Error('Formato inválido');
-        
-        if (!confirm('⚠️ ATENÇÃO: Isso vai SUBSTITUIR todos os seus dados atuais pelos do backup.\nTem certeza?')) return;
-        
-        dados = novosDados;
+        const decodificado = JSON.parse(decodeURIComponent(escape(atob(texto))));
+        dados = decodificado;
         salvarDados();
         esconderImportar();
-        alert('✅ Restauração concluída! Atualizando...');
-        window.location.reload();
-    } catch (erro) {
-        alert('❌ Código inválido! Verifique se copiou tudo certinho.');
+        alert('✅ Restauração concluída!');
+    } catch (e) {
+        alert('❌ Código inválido. Verifique se copiou tudo corretamente.');
     }
 }
 
 function atualizarTela() {
     atualizarListas(periodoAtual);
-}
-
-window.onload = function() {
-    atualizarDataTopo();
+    preencherCustosFixosTela();
     document.getElementById('dataKm').value = getDataHoje();
     document.getElementById('dataGanho').value = getDataHoje();
     document.getElementById('dataGasto').value = getDataHoje();
     document.getElementById('dataManutencao').value = getDataHoje();
-    preencherCustosFixosTela();
-    atualizarListas('dia');
+    atualizarKmRodado();
 }
+
+// Inicializar
+atualizarDataTopo();
+atualizarTela();
+setInterval(atualizarDataTopo, 60000);
 </script>
+
 </body>
                     </html>
