@@ -69,6 +69,8 @@
         .input-com-botao input { flex: 1; }
         .btn-limpar-data { padding: 0.75rem; background: #444; border: none; border-radius: 8px; color: white; cursor: pointer; transition: 0.2s; }
         .btn-limpar-data:hover { background: var(--vermelho); }
+        .salvo-indicador { font-size: 0.75rem; color: var(--verde); opacity: 0; transition: opacity 0.3s; margin-left: 0.5rem; }
+        .salvo-indicador.mostrar { opacity: 1; }
     </style>
 </head>
 <body>
@@ -162,7 +164,7 @@
         <div class="linha">
             <div>
                 <label>📅 Data do Lançamento</label>
-                <input type="date" id="dataKm">
+                <input type="date" id="dataKm" onchange="carregarKmDaData()">
             </div>
         </div>
         <button class="secundario" style="margin-bottom:1rem;width:100%;" onclick="carregarKmDaData()">📂 Carregar dados desta data</button>
@@ -171,8 +173,8 @@
             <h4 style="margin-bottom:0.8rem;color:var(--verde);">🌅 Início do Dia</h4>
             <div class="linha">
                 <div>
-                    <label>Km Inicial — <small>digite e já fica salvo automaticamente</small></label>
-                    <input type="number" id="kmInicial" placeholder="Ex: 50000" oninput="atualizarKmRodado();salvarKmAutomatico();">
+                    <label>Km Inicial — <small>salva automaticamente ✅</small><span id="salvoIni" class="salvo-indicador">✓ Salvo</span></label>
+                    <input type="number" id="kmInicial" placeholder="Ex: 50000" oninput="salvarKmAutomatico();atualizarKmRodado();">
                 </div>
             </div>
         </div>
@@ -181,8 +183,8 @@
             <h4 style="margin-bottom:0.8rem;color:var(--amarelo);">🌇 Fechamento do Dia</h4>
             <div class="linha">
                 <div>
-                    <label>Km Final — <small>digite no fim do dia</small></label>
-                    <input type="number" id="kmFinal" placeholder="Ex: 52000" oninput="atualizarKmRodado();salvarKmAutomatico();">
+                    <label>Km Final — <small>digite no fim do dia</small><span id="salvoFim" class="salvo-indicador">✓ Salvo</span></label>
+                    <input type="number" id="kmFinal" placeholder="Ex: 52000" oninput="salvarKmAutomatico();atualizarKmRodado();">
                 </div>
             </div>
         </div>
@@ -193,7 +195,7 @@
                 <p class="resumo-valor" id="kmRodado">—</p>
             </div>
         </div>
-        <button class="secundario" style="margin-top:0.5rem;width:100%;" onclick="salvarKmManual()">💾 Salvar Manualmente</button>
+        <p style="font-size:0.8rem;opacity:0.6;text-align:center;margin-top:0.5rem;">💾 Os dados salvos ficam guardados automaticamente por data</p>
     </div>
 </section>
 
@@ -430,8 +432,6 @@ function carregarDados() {
         return {
             porcentagemReserva: 10,
             registros: {},
-            kmInicial: null,
-            kmFinal: null,
             custosFixos: {
                 ipva: 0, seguro: 0, prestacao: 0, aluguel: 0, app: 0, outros: 0
             }
@@ -545,54 +545,57 @@ function atualizarKmRodado() {
     }
 }
 
-function salvarKmAutomatico() {
-    const data = document.getElementById('dataKm').value || getDataHoje();
-    const reg = pegarRegistro(data);
-    
-    const kmIni = document.getElementById('kmInicial').value;
-    const kmFin = document.getElementById('kmFinal').value;
-    
-    reg.kmInicial = kmIni ? Number(kmIni) : null;
-    reg.kmFinal = kmFin ? Number(kmFin) : null;
-    dados.kmInicial = reg.kmInicial;
-    dados.kmFinal = reg.kmFinal;
-    
-    salvarDados();
-    atualizarAlertasManutencao();
+function mostrarSalvo(tipo) {
+    const el = document.getElementById(tipo === 'ini' ? 'salvoIni' : 'salvoFim');
+    el.classList.add('mostrar');
+    setTimeout(() => el.classList.remove('mostrar'), 1500);
 }
 
-function salvarKmManual() {
-    const data = document.getElementById('dataKm').value || getDataHoje();
+function salvarKmAutomatico() {
+    const data = document.getElementById('dataKm').value;
+    if (!data) return;
+    
     const reg = pegarRegistro(data);
     const kmIni = document.getElementById('kmInicial').value;
     const kmFin = document.getElementById('kmFinal').value;
     
     reg.kmInicial = kmIni ? Number(kmIni) : null;
     reg.kmFinal = kmFin ? Number(kmFin) : null;
-    dados.kmInicial = reg.kmInicial;
-    dados.kmFinal = reg.kmFinal;
-    salvarDados();
     
-    let mensagem = `✅ Dados de ${formatarData(data)} salvos!\n`;
-    if (reg.kmInicial && !reg.kmFinal) {
-        mensagem += `📍 Km Inicial: ${reg.kmInicial}\nÀ noite é só voltar e colocar o Km Final!`;
-    } else if (reg.kmInicial && reg.kmFinal) {
-        mensagem += `📍 Início: ${reg.kmInicial} · Final: ${reg.kmFinal}\n🛵 Rodado: ${reg.kmFinal - reg.kmInicial} km`;
-    }
-    alert(mensagem);
+    salvarDados();
+    mostrarSalvo(kmIni ? 'ini' : 'fim');
 }
 
 function carregarKmDaData() {
     const data = document.getElementById('dataKm').value;
-    if (!data) { alert('Escolha uma data!'); return; }
+    if (!data) return;
+    
     const reg = pegarRegistro(data);
+    
     document.getElementById('kmInicial').value = reg.kmInicial || '';
     document.getElementById('kmFinal').value = reg.kmFinal || '';
+    
+    const hoje = getDataHoje();
+    if (data === hoje && !reg.kmInicial) {
+        const datas = Object.keys(dados.registros).sort().reverse();
+        for (const d of datas) {
+            if (d !== hoje && dados.registros[d].kmFinal) {
+                document.getElementById('kmInicial').value = dados.registros[d].kmFinal;
+                reg.kmInicial = dados.registros[d].kmFinal;
+                salvarDados();
+                alert(`✅ Km de hoje preenchido com o final de ${formatarData(d)}: ${dados.registros[d].kmFinal} km`);
+                break;
+            }
+        }
+    }
+    
     atualizarKmRodado();
 }
 
 function kmAtualParaCalculo() {
-    return dados.kmFinal || dados.kmInicial || 0;
+    const data = document.getElementById('dataKm').value || getDataHoje();
+    const reg = pegarRegistro(data);
+    return reg.kmFinal || reg.kmInicial || 0;
 }
 
 function mostrarOutraFonte() {
@@ -733,7 +736,6 @@ function usarSugestao(nome, proxKm, proxMeses) {
         document.getElementById('kmTroca').value = kmAtual;
         document.getElementById('proximoKmMeta').value = kmAtual + proxKm;
     }
-    // Data meta fica VAZIA por padrão — preencha se precisar
 }
 
 function atualizarSugestaoKm() {
@@ -755,21 +757,21 @@ function lancarManutencao() {
     const proxDataMeta = document.getElementById('proximaDataMeta').value || null;
     const proxKmMeta = document.getElementById('proximoKmMeta').value ? Number(document.getElementById('proximoKmMeta').value) : null;
     
-    if (!proxDataMeta && !proxKmMeta) {
-        alert('⚠️ Coloque pelo menos o Próximo Km OU a Próxima Data!');
+        if (!proxDataMeta && !proxKmMeta) {
+        alert('Defina pelo menos: próximo km OU próxima data!');
         return;
     }
-    
+
     const valorPeca = Number(document.getElementById('valorPeca').value) || 0;
     const valorMaoObra = Number(document.getElementById('valorMaoObra').value) || 0;
     const valorTotal = Number(document.getElementById('valorTotalManutencao').value) || (valorPeca + valorMaoObra);
-    
+    const kmTroca = document.getElementById('kmTroca').value ? Number(document.getElementById('kmTroca').value) : null;
+
     const reg = pegarRegistro(dataTroca);
-    
     reg.manutencoes.push({
-                nome: nome,
+        nome: nome,
         dataTroca: dataTroca,
-        kmTroca: document.getElementById('kmTroca').value ? Number(document.getElementById('kmTroca').value) : null,
+        kmTroca: kmTroca,
         proximoKmMeta: proxKmMeta,
         proximaDataMeta: proxDataMeta,
         valorPeca: valorPeca,
@@ -879,7 +881,6 @@ function atualizarListas(periodo) {
     document.getElementById('resumoReserva').textContent = formatarValor(reserva);
     document.getElementById('resumoMinimo').textContent = formatarValor(Number(minimoDia));
     
-    // Lista Ganhos
     const listaGanhosEl = document.getElementById('listaGanhos');
     if (todosGanhos.length === 0) {
         listaGanhosEl.innerHTML = '<p style="opacity:0.6;text-align:center;">Nenhum ganho lançado ainda</p>';
@@ -901,7 +902,6 @@ function atualizarListas(periodo) {
         `).join('');
     }
     
-    // Lista Gastos
     const listaGastosEl = document.getElementById('listaGastos');
     const nomesCategorias = {
         alimentacao: '🍔 Alimentação',
@@ -935,7 +935,6 @@ function atualizarListas(periodo) {
         `).join('');
     }
     
-    // Lista Manutenção
     const listaManutencaoEl = document.getElementById('listaManutencao');
     if (todasManutencoes.length === 0) {
         listaManutencaoEl.innerHTML = '<p style="opacity:0.6;text-align:center;">Nenhuma manutenção lançada ainda</p>';
@@ -1000,7 +999,6 @@ function atualizarAlertasManutencao() {
             let status = null;
             let texto = '';
             
-            // Verifica por KM
             if (m.proximoKmMeta && m.kmTroca && kmAtual > 0) {
                 const limite = m.proximoKmMeta;
                 const faltando = limite - kmAtual;
@@ -1017,7 +1015,6 @@ function atualizarAlertasManutencao() {
                 }
             }
             
-            // Verifica por Data
             if (m.proximaDataMeta) {
                 const proximaData = new Date(m.proximaDataMeta + 'T00:00:00');
                 const diffDias = Math.ceil((proximaData - hoje) / (1000 * 60 * 60 * 24));
@@ -1089,18 +1086,21 @@ function importarDados() {
 function atualizarTela() {
     atualizarListas(periodoAtual);
     preencherCustosFixosTela();
+    
     document.getElementById('dataKm').value = getDataHoje();
     document.getElementById('dataGanho').value = getDataHoje();
     document.getElementById('dataGasto').value = getDataHoje();
     document.getElementById('dataManutencao').value = getDataHoje();
+    
+    carregarKmDaData();
+    
     atualizarKmRodado();
 }
 
-// Inicializar
 atualizarDataTopo();
 atualizarTela();
 setInterval(atualizarDataTopo, 60000);
 </script>
 
 </body>
-                    </html>
+</html>
