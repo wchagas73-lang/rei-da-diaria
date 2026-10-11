@@ -650,6 +650,7 @@ function lancarGanho() {
     
     salvarDados();
     atualizarTelaCompleta();
+    atualizarListaGanhos();
     alert(`✅ Ganho de ${formatarValor(valor)} salvo!`);
 }
 
@@ -658,6 +659,7 @@ function excluirGanho(indice, data) {
     dados.registros[data].ganhos.splice(indice, 1);
     salvarDados();
     atualizarTelaCompleta();
+    atualizarListaGanhos();
 }
 
 function editarGanho(indice, data) {
@@ -728,6 +730,7 @@ function lancarGasto() {
     
     salvarDados();
     atualizarTelaCompleta();
+    atualizarListaGastos();
     alert(`✅ Gasto de ${formatarValor(valor)} salvo!`);
 }
 
@@ -736,6 +739,7 @@ function excluirGasto(indice, data) {
     dados.registros[data].gastos.splice(indice, 1);
     salvarDados();
     atualizarTelaCompleta();
+    atualizarListaGastos();
 }
 
 function editarGasto(indice, data) {
@@ -781,8 +785,9 @@ function atualizarListaGastos() {
     const el = document.getElementById('listaGastos');
     const categorias = {
         alimentacao: '🍔 Alimentação', combustivel: '⛽ Combustível', acessorios: '🎒 Acessórios',
-        mercado: '🛒 Mercado', farmacia: '💊 Farmácia', transporte: '🚌 Transporte',
-        vestuario: '👕 Vestuário', lazer: '🎮 Lazer', contas: '📄     };
+        mercado: '🛒 Mercado', farmacia: '💊 Farmácia', transporte: '🚌Transporte',
+        vestuario: '👕 Vestuário', lazer: '🎮 Lazer', contas: '📄 Contas', outros: '📌 Outros'
+    };
     const itens = [];
     
     Object.keys(dados.registros).sort().reverse().forEach(data => {
@@ -808,7 +813,7 @@ function atualizarListaGastos() {
     el.innerHTML = itens.length ? itens.join('') : '<p style="opacity:0.6;text-align:center;">Nenhum gasto lançado ainda</p>';
 }
 
-// ==================== MANUTENÇÃO — AQUI ESTÁ O QUE ESTAVA FALTANDO! ====================
+// ==================== MANUTENÇÃO ====================
 function normalizarTexto(texto) {
     return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 }
