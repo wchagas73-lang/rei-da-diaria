@@ -33,7 +33,7 @@
         label { font-size: 0.85rem; opacity: 0.8; margin-bottom: 0.3rem; display: block; }
         input, select, textarea { width: 100%; padding: 0.75rem; border: none; border-radius: 8px; background: #2a2a2a; color: white; border: 1px solid #3a3a3a; font-size: 1rem; }
         input:focus, select:focus, textarea:focus { outline: none; border-color: var(--dourado); }
-        button.primario { background: var(--dourado); color: #000; font-weight: 600; border: none; padding: 0.75rem; border-radius: 8px; font-size: 1rem; cursor: pointer; transition: 0.2s; }
+        button.primario { background: var(--dourado); color: #000; font-weight: 600; border: none; padding: 0.75rem; border-radius: 8px; font-size: 1rem; cursor: pointer; transition: 0.2s; width: 100%; }
         button.primario:hover { filter: brightness(1.1); }
         button.secundario { background: #333; color: white; font-weight: 500; border: none; padding: 0.75rem; border-radius: 8px; font-size: 1rem; cursor: pointer; transition: 0.2s; }
         button.secundario:hover { background: #444; }
@@ -72,7 +72,7 @@
         .input-com-botao input { flex: 1; }
         .btn-limpar-data { padding: 0.75rem; background: #444; border: none; border-radius: 8px; color: white; cursor: pointer; transition: 0.2s; }
         .btn-limpar-data:hover { background: var(--vermelho); }
-        .salvo-indicador { font-size: 0.75rem; color: var(--verde); opacity: 0; transition: opacity 0.3s; margin-left: 0.5rem; }
+        .salvo-indicador { font-size: 0.75rem; color: var(--(--verde)); opacity: 0; transition: opacity 0.3s; margin-left: 0.5rem; }
         .salvo-indicador.mostrar { opacity: 1; }
         .valor-por-km { background: rgba(250, 204, 21, 0.1); border: 1px solid var(--dourado); border-radius: 8px; padding: 0.8rem; text-align: center; margin-top: 0.8rem; }
     </style>
@@ -111,7 +111,7 @@
                     <input type="date" id="dataFinalFiltro">
                 </div>
             </div>
-            <button class="primario" style="width:100%;margin-top:0.5rem;" type="button" onclick="calcularPeriodoPersonalizado()">✅ Calcular Período</button>
+            <button class="primario" style="margin-top:0.5rem;" onclick="calcularPeriodoPersonalizado()">✅ Calcular Período</button>
         </div>
     </div>
 
@@ -135,7 +135,7 @@
                 <p class="resumo-valor amarelo" id="resumoFixos">R$ 0,00</p>
             </div>
             <div>
-                <label>🏦 Poupança de Reserva</label>
+                <label>🏦 Poupança de Reserva (<span id="mostrarPorcentagemReserva">10</span>%)</label>
                 <p class="resumo-valor" style="color:var(--dourado);" id="resumoReserva">R$ 0,00</p>
             </div>
             <div>
@@ -144,13 +144,13 @@
             </div>
         </div>
         <div class="valor-por-km" id="caixaValorPorKm" style="display:none;">
-            <strong>🚀 Média por km:</strong>
+            <strong>🚀 Média por km rodado:</strong>
             <p class="resumo-valor" style="color:var(--dourado); font-size:1.3rem;" id="valorPorKm">R$ 0,00</p>
         </div>
         <div style="margin-top:1rem;text-align:center;">
             <strong>💾 % da reserva:</strong>
             <input type="number" id="porcentagemReserva" value="10" min="0" max="100" style="width:70px;text-align:center;display:inline-block;margin-left:0.5rem;">
-            <button class="secundario pequeno" type="button" style="margin-left:0.5rem;" onclick="salvarPorcentagemReserva()">✅ Salvar</button>
+            <button class="secundario pequeno" style="margin-left:0.5rem;" onclick="salvarPorcentagemReserva()">✅ Salvar</button>
         </div>
     </div>
 
@@ -168,15 +168,15 @@
         <h3>💾 Backup dos Seus Dados</h3>
         <p style="text-align:center;font-size:0.85rem;opacity:0.7;margin-bottom:1rem;">Salve seus dados antes de atualizar o aplicativo!</p>
         <div class="botoes-lado">
-            <button class="primario" type="button" onclick="exportarDados()">📤 Exportar / Copiar</button>
-            <button class="secundario" type="button" onclick="mostrarImportar()">📥 Restaurar / Colar</button>
+            <button class="primario" onclick="exportarDados()">📤 Exportar / Copiar</button>
+            <button class="secundario" onclick="mostrarImportar()">📥 Restaurar / Colar</button>
         </div>
         <div id="caixaImportar" style="display:none;">
             <label>Cole seu código de backup abaixo:</label>
             <textarea id="textoBackup" rows="4" placeholder="Cole aqui o texto que você copiou anteriormente..."></textarea>
             <div class="botoes-lado">
-                <button class="primario" type="button" onclick="importarDados()">✅ Restaurar</button>
-                <button class="secundario" type="button" onclick="esconderImportar()">❌ Cancelar</button>
+                <button class="primario" onclick="importarDados()">✅ Restaurar</button>
+                <button class="secundario" onclick="esconderImportar()">❌ Cancelar</button>
             </div>
         </div>
     </div>
@@ -191,14 +191,14 @@
                 <input type="date" id="dataKm">
             </div>
         </div>
-        <button class="secundario" type="button" style="margin-bottom:1rem;width:100%;" onclick="carregarKmDaData()">📂 Carregar dados desta data</button>
+        <button class="secundario" style="margin-bottom:1rem;width:100%;" onclick="carregarKmDaData()">📂 Carregar dados desta data</button>
         
         <div class="secao-km inicio">
             <h4 style="margin-bottom:0.8rem;color:var(--verde);">🌅 Início do Dia</h4>
             <div class="linha">
                 <div>
-                    <label>Km Inicial <span class="salvo-indicador" id="indicadorSalvoIni">✓ Salvo</span></label>
-                    <input type="number" id="kmInicial" placeholder="Ex: 50000" oninput="salvarKmAutomatico();atualizarTelaCompleta();">
+                    <label>Km Inicial</label>
+                    <input type="number" id="kmInicial" placeholder="Ex: 50000" oninput="salvarKmAutomatico();">
                 </div>
             </div>
         </div>
@@ -207,8 +207,8 @@
             <h4 style="margin-bottom:0.8rem;color:var(--amarelo);">🌇 Fechamento do Dia</h4>
             <div class="linha">
                 <div>
-                    <label>Km Final <span class="salvo-indicador" id="indicadorSalvoFim">✓ Salvo</span></label>
-                    <input type="number" id="kmFinal" placeholder="Ex: 50177" oninput="salvarKmAutomatico();atualizarTelaCompleta();">
+                    <label>Km Final</label>
+                    <input type="number" id="kmFinal" placeholder="Ex: 50177" oninput="salvarKmAutomatico();">
                 </div>
                 <div>
                     <label>Km Rodados</label>
@@ -226,7 +226,7 @@
                 <input type="date" id="dataBuscaKm">
             </div>
         </div>
-        <button class="primario" type="button" style="width:100%;margin-top:0.5rem;" onclick="buscarHistoricoData()">🔍 Verificar Dia</button>
+        <button class="primario" style="margin-top:0.5rem;" onclick="buscarHistoricoData()">🔍 Verificar Dia</button>
         <div id="resultadoBuscaKm" style="margin-top:1rem;"></div>
     </div>
 
@@ -269,7 +269,7 @@
                 <input type="text" id="obsGanho" placeholder="Ex: 5 corridas">
             </div>
         </div>
-        <button class="primario" type="button" style="width:100%;" onclick="lancarGanho()">💾 Salvar Ganho</button>
+        <button class="primario" onclick="lancarGanho()">💾 Salvar Ganho</button>
     </div>
     <div class="cartao">
         <h3>📋 Histórico de Ganhos</h3>
@@ -310,7 +310,7 @@
                 <input type="text" id="descricaoGasto" placeholder="Ex: Almoço na padaria">
             </div>
         </div>
-        <button class="primario" type="button" style="width:100%;" onclick="lancarGasto()">💾 Salvar Gasto</button>
+        <button class="primario" onclick="lancarGasto()">💾 Salvar Gasto</button>
     </div>
 
     <div class="cartao">
@@ -467,6 +467,9 @@ function carregarDados() {
     const salvos = localStorage.getItem('reidiaria_dados');
     if (salvos) {
         dados = JSON.parse(salvos);
+        if (!dados.porcentagemReserva) dados.porcentagemReserva = 10;
+        if (!dados.registros) dados.registros = {};
+        if (!dados.custosFixos) dados.custosFixos = { ipva:0, seguro:0, prestacao:0, aluguel:0, app:0, outros:0 };
     }
 }
 
@@ -541,24 +544,13 @@ function salvarKmAutomatico() {
     
     salvarDados();
     
-    // Mostrar indicador de salvo
-    if (kmIni) {
-        const ind = document.getElementById('indicadorSalvoIni');
-        ind.classList.add('mostrar');
-        setTimeout(() => ind.classList.remove('mostrar'), 2000);
-    }
-    if (kmFin) {
-        const ind = document.getElementById('indicadorSalvoFim');
-        ind.classList.add('mostrar');
-        setTimeout(() => ind.classList.remove('mostrar'), 2000);
-    }
-    
-    // Atualizar km rodados do dia
     if (reg.kmInicial !== null && reg.kmFinal !== null) {
         document.getElementById('kmRodadosDia').value = `${reg.kmFinal - reg.kmInicial} km`;
     } else {
         document.getElementById('kmRodadosDia').value = '';
     }
+    
+    atualizarTelaCompleta();
 }
 
 function carregarKmDaData() {
@@ -574,8 +566,6 @@ function carregarKmDaData() {
     } else {
         document.getElementById('kmRodadosDia').value = '';
     }
-    
-    atualizarTelaCompleta();
 }
 
 function buscarHistoricoData() {
@@ -593,7 +583,6 @@ function buscarHistoricoData() {
     const kmRodados = (reg.kmInicial !== null && reg.kmFinal !== null) ? reg.kmFinal - reg.kmInicial : '—';
     const totalGanhos = reg.ganhos.reduce((s, g) => s + g.valor, 0);
     const totalGastos = reg.gastos.reduce((s, g) => s + g.valor, 0);
-    const valorPorKm = (kmRodados !== '—' && kmRodados > 0) ? totalGanhos / kmRodados : null;
     
     resultado.innerHTML = `
         <div class="item-lista">
@@ -603,7 +592,6 @@ function buscarHistoricoData() {
             <p>📍 Km Rodados: ${kmRodados !== '—' ? kmRodados.toLocaleString('pt-BR') + ' km' : '—'}</p>
             <p class="verde">💵 Total Ganhos: ${formatarValor(totalGanhos)}</p>
             <p class="vermelho">📉 Total Gastos: ${formatarValor(totalGastos)}</p>
-            ${valorPorKm ? `<p class="dourado">🚀 Média por km: R$ ${valorPorKm.toFixed(2)}</p>` : ''}
         </div>
     `;
 }
@@ -712,8 +700,8 @@ function atualizarListaGanhos() {
                         📅 ${formatarData(data)} ${g.obs ? `· ${g.obs}` : ''}
                     </div>
                     <div class="botoes-lado" style="margin-top:0.5rem;">
-                        <button class="secundario pequeno" type="button" onclick="editarGanho(${i}, '${data}')">✏️ Editar</button>
-                        <button class="secundario pequeno" type="button" style="color:var(--vermelho);" onclick="excluirGanho(${i}, '${data}')">🗑️ Excluir</button>
+                        <button class="secundario pequeno" onclick="editarGanho(${i}, '${data}')">✏️ Editar</button>
+                        <button class="secundario pequeno" style="color:var(--vermelho);" onclick="excluirGanho(${i}, '${data}')">🗑️ Excluir</button>
                     </div>
                 </div>
             `);
@@ -782,7 +770,7 @@ function salvarCustosFixos() {
 
 function preencherCustosFixos() {
     document.getElementById('custoIpva').value = dados.custosFixos.ipva || '';
-    document.getElementById('custoSeguro').value = dados.custosFixos.seguro|| '';
+    document.getElementById('custoSeguro').value = dados.custosFixos.seguro || '';
     document.getElementById('custoPrestacao').value = dados.custosFixos.prestacao || '';
     document.getElementById('custoAluguel').value = dados.custosFixos.aluguel || '';
     document.getElementById('custoApp').value = dados.custosFixos.app || '';
@@ -796,7 +784,7 @@ function atualizarListaGastos() {
     const categorias = {
         alimentacao: '🍔 Alimentação', combustivel: '⛽ Combustível', acessorios: '🎒 Acessórios',
         mercado: '🛒 Mercado', farmacia: '💊 Saúde', transporte: '🚌 Transporte',
-        vestuario: '👕 Vestuário', lazer: '🎮 Lazer', contas: '📄 Contas', outros: '📌 Outros'
+        vestuario: '👕 Vestuário', lazer:'🎮 Lazer', contas: '📄 Contas', outros: '📌 Outros'
     };
     const itens = [];
     
@@ -812,8 +800,8 @@ function atualizarListaGastos() {
                         📅 ${formatarData(data)} ${g.descricao ? `· ${g.descricao}` : ''}
                     </div>
                     <div class="botoes-lado" style="margin-top:0.5rem;">
-                        <button class="secundario pequeno" type="button" onclick="editarGasto(${i}, '${data}')">✏️ Editar</button>
-                        <button class="secundario pequeno" type="button" style="color:var(--vermelho);" onclick="excluirGasto(${i}, '${data}')">🗑️ Excluir</button>
+                        <button class="secundario pequeno" onclick="editarGasto(${i}, '${data}')">✏️ Editar</button>
+                        <button class="secundario pequeno" style="color:var(--vermelho);" onclick="excluirGasto(${i}, '${data}')">🗑️ Excluir</button>
                     </div>
                 </div>
             `);
@@ -873,25 +861,36 @@ function getCorBarra(porcentagem) {
 function lancarManutencao() {
     const nome = document.getElementById('nomeManutencao').value.trim();
     const data = document.getElementById('dataManutencao').value || getDataHoje();
-    const kmTroca = Number(document.getElementById('kmTroca').value) || null;
-    const proximoKm = Number(document.getElementById('proximoKmMeta').value) || null;
+    const kmTroca = document.getElementById('kmTroca').value ? Number(document.getElementById('kmTroca').value) : null;
+    const proximoKm = document.getElementById('proximoKmMeta').value ? Number(document.getElementById('proximoKmMeta').value) : null;
     const proximaData = document.getElementById('proximaDataMeta').value || null;
-    const valorPeca = Number(document.getElementById('valorPeca').value) || 0;
-    const valorMO = Number(document.getElementById('valorMaoObra').value) || 0;
-    const valorTotal = Number(document.getElementById('valorTotalManutencao').value) || valorPeca + valorMO;
+    const valorPeca = document.getElementById('valorPeca').value ? Number(document.getElementById('valorPeca').value) : 0;
+    const valorMaoObra = document.getElementById('valorMaoObra').value ? Number(document.getElementById('valorMaoObra').value) : 0;
+    const valorTotal = document.getElementById('valorTotalManutencao').value ? Number(document.getElementById('valorTotalManutencao').value) : valorPeca + valorMaoObra;
     
-    if (!nome) { alert('Digite o nome do item!'); return; }
-    
+    if (!nome) {
+        alert('⚠️ Digite o nome do item/serviço!');
+        return;
+    }
+
     const reg = pegarRegistro(data);
-    reg.manutencao.push({
-        nome, data, kmTroca, proximoKm, proximaData,
-        valorPeca, valorMaoObra: valorMO, valorTotal
-    });
+    if (!reg.manutencao) reg.manutencao = [];
     
+    reg.manutencao.push({
+        nome: nome,
+        data: data,
+        kmTroca: kmTroca,
+        proximoKm: proximoKm,
+        proximaData: proximaData,
+        valorPeca: valorPeca,
+        valorMaoObra: valorMaoObra,
+        valorTotal: valorTotal
+    });
+
     limparFormularioManutencao();
     salvarDados();
     atualizarTelaCompleta();
-    alert('✅ Manutenção salva!');
+    alert('✅ Manutenção salva com sucesso!');
 }
 
 function limparFormularioManutencao() {
@@ -1025,8 +1024,8 @@ function atualizarListaManutencao() {
                         <br>💰 ${formatarValor(m.valorTotal)}
                     </div>
                     <div class="botoes-lado">
-                        <button class="secundario pequeno" type="button" onclick="editarManutencao(${i}, '${data}')">✏️ Editar</button>
-                        <button class="secundario pequeno" type="button" style="color:var(--vermelho);" onclick="excluirManutencao(${i}, '${data}')">🗑️ Excluir</button>
+                        <button class="secundario pequeno" onclick="editarManutencao(${i}, '${data}')">✏️ Editar</button>
+                        <button class="secundario pequeno" style="color:var(--vermelho);" onclick="excluirManutencao(${i}, '${data}')">🗑️ Excluir</button>
                     </div>
                 </div>
             `);
@@ -1086,8 +1085,6 @@ function calcularPeriodoPersonalizado() {
     alert('✅ Período calculado!');
 }
 
-function atualizarPorcentagemReserva() {}
-
 function salvarPorcentagemReserva() {
     const valor = Number(document.getElementById('porcentagemReserva').value);
     if (isNaN(valor) || valor < 0 || valor > 100) {
@@ -1095,6 +1092,7 @@ function salvarPorcentagemReserva() {
         return;
     }
     dados.porcentagemReserva = valor;
+    document.getElementById('mostrarPorcentagemReserva').textContent = valor;
     salvarDados();
     alert(`✅ ${valor}% salvo!`);
 }
@@ -1174,12 +1172,12 @@ function atualizarListasResumo(datas) {
     }
     
     const gastosEl = document.getElementById('listaGastosResumo');
+    const categorias = {
+        alimentacao: '🍔 Alimentação', combustivel: '⛽ Combustível', acessorios: '🎒 Acessórios',
+        mercado: '🛒 Mercado', farmacia: '💊 Saúde', transporte: '🚌 Transporte',
+        vestuario: '👕 Vestuário', lazer: '🎮 Lazer', contas: '📄 Contas', outros: '📌 Outros'
+    };
     if (gastosLista.length) {
-        const categorias = {
-            alimentacao: '🍔 Alimentação', combustivel: '⛽ Combustível', acessorios: '🎒 Acessórios',
-            mercado: '🛒 Mercado', farmacia: '💊 Saúde', transporte: '🚌 Transporte',
-            vestuario: '👕 Vestuário', lazer: '🎮 Lazer', contas: '📄 Contas', outros: '📌 Outros'
-        };
         gastosEl.innerHTML = gastosLista.map(g => `
             <div class="item-lista" style="padding:0.6rem;">
                 <div class="cima">
@@ -1253,8 +1251,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('dataGanho').value = getDataHoje();
     document.getElementById('dataGasto').value = getDataHoje();
     document.getElementById('dataManutencao').value = getDataHoje();
+    document.getElementById('mostrarPorcentagemReserva').textContent = dados.porcentagemReserva;
     atualizarTelaCompleta();
 });
 </script>
 </body>
-</html>
+                </html>
