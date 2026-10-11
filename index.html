@@ -111,7 +111,7 @@
                     <input type="date" id="dataFinalFiltro">
                 </div>
             </div>
-            <button class="primario" style="width:100%;margin-top:0.5rem;" onclick="calcularPeriodoPersonalizado()">✅ Calcular Período</button>
+            <button class="primario" style="width:100%;margin-top:0.5rem;" type="button" onclick="calcularPeriodoPersonalizado()">✅ Calcular Período</button>
         </div>
     </div>
 
@@ -149,8 +149,8 @@
         </div>
         <div style="margin-top:1rem;text-align:center;">
             <strong>💾 % da reserva:</strong>
-            <input type="number" id="porcentagemReserva" value="10" min="0" max="100" style="width:70px;text-align:center;display:inline-block;margin-left:0.5rem;" onchange="atualizarPorcentagemReserva()">
-            <button class="secundario pequeno" style="margin-left:0.5rem;" onclick="salvarPorcentagemReserva()">✅ Salvar</button>
+            <input type="number" id="porcentagemReserva" value="10" min="0" max="100" style="width:70px;text-align:center;display:inline-block;margin-left:0.5rem;">
+            <button class="secundario pequeno" type="button" style="margin-left:0.5rem;" onclick="salvarPorcentagemReserva()">✅ Salvar</button>
         </div>
     </div>
 
@@ -168,15 +168,15 @@
         <h3>💾 Backup dos Seus Dados</h3>
         <p style="text-align:center;font-size:0.85rem;opacity:0.7;margin-bottom:1rem;">Salve seus dados antes de atualizar o aplicativo!</p>
         <div class="botoes-lado">
-            <button class="primario" onclick="exportarDados()">📤 Exportar / Copiar</button>
-            <button class="secundario" onclick="mostrarImportar()">📥 Restaurar / Colar</button>
+            <button class="primario" type="button" onclick="exportarDados()">📤 Exportar / Copiar</button>
+            <button class="secundario" type="button" onclick="mostrarImportar()">📥 Restaurar / Colar</button>
         </div>
         <div id="caixaImportar" style="display:none;">
             <label>Cole seu código de backup abaixo:</label>
             <textarea id="textoBackup" rows="4" placeholder="Cole aqui o texto que você copiou anteriormente..."></textarea>
             <div class="botoes-lado">
-                <button class="primario" onclick="importarDados()">✅ Restaurar</button>
-                <button class="secundario" onclick="esconderImportar()">❌ Cancelar</button>
+                <button class="primario" type="button" onclick="importarDados()">✅ Restaurar</button>
+                <button class="secundario" type="button" onclick="esconderImportar()">❌ Cancelar</button>
             </div>
         </div>
     </div>
@@ -191,7 +191,7 @@
                 <input type="date" id="dataKm">
             </div>
         </div>
-        <button class="secundario" style="margin-bottom:1rem;width:100%;" onclick="carregarKmDaData()">📂 Carregar dados desta data</button>
+        <button class="secundario" type="button" style="margin-bottom:1rem;width:100%;" onclick="carregarKmDaData()">📂 Carregar dados desta data</button>
         
         <div class="secao-km inicio">
             <h4 style="margin-bottom:0.8rem;color:var(--verde);">🌅 Início do Dia</h4>
@@ -226,7 +226,7 @@
                 <input type="date" id="dataBuscaKm">
             </div>
         </div>
-        <button class="primario" style="width:100%;margin-top:0.5rem;" onclick="buscarHistoricoData()">🔍 Verificar Dia</button>
+        <button class="primario" type="button" style="width:100%;margin-top:0.5rem;" onclick="buscarHistoricoData()">🔍 Verificar Dia</button>
         <div id="resultadoBuscaKm" style="margin-top:1rem;"></div>
     </div>
 
@@ -269,7 +269,7 @@
                 <input type="text" id="obsGanho" placeholder="Ex: 5 corridas">
             </div>
         </div>
-        <button class="primario" style="width:100%;" onclick="lancarGanho()">💾 Salvar Ganho</button>
+        <button class="primario" type="button" style="width:100%;" onclick="lancarGanho()">💾 Salvar Ganho</button>
     </div>
     <div class="cartao">
         <h3>📋 Histórico de Ganhos</h3>
@@ -310,7 +310,7 @@
                 <input type="text" id="descricaoGasto" placeholder="Ex: Almoço na padaria">
             </div>
         </div>
-        <button class="primario" style="width:100%;" onclick="lancarGasto()">💾 Salvar Gasto</button>
+        <button class="primario" type="button" style="width:100%;" onclick="lancarGasto()">💾 Salvar Gasto</button>
     </div>
 
     <div class="cartao">
@@ -399,8 +399,8 @@
             </div>
         </div>
         <div class="botoes-lado">
-            <button class="primario" onclick="lancarManutencao()">💾 Salvar Manutenção</button>
-            <button class="secundario" onclick="limparFormularioManutencao()">🧹 Limpar</button>
+            <button class="primario" type="button" onclick="lancarManutencao()">💾 Salvar Manutenção</button>
+            <button class="secundario" type="button" onclick="limparFormularioManutencao()">🧹 Limpar</button>
         </div>
     </div>
 
@@ -411,19 +411,19 @@
 </section>
 
 <nav>
-    <button class="ativo" onclick="trocarAba('Resumo')">
+    <button class="ativo" type="button" onclick="trocarAba('Resumo')">
         <i class="fas fa-chart-pie"></i>Resumo
     </button>
-    <button onclick="trocarAba('Km')">
+    <button type="button" onclick="trocarAba('Km')">
         <i class="fas fa-tachometer-alt"></i>Km
     </button>
-    <button onclick="trocarAba('Ganhos')">
+    <button type="button" onclick="trocarAba('Ganhos')">
         <i class="fas fa-wallet"></i>Ganhos
     </button>
-    <button onclick="trocarAba('Gastos')">
+    <button type="button" onclick="trocarAba('Gastos')">
         <i class="fas fa-file-invoice-dollar"></i>Gastos
     </button>
-    <button onclick="trocarAba('Manutencao')">
+    <button type="button" onclick="trocarAba('Manutencao')">
         <i class="fas fa-tools"></i>Manutenção
     </button>
 </nav>
@@ -712,8 +712,8 @@ function atualizarListaGanhos() {
                         📅 ${formatarData(data)} ${g.obs ? `· ${g.obs}` : ''}
                     </div>
                     <div class="botoes-lado" style="margin-top:0.5rem;">
-                        <button class="secundario pequeno" onclick="editarGanho(${i}, '${data}')">✏️ Editar</button>
-                        <button class="secundario pequeno" style="color:var(--vermelho);" onclick="excluirGanho(${i}, '${data}')">🗑️ Excluir</button>
+                        <button class="secundario pequeno" type="button" onclick="editarGanho(${i}, '${data}')">✏️ Editar</button>
+                        <button class="secundario pequeno" type="button" style="color:var(--vermelho);" onclick="excluirGanho(${i}, '${data}')">🗑️ Excluir</button>
                     </div>
                 </div>
             `);
@@ -782,7 +782,7 @@ function salvarCustosFixos() {
 
 function preencherCustosFixos() {
     document.getElementById('custoIpva').value = dados.custosFixos.ipva || '';
-    document.getElementById('custoSeguro').value = dados.custosFixos.seguro || '';
+    document.getElementById('custoSeguro').value = dados.custosFixos.seguro|| '';
     document.getElementById('custoPrestacao').value = dados.custosFixos.prestacao || '';
     document.getElementById('custoAluguel').value = dados.custosFixos.aluguel || '';
     document.getElementById('custoApp').value = dados.custosFixos.app || '';
@@ -812,8 +812,8 @@ function atualizarListaGastos() {
                         📅 ${formatarData(data)} ${g.descricao ? `· ${g.descricao}` : ''}
                     </div>
                     <div class="botoes-lado" style="margin-top:0.5rem;">
-                        <button class="secundario pequeno" onclick="editarGasto(${i}, '${data}')">✏️ Editar</button>
-                        <button class="secundario pequeno" style="color:var(--vermelho);" onclick="excluirGasto(${i}, '${data}')">🗑️ Excluir</button>
+                        <button class="secundario pequeno" type="button" onclick="editarGasto(${i}, '${data}')">✏️ Editar</button>
+                        <button class="secundario pequeno" type="button" style="color:var(--vermelho);" onclick="excluirGasto(${i}, '${data}')">🗑️ Excluir</button>
                     </div>
                 </div>
             `);
@@ -1025,8 +1025,8 @@ function atualizarListaManutencao() {
                         <br>💰 ${formatarValor(m.valorTotal)}
                     </div>
                     <div class="botoes-lado">
-                        <button class="secundario pequeno" onclick="editarManutencao(${i}, '${data}')">✏️ Editar</button>
-                        <button class="secundario pequeno" style="color:var(--vermelho);" onclick="excluirManutencao(${i}, '${data}')">🗑️ Excluir</button>
+                        <button class="secundario pequeno" type="button" onclick="editarManutencao(${i}, '${data}')">✏️ Editar</button>
+                        <button class="secundario pequeno" type="button" style="color:var(--vermelho);" onclick="excluirManutencao(${i}, '${data}')">🗑️ Excluir</button>
                     </div>
                 </div>
             `);
@@ -1257,4 +1257,4 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 </body>
-    </html>
+</html>
